@@ -47,7 +47,15 @@ opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/mulitResSurvey')
 
 Read and inspect data
 ```{r}
+<<<<<<< HEAD
 ohioRes <- read_excel("ohio2016/inputData/ohioReservoirGeomorphology12.17.15.xlsx") 
+=======
+# SET WORKING DIRECTORY.  MUST CHANGE FOR EACH USER
+# setwd("\\\\Aa.ad.epa.gov/ord/CIN/Users/main/F-K/JBEAULIE/Net MyDocuments/Documents/research/EPA/East Fork Reservoir/ACE/multiResSurvey/ohio")
+#
+
+ohioRes <- read_excel("inputData/ohioReservoirGeomorphology12.17.15.xlsx") 
+>>>>>>> 7b0b744a071a75e21da2aa94f94f3efa2e467287
 names(ohioRes) = tolower(names(ohioRes)) # Change all names to all lowercase letters
 names(ohioRes) = gsub(pattern = "/", replacement = "_", x = names(ohioRes)) # / causing problems with select
 ohioRes  <-  mutate(ohioRes, 
