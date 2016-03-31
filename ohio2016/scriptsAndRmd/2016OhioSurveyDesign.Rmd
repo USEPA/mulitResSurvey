@@ -29,21 +29,25 @@ The pool of potential reservoirs was derived from the list of Ohio reservoirs co
 
 
 To inspect the data in R, first load the necessary libraries
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE}
 library(readxl)  # For reading Excel files
 library(gdata)   # Also for reading Excel files
 library(ggplot2) # For plotting
 library(reshape) # For merge_recurse function
 library(dplyr)   # For data manipulation
+library(knitr)   # To knit rmarkdown document
+```
+
+Set up working directory for knitr.  This should be the root where the Rproject is stored.
+This is needed, otherwise R won't be able to find the data files when you use the knit HTML button.
+```{r}
+opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/mulitResSurvey') 
 ```
 
 
 Read and inspect data
 ```{r}
-# SET WORKING DIRECTORY.  MUST CHANGE FOR EACH USER
-# setwd("\\\\Aa.ad.epa.gov/ord/CIN/Users/main/F-K/JBEAULIE/Net MyDocuments/Documents/research/EPA/East Fork Reservoir/ACE/multiResSurvey/ohio")
-
-ohioRes <- read_excel("inputData/ohioReservoirGeomorphology12.17.15.xlsx") 
+ohioRes <- read_excel("ohio2016/inputData/ohioReservoirGeomorphology12.17.15.xlsx") 
 names(ohioRes) = tolower(names(ohioRes)) # Change all names to all lowercase letters
 names(ohioRes) = gsub(pattern = "/", replacement = "_", x = names(ohioRes)) # / causing problems with select
 ohioRes  <-  mutate(ohioRes, 
@@ -80,7 +84,7 @@ ohioResC <- filter(ohioRes, !grepl("Riverine|Not main dam.|Offstream|Connected|I
 length(unique(ohioResC$lake_name))  # 57 reservoirs
 ```
 
-Replace "_" in column names with "."
+Replace "_" in column names with ".".  Done to be consistent with files read in later.
 ```{r}
 names(ohioResC) = gsub(pattern = "_", replacement = ".", x = names(ohioResC))  # replace "_" with "." in names
 ```
@@ -89,20 +93,20 @@ Read in data for Louisville District reservoirs.  Four of these reservoirs are l
 included in the NID data set.  We strip these out to avoid duplicates.
 ```{r}
 # Reservoir geometry
-ldGeom <- read.xls("inputData/WA 3-93 reservoirsurfacegeometry.xlsx", sheet="Task 1a", stringsAsFactors = FALSE)
+ldGeom <- read.xls("ohio2016/inputData/WA 3-93 reservoirsurfacegeometry.xlsx", sheet="Task 1a", stringsAsFactors = FALSE)
 ldGeom <- ldGeom[1:20, c("Reservoir", "NHDArea.sqkm.", "NHDPerimeter.mi.", "Fetch..m.")]  # Subset
 names(ldGeom) <- c("Reservoir", "Reservoir.Area.sqkm", "Reservoir.Perimeter.km", "Fetch.m.")  # Rename perimeter to km
 ldGeom$Reservoir.Perimeter.km <- ldGeom$Reservoir.Perimeter.km * 1.609  # Converts mile to kilometer
 
 # Watershed land use
-ldLu <- read.xls("inputData/WatershedAreaCharacterization.xlsx", sheet="FinalForm", stringsAsFactors = FALSE)
+ldLu <- read.xls("ohio2016/inputData/WatershedAreaCharacterization.xlsx", sheet="FinalForm", stringsAsFactors = FALSE)
 str(ldLu)
 ldLu <- subset(ldLu, select=-c(Code, State, X))
 names(ldLu) = c("Reservoir", "Watershed.area.km2", "prop.crops", "prop.pasture", "prop.range", "prop.water",
               "prop.wetland", "prop.urban", "prop.forest")
 
 # Reservoir Hydrology
-ldHyd <- read.xls("inputData/LouisDistReservoirHydrology.xlsx", sheet="hydrology", stringsAsFactors=FALSE)
+ldHyd <- read.xls("ohio2016/inputData/LouisDistReservoirHydrology.xlsx", sheet="hydrology", stringsAsFactors=FALSE)
 ldHyd <- select(ldHyd, -Lake)
 
 # Merge reservoir geometry, land use, and hydrology data
