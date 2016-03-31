@@ -41,7 +41,7 @@ library(dplyr)   # For data manipulation
 Read and inspect data
 ```{r}
 # SET WORKING DIRECTORY.  MUST CHANGE FOR EACH USER
-setwd("\\\\Aa.ad.epa.gov/ord/CIN/Users/main/F-K/JBEAULIE/Net MyDocuments/Documents/research/EPA/East Fork Reservoir/ACE/multiResSurvey/ohio")
+#setwd("\\\\Aa.ad.epa.gov/ord/CIN/Users/main/F-K/JBEAULIE/Net MyDocuments/Documents/research/EPA/East Fork Reservoir/ACE/multiResSurvey/ohio")
 
 ohioRes <- read_excel("inputData/ohioReservoirGeomorphology12.17.15.xlsx") 
 names(ohioRes) = tolower(names(ohioRes)) # Change all names to all lowercase letters
