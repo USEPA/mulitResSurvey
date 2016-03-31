@@ -1,0 +1,281 @@
+---
+output: html_document
+---
+Survey Design for the 2016 Ohio Reservoir Methane Emission Study
+-----------
+-----------
+
+Introduction
+-------------
+
+Dr. Beaulieu is investigating the landscape and geomorphic factors that control methane (CH4) emission rates from reservoirs.  Methane, a potent greenhouse gas, is produced via biological activity in the sediments at the bottom of lakes and reservoirs.  The overall goal of the research program is to produce an estimate of the magnitude of CH4 emissions from reservoirs in the United States.
+
+In the next phase of the research program, Dr. Beaulieu plans to use field surveys to identify the landscape and geomorphic factors that control CH4 emission rates from reservoirs within the state of Ohio.  Ohio was chosen based on proximity to the EPA’s research facility in Cincinnati and the east to west agriculture/forest land-use gradient in the state.  
+
+There are three primary landscape and geomorphic factors that we hypothesize will control CH4 emission rates from reservoirs in the state.  The following are our predictions, listed in order of decreasing effect size:
+
+- CH4 emission rates will be positively correlated with the proportion of agricultural land use in the watershed.
+
+- CH4 emission rates will be negatively related to maximum reservoir depth.
+
+- CH4 emission rates will be positively correlated with the Relative Drainage Area (RDA, ratio of watershed area to reservoir surface area).
+
+The following is an R session demonstrating different approaches for designing the survey.
+
+Exploration of the candidate sampling sites
+---------------------------
+
+The pool of potential reservoirs was derived from the list of Ohio reservoirs contained in the US Army Corps of Engineers National Inventory of Dams.  This list included 85 dams located on 81 separate reservoirs.  Watershed size and land use was calculated for each reservoir using the USGS National Hydrography Dataset and the National Land Cover Data Set.  Max reservoir depth was determined from bathymetric maps derived from various sources.
+
+
+To inspect the data in R, first load the necessary libraries
+```{r}
+library(readxl)  # For reading Excel files
+library(gdata)   # Also for reading Excel files
+library(ggplot2) # For plotting
+library(reshape) # For merge_recurse function
+library(dplyr)   # For data manipulation
+```
+
+
+Read and inspect data
+```{r}
+# SET WORKING DIRECTORY.  MUST CHANGE FOR EACH USER
+setwd("\\\\Aa.ad.epa.gov/ord/CIN/Users/main/F-K/JBEAULIE/Net MyDocuments/Documents/research/EPA/East Fork Reservoir/ACE/multiResSurvey/ohio")
+
+ohioRes <- read_excel("inputData/ohioReservoirGeomorphology12.17.15.xlsx") 
+names(ohioRes) = tolower(names(ohioRes)) # Change all names to all lowercase letters
+names(ohioRes) = gsub(pattern = "/", replacement = "_", x = names(ohioRes)) # / causing problems with select
+ohioRes  <-  mutate(ohioRes, 
+                 lake_name = tolower(lake_name), # lowercase place names
+                 dam = tolower(dam),  # lowercase place names
+                 dam_former_name = tolower(dam_former_name)) %>% # lowercase place names
+  rename(percent_cultivated_crops = percent_culitvated_crops) %>% # correct missspelling
+  mutate(percent_openwater = percent_openwater * 100, # labeled 'percent', but reported as proportion
+         percent_urban = percent_urban * 100, # labeled 'percent', but reported as proportion
+         percent_forest = percent_forest * 100, # labeled 'percent', but reported as proportion
+         percent_pasture_hay = percent_pasture_hay * 100, # labeled 'percent', but reported as proportion
+         percent_cultivated_crops = percent_cultivated_crops * 100,  # labeled 'percent', actually proportion
+         percent_wetlands = percent_wetlands * 100) %>% # labeled 'percent', actually proportion
+  select(-contour_depth_link) # remove metadata
+str(ohioRes)
+```
+
+
+This next bit of code estimates max reservoir depth from the reported deepest contour lines
+```{r}
+ohioRes <- mutate(ohioRes,
+                  min_contour_ft = as.numeric(gsub("-.*$", "", max_contour_ft)),  # extract prior to "-"
+                  max_contour_ft = as.numeric(gsub(".*-", "", max_contour_ft)), # extract after"-"
+                  max_depth_ft = ifelse(is.na(max_depth_ft),
+                                        (min_contour_ft + (contour_interval_ft/2)),
+                                        max_depth_ft))
+
+```
+
+Data set contains some reservoirs not appropriate for this analysis.  Pull out non-main dam, industrial
+reservoirs, and other troublesome reservoirs.  This narrows the pool to 57 reservoirs.
+```{r}
+ohioResC <- filter(ohioRes, !grepl("Riverine|Not main dam.|Offstream|Connected|Industrial", issue_type))
+length(unique(ohioResC$lake_name))  # 57 reservoirs
+```
+
+Replace "_" in column names with "."
+```{r}
+names(ohioResC) = gsub(pattern = "_", replacement = ".", x = names(ohioResC))  # replace "_" with "." in names
+```
+
+Read in data for Louisville District reservoirs.  Four of these reservoirs are located in Ohio and are
+included in the NID data set.  We strip these out to avoid duplicates.
+```{r}
+# Reservoir geometry
+ldGeom <- read.xls("inputData/WA 3-93 reservoirsurfacegeometry.xlsx", sheet="Task 1a", stringsAsFactors = FALSE)
+ldGeom <- ldGeom[1:20, c("Reservoir", "NHDArea.sqkm.", "NHDPerimeter.mi.", "Fetch..m.")]  # Subset
+names(ldGeom) <- c("Reservoir", "Reservoir.Area.sqkm", "Reservoir.Perimeter.km", "Fetch.m.")  # Rename perimeter to km
+ldGeom$Reservoir.Perimeter.km <- ldGeom$Reservoir.Perimeter.km * 1.609  # Converts mile to kilometer
+
+# Watershed land use
+ldLu <- read.xls("inputData/WatershedAreaCharacterization.xlsx", sheet="FinalForm", stringsAsFactors = FALSE)
+str(ldLu)
+ldLu <- subset(ldLu, select=-c(Code, State, X))
+names(ldLu) = c("Reservoir", "Watershed.area.km2", "prop.crops", "prop.pasture", "prop.range", "prop.water",
+              "prop.wetland", "prop.urban", "prop.forest")
+
+# Reservoir Hydrology
+ldHyd <- read.xls("inputData/LouisDistReservoirHydrology.xlsx", sheet="hydrology", stringsAsFactors=FALSE)
+ldHyd <- select(ldHyd, -Lake)
+
+# Merge reservoir geometry, land use, and hydrology data
+ldRes <- merge_recurse(dfs = list(ldGeom, ldLu, ldHyd))
+names(ldRes)
+
+# Define residence time
+ldRes$residence.time.yr <- with(ldRes, (summer.storage.acre.ft*43560)  # convert to ft3
+                                      / (outflow.cfs*60*60*24*365))  # convert ot ft3 per year
+# Define mean depth
+ldRes$mean.depth.ft <- with(ldRes, (summer.storage.acre.ft*43560) /  # convert to ft3
+                                    (Reservoir.Area.sqkm * (10763.91/0.001)))  # convert to ft2
+# Define Relative Drainage Area (RDA)
+ldRes$rda <- with(ldRes, (Watershed.area.km2/Reservoir.Area.sqkm))
+
+# Strip out four reservoirs in Ohio
+# Omit harsha (EFR), Caesar(CCK), CJ Brown (CBR), and West Fork (WFR)
+ldRes <- filter(ldRes, !(Reservoir %in% c("EFR", "CCK", "CBR", "WFR")))
+```
+
+Format the Louisville District reservoir data to be consistent with ohioRes.  This is necessary to
+facilitate merging the two data sources.
+```{r}
+names(ldRes) = tolower(names(ldRes))
+ldRes <- mutate(ldRes, reservoir.area.m2 = reservoir.area.sqkm * 1000000,
+                res.perimeter.m = reservoir.perimeter.km * 1000,
+                watershed.area.m2 = watershed.area.km2 * 1000000) %>%
+  rename(res.fetch.m = fetch.m.,
+         lake.name = reservoir,
+         percent.openwater = prop.water, # labeled proportion, actually percent
+         percent.urban = prop.urban,  # labeled proportion, actually percent
+         percent.forest = prop.forest,  # labeled proportion, actually percent
+         percent.pasture.hay = prop.pasture,  # labeled proportion, actually percent
+         percent.cultivated.crops = prop.crops,  # labeled proportion, actually percent
+         percent.wetlands = prop.wetland) %>%  # labeled proportion, actually percent
+  select(lake.name, res.fetch.m, reservoir.area.m2, res.perimeter.m, watershed.area.m2, percent.openwater,
+         percent.urban, percent.forest, percent.pasture.hay, percent.cultivated.crops,
+         percent.wetlands, res.fetch.m, lake.name, summer.storage.acre.ft, outflow.cfs,
+         max.depth.ft, residence.time.yr, mean.depth.ft, rda)
+```
+
+Merge ldRes and ohioRes dataframes and inspect output.
+Merged as expected, no weird column names.
+```{r}
+survRes <- merge(ldRes, ohioResC, 
+                 by = c("lake.name", "res.perimeter.m", "res.fetch.m", "reservoir.area.m2",
+                        "watershed.area.m2", "percent.openwater", "percent.urban", 
+                        "percent.forest", "percent.pasture.hay", "percent.cultivated.crops",
+                        "percent.wetlands", "max.depth.ft", "lake.name"),
+                 all = TRUE)
+names(survRes)
+```
+
+Look at the properties of the sample frame.
+We have 73 reservoirs to choose from.
+```{r}
+length(survRes$lake.name)
+```
+
+Inspect reservoir and watershed properties.  Note that reservoir area and 
+the relative drainage area (RDA, ratio of the watershed to reservoir area) are log normally distributed.
+```{r}
+# Reservoir area
+ggplot(survRes, aes(x=reservoir.area.m2/1000000)) + #convert to km2
+  geom_histogram(binwidth=5) +
+  xlab("Reservoir area (km2)")
+
+# Relative drainage area
+ggplot(survRes, aes(x=watershed.area.m2/reservoir.area.m2)) + 
+  geom_histogram(binwidth=10) +
+  xlab("RDA")
+
+# Agricultural land use
+ggplot(survRes, aes(percent.cultivated.crops)) + 
+  geom_histogram(binwidth=1) +
+  xlab("Cultivated crops (%)")
+
+# Forested land use
+ggplot(survRes, aes(percent.forest)) + 
+  geom_histogram(binwidth=1) +
+  xlab("Forest land cover (%)")
+```
+
+
+Exploration of survey designs
+-----------
+
+**Survey Design 1:**
+One approach to addressing the hypothesis/predictions would be to employ a survey design that employs two levels (i.e., high, low) of each of the three factors (i.e., agricultural land use, reservoir depth, RDA).  This would be analogous to a 2^3 factorial experimental design containing 8 unique experimental treatments. To ensure a reasonably strong treatment, the ‘high’ and ‘low’ levels of each factor would be defined as values greater than the 70th percentile and less than the 30th percentile.  There are a few problems with this approach, however.      One issue is that this categorical approach provides no information on CH4 emission rates at intermediate levels of the three factors, which limits our ability to extrapolate our results to other systems.  Another issue is  that our pool of 73 reservoirs does not contain reservoirs in all 8 treatment combinations (see tables below).  We could perhaps address this by weakening our criteria for ‘high’ and ‘low’ treatments (by adopting a 60th and 40th quantile criteria for example), but this comes at the risk of weakening the treatment effect below our detection limit.
+
+The following code defines the treatment categories.
+
+```{r}
+survRes <- mutate(survRes, 
+                   percent.agg.ag = percent.pasture.hay + percent.cultivated.crops, # aggregate agriculture
+                   rda = watershed.area.m2/reservoir.area.m2,  # Relative Drainage Area (RDA)
+                   
+                   luQuantBin = ifelse(percent.agg.ag > quantile(percent.agg.ag, 0.7), # top 30%
+                                       "high",
+                                 ifelse(percent.agg.ag < quantile(percent.agg.ag, 0.3),  # low 30%
+                                        "low", "mid")),
+                   
+                   depthQuantBin = ifelse(max.depth.ft > quantile(max.depth.ft, 0.7, na.rm=T), # top 30% 
+                                       "high",
+                                 ifelse(max.depth.ft < quantile(max.depth.ft, 0.3, na.rm=T),# low 30%
+                                        "low", "mid")),
+                   
+                   rdaQuanBin = ifelse(rda > quantile(rda, 0.7, na.rm=T),  # top 30%
+                                       "high",
+                                 ifelse(rda < quantile(rda, 0.3, na.rm=T),  # low 30%
+                                        "low", "mid")))
+```
+
+Table to see if this pool of sites can populate a 3-factor by two level experimental design.
+Note that we have no sites in the [rda=low * depth=high * lu=high] category.
+```{r}
+with(survRes, table(luQuantBin, depthQuantBin, rdaQuanBin))  # experimental design not fully populated
+```
+
+**Survey Design 2:**  As above, but exclude the RDA factor, which we expect to be the weakest of the three factors.  This survey design would employ two levels (i.e., high, low) of each of two factors (i.e., agricultural land use, reservoir depth).  To minimize the possibility of variation in RDA confounding the main treatment effects, we should probably exclude any reservoirs with extreme RDA values from the pool of candidate sites.  The RDA values have a log normal distribution, therefore it might be best to exclude the few very high values (i.e., > 500).  The pool of candidate sites can support this survey design. While this approach may work, it provides no information on CH4 emission rates at intermediate levels of the two factors, thereby limiting our ability to extrapolate our results to other systems.
+
+The following code defines the treatment categories.
+```{r}
+# Need to assess a 2 factor by 2-level experimental design.  Remove sites with extreme RDA values
+# and recalculate quantiles
+survRes2 <- filter(survRes, rda < 500)  %>%  # exclude extreme RDA values
+  mutate(luQuantBin = ifelse(percent.agg.ag > quantile(percent.agg.ag, 0.7), # top 30%
+                             "high",
+                             ifelse(percent.agg.ag < quantile(percent.agg.ag, 0.3),  # low 30%
+                                    "low", "mid")),
+         
+         depthQuantBin = ifelse(max.depth.ft > quantile(max.depth.ft, 0.7, na.rm=T), # top 30% 
+                                "high",
+                                ifelse(max.depth.ft < quantile(max.depth.ft, 0.3, na.rm=T),# low 30%
+                                       "low", "mid")))
+```
+
+
+Table to see if this pool of sites can populate a 2-factor by two level experimental design.
+We have sufficient sites to include >= 5 replicates in each treatment category.
+```{r}
+with(survRes2, table(luQuantBin, depthQuantBin))  # experimental design is fully populated
+```
+
+***Survey Design 3:***  This survey design is an extension of Survey Design 2 where we utilize additional levels of the two factors (i.e., agricultural land use, reservoir depth) to ensure that we include sites across the full range of reservoir depth and agricultural land-use.  For example, we could define four levels of each category (level 1 = 0-25th percentile, level 2 = 26-50th percentile, level 3 = 51-75th percentile, level 4 = 76-100th percentile).  This would be a 4^2 experimental design consisting of 16 unique treatment combinations.  My resources and pool of candidate sites are sufficient to include replication in some, but not all of the treatment combinations.  Although this survey is designed based on categories, I think it would be best to treat the main factors as continuous variables in the statistical analysis.  
+
+The following code defines the treatment categories.
+```{r}
+# Extend the experimental design to inlcude multiple levels of the two factors.
+survRes3 <- mutate(survRes2,
+                    luQuantBin = cut(percent.agg.ag, 
+                                     breaks = quantile(percent.agg.ag),
+                                     include.lowest = TRUE,
+                                     labels = 1:4),
+                    depthQuantBin = cut(max.depth.ft, 
+                                     breaks = quantile(max.depth.ft, na.rm = TRUE),
+                                     include.lowest = TRUE,
+                                     labels = 1:4))
+```
+
+Table to see if this pool of sites can populate a 2-factor by four level experimental design
+```{r}
+with(survRes3, table(luQuantBin, depthQuantBin))  # design is fully populated with potential for replication
+```
+
+
+***Misc code:  Alternative approach to bin by range, rather than quantiles***
+ohioResC <- mutate(ohioResC, 
+                   luBin = findInterval(Percent_Pasture_Hay + Percent_Culitvated_Crops, 
+                                        seq(0,1,0.25)),     # four levels of lu
+                   depthBin = findInterval(Max_Depth_Ft, 
+                                           seq(0,120,30)),  # four depth levels
+                   rda = Watershed_Area_m2/Reservoir_Area_m2,
+                   rdaBin = findInterval(rda,
+                                         seq(0,365,91.25)))   # four RDA levels  
+
