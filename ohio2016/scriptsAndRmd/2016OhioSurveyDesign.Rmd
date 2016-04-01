@@ -10,7 +10,7 @@ Introduction
 
 Dr. Beaulieu is investigating the landscape and geomorphic factors that control methane (CH4) emission rates from reservoirs.  Methane, a potent greenhouse gas, is produced via biological activity in the sediments at the bottom of lakes and reservoirs.  The overall goal of the research program is to produce an estimate of the magnitude of CH4 emissions from reservoirs in the United States.
 
-In the next phase of the research program, Dr. Beaulieu plans to use field surveys to identify the landscape and geomorphic factors that control CH4 emission rates from reservoirs within the state of Ohio.  Ohio was chosen based on proximity to the EPA’s research facility in Cincinnati and the east to west agriculture/forest land-use gradient in the state.  
+In the next phase of the research program, Dr. Beaulieu plans to use field surveys to identify the landscape and geomorphic factors that control CH4 emission rates from reservoirs primarily within the state of Ohio.  Ohio was chosen based on proximity to the EPA’s research facility in Cincinnati and the east to west agriculture/forest land-use gradient in the state.  We may supplement the sample frame with 20 reservoirs within the US Army Corps of Engineers Louisville District which includes portions of Ohio, Indiana, and Kentucky.  
 
 There are three primary landscape and geomorphic factors that we hypothesize will control CH4 emission rates from reservoirs in the state.  The following are our predictions, listed in order of decreasing effect size:
 
@@ -25,7 +25,9 @@ The following is an R session demonstrating different approaches for designing t
 Exploration of the candidate sampling sites
 ---------------------------
 
-The pool of potential reservoirs was derived from the list of Ohio reservoirs contained in the US Army Corps of Engineers National Inventory of Dams.  This list included 85 dams located on 81 separate reservoirs.  Watershed size and land use was calculated for each reservoir using the USGS National Hydrography Dataset and the National Land Cover Data Set.  Max reservoir depth was determined from bathymetric maps derived from various sources.
+The pool of potential reservoirs was derived from two sources.  The first source was the list of Ohio reservoirs contained in the US Army Corps of Engineers National Inventory of Dams (NID).  This list included 85 dams located on 81 separate reservoirs.  The second source is the collection of reservoirs managed by the US Army Corps of Engineers (USACE) within the USACE Louisville District (LD).  The LD includes portions of Ohio, Kentucky, and Indiana.  
+
+Watershed size and land use was calculated for each reservoir using the USGS National Hydrography Dataset and the National Land Cover Data Set.  Max reservoir depth was determined from bathymetric maps derived from various sources.
 
 
 To inspect the data in R, first load the necessary libraries
@@ -43,14 +45,14 @@ This is needed, otherwise R won't be able to find the data files when you use th
 This will differ for each user.
 ```{r}
 # For Sarah Waldo
-opts_knit$set(root.dir = 'C:/R_Projects/mulitResSurvey') 
+#opts_knit$set(root.dir = 'C:/R_Projects/mulitResSurvey') 
 
 # For Jake Beaulieu
-#opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/mulitResSurvey') 
+opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/mulitResSurvey') 
 ```
 
 
-Read and inspect data
+**Read, Inspect, and Format Ohio NID Data**
 ```{r}
 ohioRes <- read_excel("ohio2016/inputData/ohioReservoirGeomorphology12.17.15.xlsx") 
 names(ohioRes) = tolower(names(ohioRes)) # Change all names to all lowercase letters
@@ -94,8 +96,9 @@ Replace "_" in column names with ".".  Done to be consistent with files read in 
 names(ohioResC) = gsub(pattern = "_", replacement = ".", x = names(ohioResC))  # replace "_" with "." in names
 ```
 
-Read in data for Louisville District reservoirs.  Four of these reservoirs are located in Ohio and are
-included in the NID data set.  We strip these out to avoid duplicates.
+**Read, Inspect, and Format USACE LD Reservoir Data**
+Four of USACE LD reservoirs are located in Ohio and are
+included in the NID data set.  Will strip these out to avoid duplicates.
 ```{r}
 # Reservoir geometry
 ldGeom <- read.xls("ohio2016/inputData/WA 3-93 reservoirsurfacegeometry.xlsx", sheet="Task 1a", stringsAsFactors = FALSE)
@@ -153,8 +156,7 @@ ldRes <- mutate(ldRes, reservoir.area.m2 = reservoir.area.sqkm * 1000000,
          max.depth.ft, residence.time.yr, mean.depth.ft, rda)
 ```
 
-Merge ldRes and ohioRes dataframes and inspect output.
-Merged as expected, no weird column names.
+**Merge ldRes and ohioRes Dataframes**
 ```{r}
 survRes <- merge(ldRes, ohioResC, 
                  by = c("lake.name", "res.perimeter.m", "res.fetch.m", "reservoir.area.m2",
@@ -165,14 +167,16 @@ survRes <- merge(ldRes, ohioResC,
 names(survRes)
 ```
 
+
+**Inspect Reservoir and Watershed Properties**
 Look at the properties of the sample frame.
 We have 73 reservoirs to choose from.
 ```{r}
 length(survRes$lake.name)
 ```
 
-Inspect reservoir and watershed properties.  Note that reservoir area and 
-the relative drainage area (RDA, ratio of the watershed to reservoir area) are log normally distributed.
+Note that reservoir area and the relative drainage area
+(RDA, ratio of the watershed to reservoir area) are log normally distributed.
 ```{r}
 # Reservoir area
 ggplot(survRes, aes(x=reservoir.area.m2/1000000)) + #convert to km2
