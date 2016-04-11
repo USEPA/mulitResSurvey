@@ -202,7 +202,6 @@ tmp2</code></pre>
 <div id="first-round-fit-models-directly" class="section level2">
 <h2>First round: fit models directly</h2>
 <p>We fit three models: a full factorial, the continuous linear model with interaction term, and the continuous linear model without interaction term.</p>
-<p>The factorial model is trying to fit too many parameters for the sample size of 32, and isn’t going to be an ideal choice.</p>
 <pre class="r"><code>### first do analysis with no transformation
 # factorial model
 out1 &lt;- lm(ch4 ~ factor(luQuantBin)*factor(depthQuantBin), data = sampledat)
@@ -320,12 +319,12 @@ scatter3Drgl(sampledat$percent.agg.ag, sampledat$max.depth.ft, sampledat$ch4, ad
 </div>
 <div id="fit-using-log-tranformed-response" class="section level2">
 <h2>Fit using log-tranformed response</h2>
-<p>To come…</p>
+<p>This is a possible way to avoid negative predicted emission rates. More to come.</p>
 </div>
 </div>
 <div id="simulate-data-and-fitting-many-times" class="section level1">
 <h1>Simulate data and fitting many times</h1>
-<p>What we really want is to see how the fitted surfaces vary over many simulated datasets and fits. This is a place where more discussion is worthwhile. The Task Description suggested a power analysis for effect sizes was required, but further communication has indicated the big question is “Is 30 reservoirs enough?”. We should talk about the sample size question in more detail… enough for what? I’m guessing that, ideally, you want to see parameter values in the model that are significantly different from 0. The preliminary results suggest it’s going to be difficult to nail down the interaction term, so I focused on main effects in the simulations.</p>
+<p>What we really want is to see how the fitted surfaces vary over many simulated datasets and fits. This is a place where more discussion is worthwhile. The Task Description suggested a power analysis for effect sizes was required, but further communication has indicated the big question is “Is 30 reservoirs enough?”. We should talk about the sample size question in more detail… enough for what? I’m guessing that, ideally, you want to see parameter values in the model that are significantly different from 0. The preliminary results suggest it’s going to be difficult to nail down the interaction term, the ag effect is likely to show up, the depth effect less so.</p>
 <p>The first set of simulations assumes two reservoirs in each of the 16 ag/depth combinations explained in Survey Design 3. I ran 1000 simulations and captured the p-values on the main effect interaction effect coefficients, and then determined what proportion of them were significantly different from 0 (one by one, not all three together, though the latter is enough to get, too).</p>
 <pre class="r"><code>nreps &lt;- 1000
 full &lt;- array(NA,c(4,4,nreps))
