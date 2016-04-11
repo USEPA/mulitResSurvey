@@ -1,0 +1,47 @@
+---
+output: html_document
+---
+Comments on Proposed Survey Designs
+-----------
+-----------
+
+Survey Designs 1, 2, and 3
+-------------
+
+Dr. Beaulieu has presented some possible survey designs for studying the relationship between methane emission rates for reservoirs and three factors expected to affect methane emission:  the percent of agricultural land use in the watershed of the reservoir, the maximum reservoir depth, and the relative drainage area of the watershed (watershed area divided by reservoir surface area).
+
+The first two designs are similar, each being presented as a factorial design, where the factors of interest are treated as (ordered) categorical variables with levels of low and high.  In the first, all three factors of interest are included (a 2^3 factorial design); in the second, only the the first two factors are included (a 2^2 factorial design) and reservoirs with extreme relative drainage areas are excluded from the sampling frame.  If analyzed as factorial experiments, these designs will provide limited ability to predict methane emissions from other reservoirs, since there would be only 8 (or 4) predictions, rather than a continuous range of predictions.  As Dr. Beaulieu implies by the seeming preference for the third design, the limitations of a factorial design and ANOVA analysis are less than ideal if a longer term goal is to estimate methane emissions across a large population of reservoirs.
+
+The third study design extends the second, using more levels, but also proposes that the analysis be done treating the factors as continuous variables rather than categorical.  The intent to treat the percent of agricultural land use and reservoir depth as continuous variables is a good one since the variables are in fact continuous, so less information is lost than if the variables are binned into levels.  Additionally, by choosing reservoirs from all combinations of (binned) levels for percent of agricultural land use and maximum reservoir depth, the design ensures that there will be sufficient differentiation in the land use and depth variables to make it possible to look at their interaction.  All of this is good.
+
+Since budget constraints are often an issue, one additional alternative might be worth consideration.  The third survey design suggests using 4 levels for each of the land use and depth variables, corresponding to a 4^2 sampling design.  If two reservoirs are chosen from each of the 16 possible combinations, the result is 32 reservoirs to be sampled.  If 32 is too many, a similar strategy using 3 levels and 3 reservoirs in each of the 9 combinations would lead to 27 reservoirs to be sampled.  The only advantage is decreasing the number of reservoirs to be sampled; the disadvantage is that there is less forcing of samples into the extreme land use and depth bins.
+
+-----------
+
+Models for Design 3
+-------------
+
+Two models are proposed for Survey Design 3.  One is a standard linear model, which includes main effects as well as the interaction between land use and maximum depth.  The second is a generalized additive model (GAM).  The linear model is standard, easy to work with, and likely to provide good information.
+
+As noted by Dr. Beaulieu, the GAM allows for non-linear main effects, but is more difficult to explain and potentially more difficult to use for prediction of methane emission rates from other reservoirs, which are drawbacks. A GAM is a good choice for exploring the shapes of the main effects if little is known or suspected about what those shapes might be at this stage, though care should be taken not to overfit since the commonly used cubic spline smoothers may "use up" many degrees of freedom (there are tuning parameters to control smoothness). If the researchers have some thoughts about either the process that might lead to a nonlinear effect and/or have some expectation about the shape of a hypothesized nonlinear effect, other models might be proposed.  However, if there is only the suspicion that there might be nonlinear effects, without much information about what they might be or what might cause them, it is difficult to propose alternative models before the data are collected.  Certainly following data collection, the data can be examined and alternative models suggested by exploratory data analysis could be considered (addition of polynomial terms to a linear model or transformation of variables could be considered).  The caution about overfitting with GAM applies to other potential models as well.
+
+
+
+-----------
+
+Alternative Analysis Methods
+-------------
+
+The reservoir level data are to be collected based on a GRTS survey design, and the associated analysis will lead to an estimated mean methane emission rate for each reservoir, together with a standard error on that mean.  In the models proposed thus far, the mean estimates for the reservoirs would be treated as observed data for the system level model, and the uncertainty in those estimates (the standard errors) would be lost in the system level model.  Since the uncertainty estimates are available, in an ideal world, the system level model would take those uncertainties into account, making use of the information that the mean emission rate for each reservoir is in fact an estimate.  There are probably many different ways to approach incorporating the reservoir level uncertainties; two possibilities are discussed here.
+
+A simple approach would be to weight the reservoir level estimates given the amount of information coming from each reservoir.  That is, weight the mean estimates for the reservoirs based on the corresponding standard errors. This incorporates the uncertainties in the estimates by giving more weight to reservoir estimates that have smaller uncertainties and less weight to estimates with greater uncertainties.  Usually, the weights would simply be the reciprocal of the standard errors, and they can be applied in the basic linear model already proposed in a straightforward manner.
+
+A more sophisticated approach would propagate the uncertainty in the estimates of reservoir emission rates into the estimation of regression coefficients at the reservoir level.  One way to do this is with a two-stage model.  This is probably easiest in a Bayesian setting (it might be possible to deal with the GRTS design and spatial variance in a likelihood framework, but doing so might take just as much or more work than using a Bayesian framework).  In the two-stage model approach, the design-based estimation at the reservoir level is done at the first stage, and the results are fed into the second stage model under some simplifying assumptions (such as normality and known standard errors). 
+
+Assume there are $i = 1, \ldots , n$ reservoirs, and there are design-based (GRTS) estimates $\hat{\mu}_i$ and $\hat{\sigma_i}$ for the mean and standard error of the mean for each reservoir.  Then one potential model would be
+
+$$ \hat{\mu}_i \sim Normal(\mu_i, \hat{\sigma_i}) $$
+$$ \mu_i \sim Normal(\beta_0 + \beta_1 Ag_i + \beta_2 Depth_i + \beta_3 Ag_i Depth_i, \sigma) $$
+
+Basically, the first line acknowledges that the reservoir means are estimates, but treats the reservoir standard deviations as known (to keep the model simple),, and the second line says the underlying true reservoir means follow the previous linear model, where the $\beta$ coefficients and $\sigma$ are to be estimated.  The parameters $\beta_0, \beta_1, \beta_2, \beta_3$ and $\sigma$ for the system level model would be given priors, such as $\beta_j \sim Normal(0, V), \ j=1,...,4$ and $\sigma \sim Uniform(0,B)$, where the constants $V$ and $B$ would be set to reflect prior knowledge.  Such a model could be run, for instance, in BUGS (Bayesian inference Using Gibbs Sampling), which can be interfaced with R.  Running the model would require formatting the data, setting up the model, running sampling chains in BUGS (or other software), and checking convergence using some diagnostic tools.  It would produce estimates for the parameters $\mu_i, \beta_j, \sigma$.  I would probably expect somewhere in the neighborhood of 8-16 hours to set up, run, and check such a model, in part depending on the starting point and how whether it's a "go do it" or a "show us how to do it" situation.  We could certainly work with simulated data, in which case it would presumably go much more quickly the second time around with real data.  
+
