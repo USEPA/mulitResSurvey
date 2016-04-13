@@ -1,12 +1,15 @@
 ---
 title: "Simulated Data for Methane Study"
-date: "April 9, 2016"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    toc_depth: 2
 ---
 
 # Set Up
 
-Start by running all of the chunks in 2016OhioSurveyDesign.Rmd (the resut is saved in "survRes.Rdata"), throw out a couple of reservoirs with no maximum depth, and add an id column for sampling.  Also set a seed so later work involving random draws is reproducible.
+Start by running all of the chunks in 2016OhioSurveyDesign.Rmd (I saved the result in "survRes.Rdata"), throw out a couple of reservoirs with no maximum depth, and add an id column for sampling.  Also set a seed so later work involving random draws is reproducible.
 
 ```{r}
 # libraries
@@ -34,17 +37,19 @@ dat$id <- 1:nrow(dat)
 set.seed(32123)
 ```
 
-From the Task Description and subsequent discussion, we assume emission rates are likely to range from a low of about 0.1 mg/m^2^/h for deep reservoirs with forested watersheds to a high of about 20 mg/m^2^/h for shallow reservoirs whose watersheds are highly agricultural.  Further, deep reservoirs whose watersheds are highly agricultural might see methane emission rates of around 5 mg/m^2^/h, while shallow reservoirs whose watersheds are forested might see emission rates of around 1 mg/m^2^/h.  If the emission rates are assumed to be well modeled by a function of the form, $f(a,d) = \beta_0 + \beta_1 a + \beta_2 d + beta_3 a*d$, where $a$ is percent of agricultural land use in the watershed, $d$ is the maximum depth of the reservoir, and $f(a,d)$ is the average methane emission rate, then the four points of information determine the function. The plots show the hypothesized mean surface, as a contour plot and as a surface.  (If the rgdl code at the end of the chunk is run directly in R, the command will generate an interactive object.)
+From the Task Description and subsequent discussion, we assume emission rates are likely to range from a low of about 0.1 mg/m^2^/h for deep reservoirs with forested watersheds to a high of about 20 mg/m^2^/h for shallow reservoirs whose watersheds are highly agricultural.  Further, deep reservoirs whose watersheds are highly agricultural might see methane emission rates of around 5 mg/m^2^/h, while shallow reservoirs whose watersheds are forested might see emission rates of around 1 mg/m^2^/h.  If the emission rates are assumed to be well modeled by a function of the form, $f(a,d) = \beta_0 + \beta_1 a + \beta_2 d + \beta_3 a*d$, where $a$ is percent of agricultural land use in the watershed, $d$ is the maximum depth of the reservoir, and $f(a,d)$ is the average methane emission rate, then the four points of information determine the function. The plots show the hypothesized mean surface, as a contour plot and as a surface.  (If the rgdl code at the end of the chunk is run directly in R, the command will generate an interactive object.)
 
 # Hypothesized Surface
 
 ```{r}
-# fit data
-fitdat <- data.frame(expand.grid(ag = range(dat$percent.agg.ag), depth = range(dat$max.depth.ft)), ch4 = c(1,20,.1,5))
+# fit data (the four methane emission rates from Jake, 
+# which I situated essentially at the corners of the explanatory
+# variable plane)
+fitdat <- data.frame(expand.grid(ag = range(dat$percent.agg.ag), 
+                                 depth = range(dat$max.depth.ft)), 
+                     ch4 = c(1,20,.1,5))
+fitdat
 summary(out <- lm(ch4 ~ ag*depth, data = fitdat))
-# summary(lm(ch4 ~ scaleag*scaledepth, data = fitdat))
-# summary(lm(log(ch4) ~ ag*depth, data = fitdat))
-# summary(lm(log(ch4) ~ scaleag*scaledepth, data = fitdat))
 
 # hypothesized function for methane emission
 ch4fun <- function(a,d){out$coefficients[1] + out$coefficients[2]*a + out$coefficients[3]*d + out$coefficients[4]*a*d}
@@ -66,7 +71,7 @@ persp3Drgl(a,d,z, xlab = "Ag %", ylab = "Max Depth (Ft)" ,main = "Hypothesized S
 
 This, together with the assumption that standard errors on the average emission rate for a reservoir are on the order of 3/4 of the estimated mean, will allow pseudo-data to be simulated.  The preferred sampling design would select two (or at least one, and two when possible) reservoirs from each of 16 combinations of land use and maximum depth.  The code below choses a sample of 32 reservoirs, as described in Survey Design 3.  The plot shows the explanatory variable combinations of all of the reservoirs in the sampling frame, with the chosen reservoirs in red.
 
-# Simulated Data
+# Simulating Sample Data
 
 To simulate data, uncertainty is introduced around the hypothesized mean.  Define a function that, given explanatory variable values, grabs the expected mean using the hypothesized relationship above and then draws from a normal distribution with the specified mean and standard deviation of three-quarters of the mean.  Then look at the relationship between each explanatory variable and the response to be sure it makes sense.
 
@@ -94,7 +99,7 @@ qplot(max.depth.ft, ch4, data = dat, size = I(3))
 
 ```
 
-In practice, at most 32 reservoirs are to be sampled, as described in Survey Design 3.  Take such a sample, and look at the chosen sample in terms of the explanatory variable values, then also relative to the hypothesized surface.  (Again, the rgl plot code at the end of the chunk can be run separately to generate an interactive plot.)
+In practice, at most 32 reservoirs are to be sampled, as described in Survey Design 3.  Take such a sample, and look at the chosen sample in terms of the explanatory variable values, then also relative to the hypothesized surface.  In the latter plot, all of the reservoirs in the sampling frame are shown, with the sampled ones in red.  The lines in the plot show the quartiles for each variable, so we can see that two reservoirs are drawn from each cell.  The last of the plots shows the hypothesized surface together with the simulated data.  (Again, the rgl plot code at the end of the chunk can be run separately to generate an interactive plot.)
 
 ```{r}
 # get a sample of 2 from each of the 16 depth/ag combos
@@ -119,7 +124,11 @@ persp3D(a,d,z,phi=15,theta=-30, xlab = "Ag %", ylab = "Max Depth (Ft)" ,main = "
 scatter3D(sampledat$percent.agg.ag, sampledat$max.depth.ft, sampledat$ch4, add = T, col = "black")
 persp3Drgl(a,d,z, xlab = "Ag %", ylab = "Max Depth (Ft)" ,main = "Hypothesized Surface", ticktype = "detailed")
 scatter3Drgl(sampledat$percent.agg.ag, sampledat$max.depth.ft, sampledat$ch4, add = T, col = "black")
+```
 
+Finally, look at the mean emission rates for the two samples in each of the 16 cells.  Some of the patterns are as expected, but not all -- the variability associated with the simulation and the small sample size per cell means the full factorial model will be hard to fit.
+
+```{r}
 # look at cell means out of curiosity... these are going to be tough to work with
 tmp <- aggregate(dat$ch4, by = list(dat$luQuantBin, dat$depthQuantBin), mean)
 tmp2 <- spread(tmp, Group.2, x)
@@ -131,23 +140,22 @@ tmp2
 ```
 
 
-The relatively large standard errors may cause some fairly extreme emission rates in the simulations.
+# Fitting Models
 
-# Fit Models
-
-## First round:  fit models directly
+## Basic models
 
 We fit three models:  a full factorial, the continuous linear model with interaction term, and the continuous linear model without interaction term.  
 
 
 ```{r}
 
-### first do analysis with no transformation
+### first do analysis with no transformation on the response variable
+
 # factorial model
 out1 <- lm(ch4 ~ factor(luQuantBin)*factor(depthQuantBin), data = sampledat)
 summary(aov(out1))
 
-# continuous predictor regression model
+# continuous predictor regression model with interaction
 out2 <- lm(ch4 ~ percent.agg.ag*max.depth.ft, data = sampledat)
 summary(out2)
 # hist(out2$residuals)
@@ -163,6 +171,7 @@ summary(out3)
 # plot(sampledat$max.depth.ft, out3$residuals)
 # plot(out3)
 
+# predictions at the explanatory plane "corners" for comparison to the expected values
 preds2 <- predict(out2, newdata <- data.frame(expand.grid(percent.agg.ag = range(dat$percent.agg.ag), max.depth.ft = range(dat$max.depth.ft))))
 preds3 <- predict(out3, newdata <- data.frame(expand.grid(percent.agg.ag = range(dat$percent.agg.ag), max.depth.ft = range(dat$max.depth.ft))))
 
@@ -170,12 +179,12 @@ preds3 <- predict(out3, newdata <- data.frame(expand.grid(percent.agg.ag = range
 mysummary <- data.frame(expand.grid(percent.agg.ag = range(dat$percent.agg.ag), 
                                     max.depth.ft = range(dat$max.depth.ft)),
                         predch4 = c(1,20,.1,5),
-                        withInt = preds2,
-                        withoutInt = preds3)
+                        withInteraction = preds2,
+                        withoutInteraction = preds3)
 mysummary
 ```
 
-The fits are problematic because they predict negative emission rates (the table above provides predicted methane emission rates at the four extremes of the explanatory variables for each model (withInt, withoutInt) and for Jake's predictions (predch4), and some are negative).  The plots of the fitted surfaces shown below confirm the problem.  (Note the negative values on the plot scales.)  The fit with the interaction term doesn't get the relationship right for depth when little land use is agricultural.  This is explained in part by the relative lack of data in the upper left and lower left corners of the plot of the explanatory variables (low ag use and extreme depths, either low or high)  The fitted plane (no interaction term) does better with the qualitative relationship, but still predicts negative emission rates.
+The fits are problematic because they predict negative emission rates (the table above provides predicted methane emission rates at the four extremes of the explanatory variables for the hypothesized values above (predch4) and for the models with and without Interaction terms).  The plots of the fitted surfaces shown below confirm the problem.  (Note the negative values on the plot scales.)  The fit with the interaction term doesn't get the relationship right for depth when little land use is agricultural.  This is explained in part by the relative lack of data in the upper left and lower left corners of the plot of the explanatory variables (low ag use and extreme depths, either low or high)  The fitted plane (no interaction term) does better with the qualitative relationship, but still predicts negative emission rates.
 
 
 ```{r}
@@ -205,26 +214,32 @@ scatter3Drgl(sampledat$percent.agg.ag, sampledat$max.depth.ft, sampledat$ch4, ad
 
 ```
 
-## Fit using log-tranformed response
+## Modeling with a log-tranformed response
 
-This is a possible way to avoid negative predicted emission rates.  More to come.
+Using a log-transformed response is a possible way to avoid negative predicted emission rates.  Unless the surface fit to the log-transformed hypothesized emission rates (shown near the end of this file) makes better intutive sense than the surfaces above, the trade-off in interpretability may not be worth avoiding negative predicted emission rates at the edges of the explanatory variable case.  To explore these, just repeat the analyses above but with log(ch4) instead of ch4 as the response in the linear model statements.
 
-# Simulate data and fitting many times
+# Collections of simulations to understand power to detect effects
 
-What we really want is to see how the fitted surfaces vary over many simulated datasets and fits.  This is a place where more discussion is worthwhile.  The Task Description suggested a power analysis for effect sizes was required, but further communication has indicated the big question is "Is 30 reservoirs enough?".  We should talk about the sample size question in more detail... enough for what?  I'm guessing that, ideally, you want to see parameter values in the model that are significantly different from 0.  The preliminary results suggest it's going to be difficult to nail down the interaction term, the ag effect is likely to show up, the depth effect less so.
+## Sample size of 32
 
-The first set of simulations assumes two reservoirs in each of the 16 ag/depth combinations explained in Survey Design 3.  I ran 1000 simulations and captured the p-values on the main effect interaction effect coefficients, and then determined what proportion of them were significantly different from 0 (one by one, not all three together, though the latter is enough to get, too).
+What we really want is to see how the fitted surfaces vary over many simulated datasets and fits.  This is a place where more discussion is worthwhile.  The Task Description suggested a power analysis for effect sizes was required, but further communication has indicated the big question is "Is 30 reservoirs enough?".  Further discussion suggests the first goal is to be sure that there are enough reservoirs to detect that the main effect coefficients in the linear model are significantly different from 0.  The preliminary results suggest it will be difficult to detect that the interaction term is different from 0, the land use effect is likely to show up, and the depth effect will be someone more difficult to detect.  These conclusions are predicated on the hypothesized model above being essentially correct, and the variability for the individual reservoir emission rates behaving as expected.  The extent to which the results are sensitive to the different assumptions could be tested by running more simulations with different models and simulated data variability.
+
+The first set of simulations assumes two reservoirs in each of the 16 ag/depth combinations explained in Survey Design 3.  I ran 1000 simulations and captured the $p$-values on the main effect interaction effect coefficients for the primary model, and then determined what proportion of them were significantly different from 0.  I also fit the simpler (no interaction term) model and captured the $p$-values there.
 
 ```{r}
+### set things up for the simulation
+# number of reps
 nreps <- 1000
+# array to store the coefficient matrices for the full models
 full <- array(NA,c(4,4,nreps))
+# array to store the coefficient matrices for the simpler model (no interaction)
 red <- array(NA, c(3,4,nreps))
 
 for (i in 1:nreps){
   # draw new response data
   dat$ch4 <- ch4funData(dat$percent.agg.ag, dat$max.depth.ft)
   
-  # select 32
+  # select 32 reservoirs
   # get a sample of 2 from each of the 16 depth/ag combos
   mysample <- c()
   for (depth in 1:4){
@@ -235,14 +250,14 @@ for (i in 1:nreps){
   # record which records were selected for sampling
   dat$select <- dat$id %in% mysample
   
-  # just get sample
+  # subset to the selected sample
   sampledat <- subset(dat, select == T)
   
   # fit full model
   out2 <- lm(ch4 ~ percent.agg.ag*max.depth.ft, data = sampledat)
   # fit reduced model
   out3 <- lm(ch4 ~ percent.agg.ag+max.depth.ft, data = sampledat)
-
+  # capture the coefficient matrices
   full[,,i] <- summary(out2)$coefficients
   red[,,i] <- summary(out3)$coefficients
   
@@ -250,29 +265,37 @@ for (i in 1:nreps){
 
 # full model:  ch4 = beta0 + beta1*ag + beta2*depth + beta3*ag*depth
 # reduced model: ch4 = beta0 + beta1*ag + beta2*depth
+```
 
+The table below shows the proportion of models (from 1000) for which each of the individual parameters turned out to be significantly different from 0.  The parameter $\beta_1$ is for land use, $\beta_2$ is for depth, and $\beta_3$ is for their interaction.
 
-# power to detect beta1 nonzero in full model
-sum(full[2,4,] < 0.05)/nreps
-# power to detect beta2 nonzero in full model
-sum(full[3,4,] < 0.05)/nreps
-# power to detect beta3 nonzero in full model
-sum(full[4,4,] < 0.05)/nreps
+```{r}
+# Find proportion of fitted models with beta parameters that are significantly different from 0
+signpFull <- apply(full<.05,c(1,2),sum)[2:4,4]/1000
+names(signpFull) <- c("PropBeta1!=0", "PropBeta2!=0","PropBeta3!=0")
+signpFull
+```
 
-sum(full[4,4,] < 0.05 & full[3,4,] < 0.05 & full[2,4,] < 0.05)/nreps
+Same thing, but for the reduced model.
 
-# power to detect beta1 nonzero in red model
-sum(red[2,4,] < 0.05)/nreps
-# power to detect beta2 nonzero in red model
-sum(red[3,4,] < 0.05)/nreps
+```{r}
 
-sum(red[2,4,] < 0.05 & red[3,4,] < 0.05)/nreps
+# Same thing for the reduced model
+signpReduced <- apply(red<.05,c(1,2),sum)[2:3,4]/1000
+names(signpReduced) <- c("PropBeta1!=0", "PropBeta2!=0")
+signpReduced
 
 ```
 
 Assuming the hypothesized model is basically correct for the mean methane emission rate, that the standard error on the mean is about 0.75 of the mean, and the model is fit directly, the results suggest there is only about a 50% chance that the main effect due to agricultural use will be identified in the full model (that includes ag use, depth and interaction), but since the chances of finding the interaction term to be different than 0 are quite small, the simpler model (no interaction term) is likely going to be the one of interest.  In that case, there's about a 90% chance of catching the main effect for ag, and a considerably smaller chance of catching the main effect for depth with a sample size of 32 (which is still to big for the budget, as I understand things).
 
-The next set of simulations drops to a sample size of 24, with one reservoir chosen from each of the 16 cells, and a second chosen in a checkerboard pattern (working across the cells, pick a resservoir from a cell, then skip a cell, pick one, skip one, and so on).
+## Sample size of 24
+
+The next set of simulations drops to a sample size of 24, with one reservoir chosen from each of the 16 cells, and a second chosen in a checkerboard pattern (working across the cells, pick a resservoir from a cell, then skip a cell, pick one, skip one, and so on).  The pattern was just an easy one that spread the reservoirs across the sample space in a reasonable way.  Other patterns (or a random selection) should give similar results.
+
+The choice of 24 was based on the understanding that sampling 24 reservoirs is probably feasible.  Trying to cut things too fine (32, 31, 30, ...) is somewhat risky unless there is a lot of confidence in the hypothesized model.
+
+Tables reporting the proportion of models for which parameters are significantly different from 0, similar to those above, are generated by the last bits of code in the next chunk.
 
 ```{r}
 nreps <- 1000
@@ -309,58 +332,77 @@ for (i in 1:nreps){
   
 }  
 
-# full model:  ch4 = beta0 + beta1*ag + beta2*depth + beta3*ag*depth
-# reduced model: ch4 = beta0 + beta1*ag + beta2*depth
+# Find proportion of fitted models with beta parameters that are significantly different from 0
+signpFull <- apply(full<.05,c(1,2),sum)[2:4,4]/1000
+names(signpFull) <- c("PropBeta1!=0", "PropBeta2!=0","PropBeta3!=0")
+signpFull
 
-# power to detect beta1 nonzero in full model
-sum(full[2,4,] < 0.05)/nreps
-# power to detect beta2 nonzero in full model
-sum(full[3,4,] < 0.05)/nreps
-# power to detect beta3 nonzero in full model
-sum(full[4,4,] < 0.05)/nreps
-
-# power to detect beta1 nonzero in red model
-sum(red[2,4,] < 0.05)/nreps
-# power to detect beta2 nonzero in red model
-sum(red[3,4,] < 0.05)/nreps
-
-sum(red[2,4,] < 0.05 & red[3,4,] < 0.05)/nreps
+# Same thing for the reduced model
+signpReduced <- apply(red<.05,c(1,2),sum)[2:3,4]/1000
+names(signpReduced) <- c("PropBeta1!=0", "PropBeta2!=0")
+signpReduced
 
 ```
 
 At this point, it seems clear the main effects model is the one that will be of interest, and there's still about 80% power to detect the main effect for agriculturall use, and about 30% power for depth, based on 24 samples.  These are power to detect a nonzero parameter value... how well the parameter value is estimated is of course another question.
 
-We can run other scenarios, and do some sensitivity analyses, but it seems worth discussing these first.  
+# Other potential hypothesized models
 
-One thing to think about might be the form of the hypothesized model, and also whether I made reasonable choices for the shallow/low ag use and deep/high ag use explanatory variable values in setting up the models.  I chose the simplest above, but there may be four worth looking at (assuming the explanatory variable values are reasonable -- there are more options if those should be reconsidered, of course).  Two fit the four specified points, but have different forms; the other two are simplifed models (no interaction term), so they don't fit all four points, but still might give good enough approximations for the effort at hand.  The first is the one used in the simulations (and is exactly what was presented at the top of the document), the second is what would result from log tranforming the response before fitting.  The third and fourth omit the interaction term, with the original scale and log transformed rates, respectively.  It might be worth thinking about the worthiness of each as a starting point for simulations.
+One thing to think about might be the form of the hypothesized model, and also whether I made reasonable choices for the shallow/low ag use and deep/high ag use explanatory variable values in setting up the models.  I chose the simplest above, but there may be others worth looking at (assuming the explanatory variable values are reasonable -- there are more options if those should be reconsidered, of course).  Two fit the four specified points, but have different forms; the other two are simplifed models (no interaction term), so they don't fit all four points, but still might give good enough approximations for the effort at hand.  The first is the one used in the simulations (and is exactly what was presented at the top of the document), the second is what would result from log tranforming the response before fitting.  The third and fourth omit the interaction term, with the original scale and log transformed rates, respectively.  
 
 ```{r}
-fitdat <- data.frame(expand.grid(ag = range(dat$percent.agg.ag), depth = range(dat$max.depth.ft)), ch4 = c(1,20,.1,5))
+# the assumptions
+fitdat 
+# the four models
 summary(out <- lm(ch4 ~ ag*depth, data = fitdat))
 summary(outl <- lm(log(ch4) ~ ag*depth, data = fitdat))
 summary(outred <- lm(ch4 ~ ag + depth, data = fitdat) )
 summary(outredl <- lm(log(ch4) ~ ag + depth, data = fitdat))
 
 # possible functions for methane emission simulation
-# as before
+
+# define the four surfaces
 ch4fun <- function(a,d){out$coefficients[1] + out$coefficients[2]*a + out$coefficients[3]*d + out$coefficients[4]*a*d}
 ch4funlog <- function(a,d){outl$coefficients[1] + outl$coefficients[2]*a + outl$coefficients[3]*d + outl$coefficients[4]*a*d}
 ch4funred <- function(a,d){outred$coefficients[1] + outred$coefficients[2]*a + outred$coefficients[3]*d}
 ch4funredlog <- function(a,d){outredl$coefficients[1] + outredl$coefficients[2]*a + outredl$coefficients[3]*d}
 
-
-# look at the surface, as a contour plot and as a surface
+# set up for looking at the surfaces
 a <- seq(min(dat$percent.agg.ag), max(dat$percent.agg.ag), length.out = 11)
 d <- seq(min(dat$max.depth.ft), max(dat$max.depth.ft), length.out = 11)
 z <- outer(a,d,ch4fun)
 zlog <- outer(a,d,ch4funlog)
 zred <- outer(a,d,ch4funred)
 zredlog <- outer(a,d,ch4funredlog)
-persp3D(x=a,y=d,z,phi=15,theta=-30,main = "Hypothesized Surface (Original)", xlab = "Ag %", ylab = "Max Depth", zlab = "Methane Emission Rate (mg/m^2/h)", ticktype = "detailed")
-persp3D(x=a,y=d,exp(zlog),phi=15,theta=-30,main = "Hypothesized Surface (Transformed Response)", xlab = "Ag %", ylab = "Max Depth", zlab = "Methane Emission Rate (mg/m^2/h)", ticktype = "detailed")
-persp3D(x=a,y=d,zred,phi=15,theta=-30,main = "Hypothesized Surface (No Interaction)", xlab = "Ag %", ylab = "Max Depth", zlab = "Methane Emission Rate (mg/m^2/h)", ticktype = "detailed")
-persp3D(x=a,y=d,exp(zredlog),phi=15,theta=-30,main = "Hypothesized Surface (No Interaction and Transformed Response)", xlab = "Ag %", ylab = "Max Depth", zlab = "Methane Emission Rate (mg/m^2/h)", ticktype = "detailed")
+```
 
+## The original hypothesized surface
+
+```{r}
+persp3D(x=a,y=d,z,phi=15,theta=-30,main = "Hypothesized Surface (Original)", xlab = "Ag %", ylab = "Max Depth", zlab = "Methane Emission Rate (mg/m^2/h)", ticktype = "detailed")
+```
+
+## The surface obtained by log transforming the response and then fitting
+
+```{r}
+persp3D(x=a,y=d,exp(zlog),phi=15,theta=-30,main = "Hypothesized Surface (Transformed Response)", xlab = "Ag %", ylab = "Max Depth", zlab = "Methane Emission Rate (mg/m^2/h)", ticktype = "detailed")
+```
+
+## The original surface with no interaction term (this one is a plane)
+
+```{r}
+persp3D(x=a,y=d,zred,phi=15,theta=-30,main = "Hypothesized Surface (No Interaction)", xlab = "Ag %", ylab = "Max Depth", zlab = "Methane Emission Rate (mg/m^2/h)", ticktype = "detailed")
+```
+
+## The surface using the log tranformation to fit, and omitting the interaction term
+
+```{r}
+persp3D(x=a,y=d,exp(zredlog),phi=15,theta=-30,main = "Hypothesized Surface (No Interaction and Transformed Response)", xlab = "Ag %", ylab = "Max Depth", zlab = "Methane Emission Rate (mg/m^2/h)", ticktype = "detailed")
+```
+
+The code below generates the interactive versions (but must be run directly in R).
+
+```{r}
 # interactive versions
 persp3Drgl(x=a,y=d,z,phi=15,theta=-30,main = "Hypothesized Surface (Original)", xlab = "Ag %", ylab = "Max Depth", zlab = "Methane Emission Rate (mg/m^2/h)", ticktype = "detailed")
 persp3Drgl(x=a,y=d,exp(zlog),phi=15,theta=-30,main = "Hypothesized Surface (Transformed Response)", xlab = "Ag %", ylab = "Max Depth", zlab = "Methane Emission Rate (mg/m^2/h)", ticktype = "detailed")
