@@ -25,7 +25,7 @@ The following is an R session demonstrating different approaches for designing t
 Exploration of the candidate sampling sites
 ---------------------------
 
-The pool of potential reservoirs was derived from two sources.  The first source was the list of Ohio reservoirs contained in the US Army Corps of Engineers National Inventory of Dams (NID).  This list included 85 dams located on 81 separate reservoirs.  The second source is the collection of reservoirs managed by the US Army Corps of Engineers (USACE) within the USACE Louisville District (LD).  The LD includes portions of Ohio, Kentucky, and Indiana.  
+The pool of potential reservoirs was derived from two sources.  The first source was the list of Ohio reservoirs contained in the US Army Corps of Engineers National Inventory of Dams (NID).  This list included 85 dams located on 81 separate reservoirs.  The original NID database for Ohio included >1000 dams.  I excluded those < 1km2 in size.  The second source is the collection of reservoirs managed by the US Army Corps of Engineers (USACE) within the USACE Louisville District (LD).  The LD includes portions of Ohio, Kentucky, and Indiana.  
 
 Watershed size and land use was calculated for each reservoir using the USGS National Hydrography Dataset and the National Land Cover Data Set.  Max reservoir depth was determined from bathymetric maps derived from various sources.
 
@@ -178,6 +178,11 @@ length(survRes$lake.name)
 Note that reservoir area and the relative drainage area
 (RDA, ratio of the watershed to reservoir area) are log normally distributed.
 ```{r}
+# Reservoir depth
+ggplot(survRes, aes(x=max.depth.ft)) + #convert to km2
+  geom_histogram(binwidth=5) +
+  xlab("Reservoir area (km2)")
+
 # Reservoir area
 ggplot(survRes, aes(x=reservoir.area.m2/1000000)) + #convert to km2
   geom_histogram(binwidth=5) +

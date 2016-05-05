@@ -21,7 +21,8 @@ library(tidyr)
 
 # set options
 theme_set(theme_bw(base_size = 18))
-opts_knit$set(root.dir = 'C:/git/USEPA/mulitResSurvey')
+# opts_knit$set(root.dir = 'C:/git/USEPA/mulitResSurvey')  # for Steph's machine
+opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/mulitResSurvey') # For Jake's machine
 ```
 
 ```{r}
