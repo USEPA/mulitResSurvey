@@ -1,11 +1,16 @@
 # DEMO:  KISER LAKE DESIGN
-
-
 # SHALLOW LAKE WITH NO OBVIOUS 'TRIBUTARY AREA'.
 # WILL USE AN UNSTRATIFIED-EQUAL PROBABILITY GRTS DESIGN
 
+# LIBRARY----------
+source("ohio2016/scriptsAndRmd/masterLibrary.R")
+
+# CREATE OBJECT TO HOLD FIRST PORTION OF L-DRIVE WORKING DIRECTORY
+# TO BE USED FOR ALL SHAPEFILES
+rootDir <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
+
 # READ/PLOT SHAPEFILE
-  kiserLakeEqArea <- readOGR(dsn = "ohio2016/inputData/spatialData", # Could use read.shape from spsurvey package
+  kiserLakeEqArea <- readOGR(dsn = paste(rootDir, "kiserLakeDemo", sep=""), # Could use read.shape from spsurvey package
                       layer = "kiserLakeEqArea")  # shapefile name
     plot(kiserLakeEqArea) # visualize polygon
   
@@ -18,8 +23,8 @@
 # the readOGR object directly, but can't get it to work.
   
 sp2shape(sp.obj=kiserLakeEqArea, # object created with readOGR or read.shape
-         prjfilename = "ohio2016/inputData/spatialData/kiserLakeEqArea", # proj from original shapefile
-         shpfilename="ohio2016/inputData/spatialData/kiserLakeEqArea_shp") # name of created shapefile.
+         prjfilename = paste(rootDir, "kiserLakeDemo/kiserLakeEqArea", sep=""), # proj from original shapefile
+         shpfilename=paste(rootDir, "kiserLakeDemo/kiserLakeEqAreaShp", sep="")) # name of created shapefile.
 
 # EXTRACT ATTRIBUTE TABLE
 # This is referenced in the GRTS att.frame argument.  If src.frame is
@@ -30,7 +35,7 @@ sp2shape(sp.obj=kiserLakeEqArea, # object created with readOGR or read.shape
 # spatial object (i.e. shapefile) could be read into environment and we could reference 
 # shapefile@data in the att.frame argument.  This worked with the UT_ecoregions demo, but we
 # can't get it to work here.  
-attKiser <- read.dbf(filename = "ohio2016/inputData/spatialData/kiserLakeEqArea")
+attKiser <- read.dbf(filename = paste(rootDir, "kiserLakeDemo/kiserLakeEqArea", sep=""))
 
   
 # SET UP FOR GRTS FUNCTION  
@@ -48,11 +53,11 @@ kiserSites <- grts(design=kiserDsgn,
                    DesignID="EQUAL", # name that will append site name in output file
                    type.frame="area",
                    src.frame="shapefile",
-                   in.shape="ohio2016/inputData/spatialData/kiserLakeEqArea_shp",
+                   in.shape=paste(rootDir, "kiserLakeDemo/kiserLakeEqAreaShp", sep=""),
                    att.frame=attKiser,
                    shapefile=TRUE,
-                   prjfilename = "ohio2016/inputData/spatialData/kiserLakeEqArea",
-                   out.shape="ohio2016/inputData/spatialData/kiserSites")
+                   prjfilename = paste(rootDir, "kiserLakeDemo/kiserLakeEqArea", sep=""),
+                   out.shape=paste(rootDir, "kiserLakeDemo/kiserSites", sep=""))
 
 # Print the initial six lines of the survey design
 head(kiserSites@data)

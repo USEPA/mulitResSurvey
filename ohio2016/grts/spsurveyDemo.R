@@ -1,17 +1,22 @@
 #  SCRIPT TO DEMO spsurvey PACKAGE FOR THE GRTS DESIGN OF AN AREA RESOURCE
 
 # LIBRARY----------
-library(spsurvey)
+source("ohio2016/scriptsAndRmd/masterLibrary.R")
+
+# CREATE OBJECT TO HOLD FIRST PORTION OF L-DRIVE WORKING DIRECTORY
+# TO BE USED FOR ALL SHAPEFILES
+rootDir <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
 
 # READING IN AND FORMATTING SPATIAL DATA---------
 # Load the sp object in the data directory
   data(UT_ecoregions)
   str(UT_ecoregions)
 # Create a shapefile
-   sp2shape(sp.obj=UT_ecoregions, shpfilename="UT_ecoregions")
+   sp2shape(sp.obj=UT_ecoregions, 
+            shpfilename=paste(rootDir, "spsurveyDemo/UT_ecoregionsShp", sep=""))
 
 # Read the attribute table from the shapefile
-  att <- read.dbf("UT_ecoregions")
+  att <- read.dbf(paste(rootDir, "spsurveyDemo/UT_ecoregionsShp", sep=""))
 
 # Display the attribute data frame
   att
@@ -34,10 +39,10 @@ Equalsites <- grts(design=Equaldsgn,
                    DesignID="EQUAL", # name that will append site name in output file
                    type.frame="area",
                    src.frame="shapefile",
-                   in.shape="UT_ecoregions",
+                   in.shape=paste(rootDir, "spsurveyDemo/UT_ecoregionsShp", sep=""),
                    att.frame=att,
                    shapefile=TRUE,
-                   out.shape="Equalsites")
+                   out.shape=paste(rootDir, "spsurveyDemo/Equalsites", sep=""))
 
 # Print the initial six lines of the survey design
    head(Equalsites@data)
@@ -64,11 +69,11 @@ Unequalsites <- grts(design=Unequaldsgn,
                      DesignID="UNEQUAL", # name that will append site name in output file
                      type.frame="area",
                      src.frame="shapefile",
-                     in.shape="UT_ecoregions",
+                     in.shape=paste(rootDir, "spsurveyDemo/UT_ecoregionsShp", sep=""),
                      att.frame=att,
                      mdcaty="Level3_Nam",
                      shapefile=TRUE,  #optional, TRUE if you want shapefile created
-                     out.shape="Unequalsites")  # shapefile name
+                     out.shape=paste(rootDir, "spsurveyDemo/Unequalsites", sep=""))  # shapefile name
 
  # Print the initial six lines of the survey design
    head(Unequalsites@data)
@@ -79,7 +84,7 @@ points(Unequalsites$xcoord, Unequalsites$ycoord)
 
 # Stratifed, equal probability, GRTS survey design-----------------
 # Read the shapefile
- shp <- read.shape("UT_ecoregions") # more typical with readOGR function
+ shp <- read.shape(paste(rootDir, "spsurveyDemo/UT_ecoregionsShp", sep="")) # more typical with readOGR function
 
 # Create the design list
 Stratdsgn <- list("Central Basin and Range"=list(panel=c(PanelOne=25),                                                 
@@ -105,7 +110,7 @@ Stratsites <- grts(design=Stratdsgn,
                    att.frame=att,
                    stratum="Level3_Nam",
                    shapefile=TRUE,
-                   out.shape="EqualStratified")
+                   out.shape=paste(rootDir, "spsurveyDemo/EqualStratified", sep=""))
 
  # Print the initial six lines of the survey design
    head(Stratsites@data)
@@ -134,11 +139,11 @@ Panelsites <- grts(design=Paneldsgn,
                    DesignID="UNEQUAL",
                    type.frame="area",
                    src.frame="shapefile",
-                   in.shape="UT_ecoregions",
+                   in.shape=paste(rootDir, "spsurveyDemo/UT_ecoregionsShp", sep=""),
                    att.frame=att,
                    mdcaty="Level3_Nam",
                    shapefile=TRUE,
-                   out.shape="UnequalOverTime")
+                   out.shape=paste(rootDir, "spsurveyDemo/UnequalOverTime", sep=""))
 
  # Print the initial six lines of the survey design
    head(Panelsites@data)
