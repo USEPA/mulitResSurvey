@@ -4,4 +4,7 @@ library(ggplot2) # For plotting
 library(reshape) # For merge_recurse function
 library(dplyr)   # For data manipulation
 library(knitr)   # To knit rmarkdown document
-library(ggmap)
+library(ggmap)   # For ggmap plot of reservoirs
+library(rgdal)   # For reading shapefiles
+library(spsurvey)  # survey design
+
