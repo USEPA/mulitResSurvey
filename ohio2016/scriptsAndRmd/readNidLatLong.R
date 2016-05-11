@@ -50,3 +50,6 @@ ggmap(map) + geom_point(data = survRes3latLong,
 ggsave(filename="ohio2016/output/siteMap.tiff",
        width=8,height=5.5, units="in",
        dpi=800,compression="lzw")
+
+# Write out to Excel file to be pulled into ArcGIS
+write.table(survRes3latLong, file = "ohio2016/output/sampleFrameCoordinates.txt", row.names = FALSE)
