@@ -9,5 +9,4 @@ library(ggmap)   # For ggmap plot of reservoirs
 library(rgdal)   # For reading shapefiles
 library(spsurvey)  # survey design
 library(maptools) # for ggplot plotting of shapefile (fortify function)
-library(plyr)  # for 'join' in ggplot plotting of shapefile
 
