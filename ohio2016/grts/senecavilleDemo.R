@@ -53,6 +53,10 @@ summary(senecavilleSites)
 # Project spatial polygon into WGS84 for plotting in ggmap/ggplot 
 senecavilleEqArea84 <- spTransform(x = senecavilleEqArea, 
                                    CRS("+proj=longlat +datum=WGS84")) # specifies projection
+writeOGR(obj = senecavilleEqArea84, # write projected shapefile to disk for use on field computer
+         dsn = paste(rootDir, "senecavilleDemo", sep=""), 
+         layer = "senecavilleEqArea84",
+         driver = "ESRI Shapefile")
 senecavilleEqArea84@data$id = rownames(senecavilleEqArea84@data)
 senecavilleEqArea84.f <- fortify(senecavilleEqArea84, region="id")  # fortify polygon for ggmap/ggplot
 senecavilleEqArea84.f <- merge(senecavilleEqArea84.f, senecavilleEqArea84@data, 
