@@ -66,6 +66,11 @@ senecavilleSites84 <- spTransform(x = senecavilleSitesPlot, #reproject
 senecavilleSites84@data <- mutate(senecavilleSites84@data, 
                                   long=coordinates(senecavilleSites84)[,1], # add long to @data slot
                                   lat=coordinates(senecavilleSites84)[,2]) # add lat to @data slot
+writeOGR(obj = senecavilleSites84, # write projected shapefile to disk for use on field computer
+         dsn = paste(rootDir, "senecavilleDemo", sep=""), 
+         layer = "senecavilleSites84",
+         driver = "ESRI Shapefile")
+
 # Get ggmap
 bbox <- make_bbox(data=senecavilleSites84@data, #defines map extent based on sample site lat/lon
                   long, lat, f = 0.2) # f is zoom.  Large #, less zoom. tweak for each lake.  
