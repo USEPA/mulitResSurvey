@@ -49,14 +49,15 @@ head(senecavilleSites@data)
 # Print the survey design summary
 summary(senecavilleSites)
 
-# VISUALIZE SURVEY DESIGN-------
+# MANIPULATE, PROJECT, SUBSET, AND WRITE SHAPEFILES FOR PLOTTING-------
 # Project spatial polygon into WGS84 for plotting in ggmap/ggplot 
 senecavilleEqArea84 <- spTransform(x = senecavilleEqArea, 
                                    CRS("+proj=longlat +datum=WGS84")) # specifies projection
-writeOGR(obj = senecavilleEqArea84, # write projected shapefile to disk for use on field computer
+writeOGR(obj = senecavilleEqArea84,  # write projected shapefile to disk for use on field computer
          dsn = paste(rootDir, "senecavilleDemo", sep=""), 
          layer = "senecavilleEqArea84",
-         driver = "ESRI Shapefile")
+         driver = "ESRI Shapefile",
+         overwrite_layer = TRUE)
 senecavilleEqArea84@data$id = rownames(senecavilleEqArea84@data)
 senecavilleEqArea84.f <- fortify(senecavilleEqArea84, region="id")  # fortify polygon for ggmap/ggplot
 senecavilleEqArea84.f <- merge(senecavilleEqArea84.f, senecavilleEqArea84@data, 
@@ -69,12 +70,62 @@ senecavilleSites84 <- spTransform(x = senecavilleSitesPlot, #reproject
                                   CRS("+proj=longlat +datum=WGS84")) # projection needed for google maps
 senecavilleSites84@data <- mutate(senecavilleSites84@data, 
                                   long=coordinates(senecavilleSites84)[,1], # add long to @data slot
-                                  lat=coordinates(senecavilleSites84)[,2]) # add lat to @data slot
-writeOGR(obj = senecavilleSites84, # write projected shapefile to disk for use on field computer
+                                  lat=coordinates(senecavilleSites84)[,2], # add lat to @data slot
+                                  deployDate = "",    # adding all of these colums to the 
+                                  deployTime = "",    # shape file to be filled in the field
+                                  waterDepth = "",    # tried to enter them in the order they will be filled                      
+                                  Temp_F_S = "",
+                                  DOPercent_S = "",
+                                  DO_mg_L_S = "",
+                                  SpCond_ms_S = "",
+                                  pH_S = "",
+                                  ORP_S = "",
+                                  TurbidNTU_S = "",
+                                  chla_S = "",
+                                  Temp_F_D = "",
+                                  DOPercent_D = "",
+                                  DO_mg_L_D = "",
+                                  SpCond_ms_D = "",
+                                  pH_D = "",
+                                  ORP_D = "",
+                                  TurbidNTU_D = "",
+                                  chla_D = "",
+                                  AirExtnrs = "",
+                                  DG_Extnrs = "",
+                                  BarPrssr = "",
+                                  RtrvDate = "",
+                                  RtrvTime = "",
+                                  TotTrapVol = "",
+                                  TrapExtnrs = "",
+                                  Notes = ""
+                                  )
+
+# write projected shapefile to disk for use on field computer.
+# iPad and geoplatform require separate shapefiles for main and oversamp sites.
+# arcPad requires one shapefile with all sites.
+# write one shapefile with all sites for use with arcPad
+writeOGR(obj = senecavilleSites84, 
          dsn = paste(rootDir, "senecavilleDemo", sep=""), 
          layer = "senecavilleSites84",
-         driver = "ESRI Shapefile")
+         driver = "ESRI Shapefile",
+         overwrite_layer = TRUE)
+# separate shapefile for panelOne (main sites) and OverSamp (overdraw sites)
+senecavilleSites84ListByPanel <- split(senecavilleSites84, # split preserves class, outputs a list
+                                       f= senecavilleSites84@data$panel)
+# Write 'OverSamp' to disk
+writeOGR(obj = senecavilleSites84ListByPanel[[1]], # pulls out 'OverSamp' shapefile from list.  Should confirm.
+         dsn = paste(rootDir, "senecavilleDemo", sep=""), 
+         layer = "senecavilleSites84OverSamp",
+         driver = "ESRI Shapefile",
+         overwrite_layer = TRUE)
+# Write 'PanelOne' to disk
+writeOGR(obj = senecavilleSites84ListByPanel[[2]], # pulls out 'PanelOne' shapefile from list.  Should confirm.
+         dsn = paste(rootDir, "senecavilleDemo", sep=""), 
+         layer = "senecavilleSites84PanelOne",
+         driver = "ESRI Shapefile",
+         overwrite_layer = TRUE)
 
+# VISUALIZE SURVEY DESIGN--------
 # Get ggmap
 bbox <- make_bbox(data=senecavilleSites84@data, #defines map extent based on sample site lat/lon
                   long, lat, f = 0.2) # f is zoom.  Large #, less zoom. tweak for each lake.  
@@ -89,12 +140,12 @@ ggmap(senecavilleSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
   geom_polygon(data=senecavilleEqArea84.f, aes(long, lat, group=group, fill=strata)) +
-  scale_fill_manual(values = c("#000066", "#333366")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+  scale_fill_manual(values = c("#000066", "#666699")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   geom_point(data=filter(senecavilleSites84@data, panel == "PanelOne"), #only main sites
              aes(x=long, y=lat),
              size = 2, color = "#00BFC4") + # specify color to be consistent across maps
   geom_text(data=filter(senecavilleSites84@data, panel == "PanelOne"), #only main sites
-            aes(label=siteID, x=long, y=lat, color=panel),
+            aes(label=siteID, x=long, y=lat),
             hjust=1.2, vjust=0, size=2, color = "#00BFC4") +
   coord_equal() +
   ggtitle("Main Measurement locations for Senecaville Lake")
@@ -108,12 +159,12 @@ ggmap(senecavilleSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
   geom_polygon(data=senecavilleEqArea84.f, aes(long, lat, group=group, fill=strata)) +
-  scale_fill_manual(values = c("#000066", "#333366")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+  scale_fill_manual(values = c("#000066", "#666699")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   geom_point(data=filter(senecavilleSites84@data, panel == "OverSamp"), #only main sites
              aes(x=long, y=lat),
              size = 2, color = "#F8766D") + # specify color to be consistent across maps
   geom_text(data=filter(senecavilleSites84@data, panel == "OverSamp"), #only main sites
-            aes(label=siteID, x=long, y=lat, color=panel),
+            aes(label=siteID, x=long, y=lat),
             hjust=1.2, vjust=0, size=2, color = "#F8766D") +
   coord_equal() +
   ggtitle("Oversample locations for Senecaville Lake")
@@ -127,7 +178,7 @@ ggmap(senecavilleSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
   geom_polygon(data=senecavilleEqArea84.f, aes(long, lat, group=group, fill=strata)) +
-  scale_fill_manual(values = c("#000066", "#333366")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+  scale_fill_manual(values = c("#000066", "#666699")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   geom_point(data=senecavilleSites84@data, 
              aes(x=long, y=lat, color = panel),
              size = 2) +
