@@ -37,7 +37,7 @@ set.seed(4447864)      #4447864
 # Create the design list
 actonDsgn <- list(None=list(panel=c(mainSites=15), # unstratified, therefore 1 list
                             seltype="Equal",
-                            overSites = 20)) # Equal probability, have been using 20 for oversample sites
+                            over = 20)) # Equal probability, have been using 20 for oversample sites
 
 
 # Execute survey design  
@@ -53,6 +53,7 @@ actonSites <- grts(design=actonDsgn,
 
 # Print the initial six lines of the survey design ------------
 head(actonSites@data)
+
 
 # Print the survey design summary
 summary(actonSites)
@@ -106,7 +107,15 @@ actonSites84@data <- mutate(actonSites84@data,
                             TotTrapVol = "",
                             TrapExtnrs = "",
                             Notes = ""
-)
+                              )
+
+# write out table of overdraw sites for reference in field
+write.table(filter(actonSites84@data, panel == "OverSamp")   %>%
+              select(siteID, stratum, long, lat),
+            file = paste(rootDir, "acton/actonOverSampList.txt", sep=""),
+            row.names = FALSE, sep="\t")
+            
+
 # write projected shapefile to disk for use on field computer.
 # arcPad requires one shapefile with all sites.
 # write one shapefile with all sites for use with arcPad
@@ -117,28 +126,28 @@ writeOGR(obj = actonSites84,
          overwrite_layer = TRUE)
 
 # iPad and geoplatform require separate shapefiles for main and oversamp sites.
-# separate shapefile for panelOne (main sites) and OverSamp (overdraw sites)
+# separate shapefile for mainSites (main sites) and OverSamp (overdraw sites)
 actonSites84ListByPanel <- split(actonSites84, # split preserves class, outputs a list
                                  f= actonSites84@data$panel)
 # to look at the list (optional):
-actonSites84ListByPanel[[1]]@data        #should be the OverSamp sites
-actonSites84ListByPanel[[2]]@data        #should be PanelOne
+actonSites84ListByPanel[[1]]@data        #should be the main sites
+actonSites84ListByPanel[[2]]@data        #should be OverSamp sites
 
-# Write 'OverSamp' to disk
-writeOGR(obj = actonSites84ListByPanel[[1]], # pulls out 'OverSamp' shapefile from list.  Should confirm.
+# Write 'mainSites' shapefile to disk
+writeOGR(obj = actonSites84ListByPanel[[1]], # pulls out 'mainSites' shapefile from list.  Should confirm.
+         dsn = paste(rootDir, "acton", sep=""), 
+         layer = "actonSites84mainSites",
+         driver = "ESRI Shapefile",
+         overwrite_layer = TRUE)
+# Write 'OverSamp' shapefile to disk
+writeOGR(obj = actonSites84ListByPanel[[2]], # pulls out 'OverSamp' shapefile from list.  Should confirm.
          dsn = paste(rootDir, "acton", sep=""), 
          layer = "actonSites84OverSamp",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
-# Write 'PanelOne' to disk
-writeOGR(obj = actonSites84ListByPanel[[2]], # pulls out 'PanelOne' shapefile from list.  Should confirm.
-         dsn = paste(rootDir, "acton", sep=""), 
-         layer = "actonSites84PanelOne",
-         driver = "ESRI Shapefile",
-         overwrite_layer = TRUE)
 
 # SIMPLE VISUALIZATION WITH BASIC R --------
-plot(actonLakeEqArea)
+plot(actonEqArea)
 points(actonSites$xcoord, actonSites$ycoord)
 
 # VISUALIZE SURVEY DESIGN WITH GGMAPS--------
@@ -157,16 +166,16 @@ ggmap(actonSat) +
   xlab ("Longitude") +
   geom_polygon(data=actonEqArea84.f, aes(long, lat, group=group, fill="Open Water")) +
   scale_fill_manual(values = c("#000066")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
-  geom_point(data=filter(actonSites84@data, panel == "PanelOne"), #only main sites
+  geom_point(data=filter(actonSites84@data, panel == "mainSites"), #only main sites
              aes(x=long, y=lat),
-             size = 2, color = "#00BFC4") + # specify color to be consistent across maps
-  geom_text(data=filter(actonSites84@data, panel == "PanelOne"), #only main sites
+             size = 2, color = "#F8766D") + # specify color to be consistent across maps
+  geom_text(data=filter(actonSites84@data, panel == "mainSites"), #only main sites
             aes(label=siteID, x=long, y=lat),
-            hjust=1.2, vjust=0, size=2, color = "#00BFC4") +
+            hjust=1.2, vjust=0, size=2, color = "#F8766D") +    #alternate color: "#00BFC4"
   coord_equal() +
   ggtitle("Main Measurement locations for Acton Lake")
 
-ggsave(filename=paste(rootDir, "acton/actonMainSites.tiff", sep=""),
+ggsave(filename=paste(rootDir, "acton/actonmainSites.tiff", sep=""),
        width=8,height=5.5, units="in",
        dpi=800,compression="lzw")
 
@@ -180,10 +189,10 @@ ggmap(actonSat) +
   #scale_fill_manual(values = c("#000066", "#333366")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   geom_point(data=filter(actonSites84@data, panel == "OverSamp"), #only main sites
              aes(x=long, y=lat),
-             size = 2, color = "#F8766D") + # specify color to be consistent across maps
+             size = 2, color = "#00BFC4") + # specify color to be consistent across maps
   geom_text(data=filter(actonSites84@data, panel == "OverSamp"), #only main sites
             aes(label=siteID, x=long, y=lat),
-            hjust=1.2, vjust=0, size=2, color = "#F8766D") +
+            hjust=1.2, vjust=0, size=2, color = "#00BFC4") +      #alternate color: "#F8766D"
   coord_equal() +
   ggtitle("Oversample locations for Acton Lake")
 
@@ -191,21 +200,23 @@ ggsave(filename=paste(rootDir, "acton/actonOversampleSites.tiff", sep=""),
        width=8,height=5.5, units="in",
        dpi=800,compression="lzw")
 
+
+
 # Third map contains all sites
 ggmap(actonSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
-  geom_polygon(data=actonEqArea84.f, aes(long, lat, group=group, fill="Open Water"), alpha=0.5) +
+  geom_polygon(data=actonEqArea84.f, aes(long, lat, group=group, fill="Open Water")) +
   scale_fill_manual(values = c("#000066")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   geom_point(data=actonSites84@data, 
-             aes(x=long, y=lat, color = panel),
+             aes(x=long, y=lat, color = panel),       
              size = 2) +
   geom_text(data=actonSites84@data,
-            aes(label=siteID, x=long, y=lat, color=panel),
+            aes(label=siteID, x=long, y=lat, color= panel),
             hjust=1.2, vjust=0, # horizontal and vertical adjustment
-            size=2, show.legend = FALSE) + # text size and call to suppres legend
+            size=2, show.legend = FALSE) + # text size and call to suppres legend 
   scale_color_discrete(name = "Sites",
-                       labels = c("Oversample", "Main")) +
+                       labels = c("Main", "Oversample")) +
   coord_equal() +
   ggtitle("All Measurement locations for Acton Lake")
 

@@ -44,9 +44,9 @@ attKiser <- read.dbf(filename = paste(rootDir, "kiserLakeDemo/kiserLakeEqArea", 
 set.seed(4447864)
 
 # Create the design list
-kiserDsgn <- list(None=list(panel=c(PanelOne=15), # unstratified, therefore 1 list
+kiserDsgn <- list(None=list(panel=c(mainSites=15), # unstratified, therefore 1 list
                             seltype="Equal",
-                            over = 20)) # Equal probability, have been using 20 for oversample sites
+                            overSites = 20)) # Equal probability, have been using 20 for oversample sites
 
 
 # Execute survey design  
@@ -136,13 +136,13 @@ kiserSites84ListByPanel[[2]]@data
 # Write 'OverSamp' to disk
 writeOGR(obj = kiserSites84ListByPanel[[1]], # pulls out 'OverSamp' shapefile from list.  Should confirm.
          dsn = paste(rootDir, "kiserLakeDemo", sep=""), 
-         layer = "kiserSites84OverSamp",
+         layer = "kiserSites84OverSites",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
 # Write 'PanelOne' to disk
 writeOGR(obj = kiserSites84ListByPanel[[2]], # pulls out 'PanelOne' shapefile from list.  Should confirm.
          dsn = paste(rootDir, "kiserLakeDemo", sep=""), 
-         layer = "kiserSites84PanelOne",
+         layer = "kiserSites84mainSites",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
 
