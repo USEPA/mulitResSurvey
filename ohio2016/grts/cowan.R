@@ -67,7 +67,7 @@ cowanEqArea84.f <- fortify(cowanEqArea84, region="id")  # fortify polygon for gg
 cowanEqArea84.f <- merge(cowanEqArea84.f, cowanEqArea84@data, 
                                by="id")  # bring attributes back in 
 
-# Read and project spatial points dataframe for plotting
+# Read and project spatial points dataframe for plottin
 cowanSitesPlot <- readOGR(dsn = paste(rootDir, "cowan", sep=""), 
                                 layer = "cowanSites")  # shapefile created with grts function
 cowanSites84 <- spTransform(x = cowanSitesPlot, #reproject
@@ -125,7 +125,7 @@ cowanSites84ListByPanel <- split(cowanSites84, # split preserves class, outputs 
                                        f= cowanSites84@data$panel)
 
 # to look at the list (optional):
-cowanSites84ListByPanel[[1]]@data        #should be the main sites
+cowanSites84ListByPanel[[1]]@data        #should be mainSites
 cowanSites84ListByPanel[[2]]@data        #should be OverSamp sites
 
 # Write 'mainSites' to disk
@@ -152,6 +152,7 @@ cowanSat <- get_map(location = bbox,
 
 # Plot ggmap with sites
 # First map contains only main sample sites
+# Island not showing up properly for some reason?
 ggmap(cowanSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
