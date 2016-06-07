@@ -116,6 +116,14 @@ kiserSites84@data <- mutate(kiserSites84@data,
                             TrapExtnrs = "",
                             Notes = ""
                             )
+
+
+# write out table of overdraw sites for reference in field
+write.table(filter(kiserSites84@data, panel == "OverSamp")   %>%
+              select(siteID, stratum, long, lat),
+            file = paste(rootDir, "kiserLakeDemo/kiserOverSampList.txt", sep=""),
+            row.names = FALSE, sep="\t")
+
 # write projected shapefile to disk for use on field computer.
 # arcPad requires one shapefile with all sites.
 # write one shapefile with all sites for use with arcPad
@@ -130,19 +138,19 @@ writeOGR(obj = kiserSites84,
 kiserSites84ListByPanel <- split(kiserSites84, # split preserves class, outputs a list
                                        f= kiserSites84@data$panel)
 # to look at the list (optional):
-kiserSites84ListByPanel[[1]]@data
-kiserSites84ListByPanel[[2]]@data
+kiserSites84ListByPanel[[1]]@data   # should be main sites
+kiserSites84ListByPanel[[2]]@data   # should be over sample
 
 # Write 'OverSamp' to disk
-writeOGR(obj = kiserSites84ListByPanel[[1]], # pulls out 'OverSamp' shapefile from list.  Should confirm.
+writeOGR(obj = kiserSites84ListByPanel[[1]], # pulls out 'mainSites' shapefile from list.  Should confirm.
          dsn = paste(rootDir, "kiserLakeDemo", sep=""), 
-         layer = "kiserSites84OverSites",
+         layer = "kiserSites84mainSites",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
 # Write 'PanelOne' to disk
-writeOGR(obj = kiserSites84ListByPanel[[2]], # pulls out 'PanelOne' shapefile from list.  Should confirm.
+writeOGR(obj = kiserSites84ListByPanel[[2]], # pulls out 'OverSamp' shapefile from list.  Should confirm.
          dsn = paste(rootDir, "kiserLakeDemo", sep=""), 
-         layer = "kiserSites84mainSites",
+         layer = "kiserSites84OverSamp",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
 
@@ -153,7 +161,7 @@ points(kiserSites$xcoord, kiserSites$ycoord)
 # VISUALIZE SURVEY DESIGN WITH GGMAPS--------
 # Get ggmap
 bbox <- make_bbox(data=kiserSites84@data, #defines map extent based on sample site lat/lon
-                  long, lat, f = 0.5) # f is zoom.  Large #, less zoom. tweak for each lake.  
+                  long, lat, f = 0.25) # f is zoom.  Large #, less zoom. tweak for each lake.  
 kiserSat <- get_map(location = bbox,
                           color = "color",
                           source = "google",
@@ -166,12 +174,12 @@ ggmap(kiserSat) +
   xlab ("Longitude") +
   geom_polygon(data=kiserEqArea84.f, aes(long, lat, group=group, fill="Open Water")) +
   scale_fill_manual(values = c("#000066")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
-  geom_point(data=filter(kiserSites84@data, panel == "PanelOne"), #only main sites
+  geom_point(data=filter(kiserSites84@data, panel == "mainSites"), #only main sites
              aes(x=long, y=lat),
-             size = 2, color = "#00BFC4") + # specify color to be consistent across maps
-  geom_text(data=filter(kiserSites84@data, panel == "PanelOne"), #only main sites
+             size = 2, color = "#F8766D") + # specify color to be consistent across maps
+  geom_text(data=filter(kiserSites84@data, panel == "mainSites"), #only main sites
             aes(label=siteID, x=long, y=lat),
-            hjust=1.2, vjust=0, size=2, color = "#00BFC4") +
+            hjust=1.2, vjust=0, size=2, color = "#F8766D") + #00BFC4 other color
   coord_equal() +
   ggtitle("Main Measurement locations for Kiser Lake")
 
@@ -189,10 +197,10 @@ ggmap(kiserSat) +
   #scale_fill_manual(values = c("#000066", "#333366")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   geom_point(data=filter(kiserSites84@data, panel == "OverSamp"), #only main sites
              aes(x=long, y=lat),
-             size = 2, color = "#F8766D") + # specify color to be consistent across maps
+             size = 2, color = "#00BFC4") + # specify color to be consistent across maps
   geom_text(data=filter(kiserSites84@data, panel == "OverSamp"), #only main sites
             aes(label=siteID, x=long, y=lat),
-            hjust=1.2, vjust=0, size=2, color = "#F8766D") +
+            hjust=1.2, vjust=0, size=2, color = "#00BFC4") +   #F8766D
   coord_equal() +
   ggtitle("Oversample locations for Kiser Lake")
 
@@ -214,7 +222,7 @@ ggmap(kiserSat) +
             hjust=1.2, vjust=0, # horizontal and vertical adjustment
             size=2, show.legend = FALSE) + # text size and call to suppres legend
   scale_color_discrete(name = "Sites",
-                       labels = c("Oversample", "Main")) +
+                       labels = c("Main Sites", "Oversample")) +
   coord_equal() +
   ggtitle("All Measurement locations for Kiser Lake")
 
