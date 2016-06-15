@@ -16,6 +16,7 @@ rootDir <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDe
 # ONLY USED TO CONFIRM THE POLYGON LOOKS RIGHT.  OBJECT NOT DIRECTLY USED IN GRTS CALL
 paintCreekEqArea <- readOGR(dsn = paste(rootDir, "paintCreek", sep=""), # Could use read.shape from spsurvey package
                        layer = "paintCreekEqArea")  # shapefile name
+
 plot(paintCreekEqArea) # visualize polygon
 
 # EXTRACT ATTRIBUTE TABLE
@@ -35,7 +36,7 @@ paintCreekDsgn <- list("open_water" = list(panel=c(mainSites=11),
                               seltype="Equal",
                               over=10))
 
-paintCreekSites <- grts(design=paintCreekDsgn,
+paintCreekSitesEqArea <- grts(design=paintCreekDsgn,
                    DesignID="S", # S for stratified
                    type.frame="area",
                    src.frame="shapefile",
@@ -43,15 +44,57 @@ paintCreekSites <- grts(design=paintCreekDsgn,
                    att.frame=attPaintCreek,
                    stratum="strata",
                    shapefile=TRUE,
-                   out.shape=paste(rootDir, "paintCreek/paintCreekSites", sep=""),
+                   out.shape=paste(rootDir, "paintCreek/paintCreekSitesEqArea", sep=""),
                    prjfilename=paste(rootDir, "paintCreek/paintCreekEqArea", sep=""))
-
 
 # Print the initial six lines of the survey design
 head(paintCreekSites@data)
 
 # Print the survey design summary
 summary(paintCreekSites)
+
+# read in site shapefile so that we can add additional attributes to be analyzed later
+
+paintCreekSitesEqArea <- readOGR(dsn = paste(rootDir, "paintCreek", sep=""), # Could use read.shape from spsurvey package
+                            layer = "paintCreekSitesEqArea")  # shapefile name
+
+paintCreekSitesEqArea@data <- mutate(paintCreekSitesEqArea@data, 
+                                 deployDate = "",    # adding all of these colums to the 
+                                 deployTime = "",    # shape file to be filled in the field
+                                 waterDepth = "",    # tried to enter them in the order they will be filled                      
+                                 Temp_F_S = "",
+                                 DOPercent_S = "",
+                                 DO_mg_L_S = "",
+                                 SpCond_ms_S = "",
+                                 pH_S = "",
+                                 ORP_S = "",
+                                 TurbidNTU_S = "",
+                                 chla_S = "",
+                                 Temp_F_D = "",
+                                 DOPercent_D = "",
+                                 DO_mg_L_D = "",
+                                 SpCond_ms_D = "",
+                                 pH_D = "",
+                                 ORP_D = "",
+                                 TurbidNTU_D = "",
+                                 chla_D = "",
+                                 AirExtnrs = "",
+                                 DG_Extnrs = "",
+                                 BarPrssr = "",
+                                 RtrvDate = "",
+                                 RtrvTime = "",
+                                 TotTrapVol = "",
+                                 TrapExtnrs = "",
+                                 Notes = ""
+)
+
+
+#new feature added 14 June 2016
+writeOGR(obj = paintCreekSitesEqArea,  # write projected shapefile to disk for use on field computer
+         dsn = paste(rootDir, "paintCreek", sep=""), 
+         layer = "paintCreekSitesEqArea",
+         driver = "ESRI Shapefile",
+         overwrite_layer = TRUE)
 
 # MANIPULATE, PROJECT, SUBSET, AND WRITE SHAPEFILES FOR PLOTTING-------
 # Project spatial polygon into WGS84 for plotting in ggmap/ggplot 
@@ -69,40 +112,14 @@ paintCreekEqArea84.f <- merge(paintCreekEqArea84.f, paintCreekEqArea84@data,
 
 # Read and project spatial points dataframe for plottin
 paintCreekSitesPlot <- readOGR(dsn = paste(rootDir, "paintCreek", sep=""), 
-                          layer = "paintCreekSites")  # shapefile created with grts function
+                          layer = "paintCreekSitesEqArea")  # shapefile created with grts function
 paintCreekSites84 <- spTransform(x = paintCreekSitesPlot, #reproject
                             CRS("+proj=longlat +datum=WGS84")) # projection needed for google maps
 paintCreekSites84@data <- mutate(paintCreekSites84@data, 
                             long=coordinates(paintCreekSites84)[,1], # add long to @data slot
-                            lat=coordinates(paintCreekSites84)[,2], # add lat to @data slot
-                            deployDate = "",    # adding all of these colums to the 
-                            deployTime = "",    # shape file to be filled in the field
-                            waterDepth = "",    # tried to enter them in the order they will be filled                      
-                            Temp_F_S = "",
-                            DOPercent_S = "",
-                            DO_mg_L_S = "",
-                            SpCond_ms_S = "",
-                            pH_S = "",
-                            ORP_S = "",
-                            TurbidNTU_S = "",
-                            chla_S = "",
-                            Temp_F_D = "",
-                            DOPercent_D = "",
-                            DO_mg_L_D = "",
-                            SpCond_ms_D = "",
-                            pH_D = "",
-                            ORP_D = "",
-                            TurbidNTU_D = "",
-                            chla_D = "",
-                            AirExtnrs = "",
-                            DG_Extnrs = "",
-                            BarPrssr = "",
-                            RtrvDate = "",
-                            RtrvTime = "",
-                            TotTrapVol = "",
-                            TrapExtnrs = "",
-                            Notes = ""
-)
+                            lat=coordinates(paintCreekSites84)[,2]) # add lat to @data slot
+                           
+str(paintCreekSites84@data)
 
 # write out table of overdraw sites for reference in field
 write.table(filter(paintCreekSites84@data, panel == "OverSamp")   %>%

@@ -11,7 +11,7 @@ source("ohio2016/scriptsAndRmd/masterLibrary.R")
 rootDir <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
 
 # READ/PLOT SHAPEFILE ---------
-actonEqArea <- readOGR(dsn = paste(rootDir, "acton", sep=""), # Could use read.shape from spsurvey package
+actonEqArea <- readOGR(dsn = paste(rootDir, "acton2", sep=""), # Could use read.shape from spsurvey package
                            layer = "actonEqArea")  # shapefile name
 plot(actonEqArea) # visualize polygon
 
@@ -41,29 +41,81 @@ actonDsgn <- list(None=list(panel=c(mainSites=15), # unstratified, therefore 1 l
 
 
 # Execute survey design  
-actonSites <- grts(design=actonDsgn,
+actonSitesEqArea <- grts(design=actonDsgn,
                    DesignID="U", # U for unstratified
                    type.frame="area",
                    src.frame="shapefile",
-                   in.shape=paste(rootDir, "acton/actonEqArea", sep=""),
+                   in.shape=paste(rootDir, "acton2/actonEqArea", sep=""),
                    att.frame=attActon,
                    shapefile=TRUE,
-                   prjfilename = paste(rootDir, "acton/actonEqArea", sep=""),
-                   out.shape=paste(rootDir, "acton/actonSites", sep=""))
+                   prjfilename = paste(rootDir, "acton2/actonEqArea", sep=""),
+                   out.shape=paste(rootDir, "acton2/actonSitesEqArea", sep=""))
+
+# new feature added 14 June 2016
+# Set up for mutating the actonSitesEqArea file to include all of the fill-able fields
+# necessary in order to keep the Equal Area projection
+actonSitesEqArea <- readOGR(dsn = paste(rootDir, "acton2", sep=""), # Could use read.shape from spsurvey package
+                                 layer = "actonSitesEqArea")  # shapefile name
+
+# add fill-able fields, preparation for analyzing GRTS results
+actonSitesEqArea@data <- mutate(actonSitesEqArea@data, 
+                                deployDate = "",    # adding all of these colums to the 
+                                deployTime = "",    # shape file to be filled in the field
+                                chamStTime = "",    # tried to enter them in the order they will be filled
+                                chamEndTime = "",
+                                bubblingObs = "",                                
+                                waterDepth = "",                          
+                                Temp_F_S = "",
+                                DOPercent_S = "",
+                                DO_mg_L_S = "",
+                                SpCond_ms_S = "",
+                                pH_S = "",
+                                ORP_S = "",
+                                TurbidNTU_S = "",
+                                chla_S = "",
+                                Temp_F_D = "",
+                                DOPercent_D = "",
+                                DO_mg_L_D = "",
+                                SpCond_ms_D = "",
+                                pH_D = "",
+                                ORP_D = "",
+                                TurbidNTU_D = "",
+                                chla_D = "",
+                                AirExtnrs = "",
+                                DG_Extnrs = "",
+                                H2O_vol = "",
+                                HeVol = "",
+                                BarPrssr = "",
+                                RtrvDate = "",
+                                RtrvTime = "",
+                                TotTrapVol = "",
+                                TrapExtnrs = "",
+                                Notes = "",
+                                LatSamp = "",
+                                LongSamp = ""
+)
+
+
+# re-write this mutated file, will keep the equal area projection
+writeOGR(obj = actonSitesEqArea,  # write projected shapefile to disk for use on field computer
+         dsn = paste(rootDir, "acton2", sep=""), 
+         layer = "actonSitesEqArea",
+         driver = "ESRI Shapefile",
+         overwrite_layer = TRUE)
 
 # Print the initial six lines of the survey design ------------
-head(actonSites@data)
+head(actonSitesEqArea@data)
 
 
 # Print the survey design summary
-summary(actonSites)
+summary(actonSitesEqArea)
 
 # PROJECT, SUBSET, AND WRITE SHAPEFILES FOR PLOTTING-------
 # Project spatial polygon into WGS84 for plotting in ggmap/ggplot 
 actonEqArea84 <- spTransform(x = actonEqArea, 
                              CRS("+proj=longlat +datum=WGS84")) # specifies projection
 writeOGR(obj = actonEqArea84,  # write projected shapefile to disk for use on field computer
-         dsn = paste(rootDir, "acton", sep=""), 
+         dsn = paste(rootDir, "acton2", sep=""), 
          layer = "actonEqArea84",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
@@ -73,42 +125,14 @@ actonEqArea84.f <- merge(actonEqArea84.f, actonEqArea84@data,
                          by="id")  # bring attributes back in 
 
 # Read and project spatial points dataframe for plotting
-actonSitesPlot <- readOGR(dsn = paste(rootDir, "acton", sep=""), 
-                          layer = "actonSites")  # shapefile created with grts function
+actonSitesPlot <- readOGR(dsn = paste(rootDir, "acton2", sep=""), 
+                          layer = "actonSitesEqArea")  # shapefile created with grts function
 actonSites84 <- spTransform(x = actonSitesPlot, #reproject
                             CRS("+proj=longlat +datum=WGS84")) # projection needed for google maps
 actonSites84@data <- mutate(actonSites84@data, 
                             long=coordinates(actonSites84)[,1], # add long to @data slot
-                            lat=coordinates(actonSites84)[,2], # add lat to @data slot
-                            deployDate = "",    # adding all of these colums to the 
-                            deployTime = "",    # shape file to be filled in the field
-                            waterDepth = "",    # tried to enter them in the order they will be filled                      
-                            Temp_F_S = "",
-                            DOPercent_S = "",
-                            DO_mg_L_S = "",
-                            SpCond_ms_S = "",
-                            pH_S = "",
-                            ORP_S = "",
-                            TurbidNTU_S = "",
-                            chla_S = "",
-                            Temp_F_D = "",
-                            DOPercent_D = "",
-                            DO_mg_L_D = "",
-                            SpCond_ms_D = "",
-                            pH_D = "",
-                            ORP_D = "",
-                            TurbidNTU_D = "",
-                            chla_D = "",
-                            AirExtnrs = "",
-                            DG_Extnrs = "",
-                            BarPrssr = "",
-                            RtrvDate = "",
-                            RtrvTime = "",
-                            TotTrapVol = "",
-                            TrapExtnrs = "",
-                            Notes = ""
-                              )
-
+                            lat=coordinates(actonSites84)[,2]) # add lat to @data slot
+                            
 # write out table of overdraw sites for reference in field
 write.table(filter(actonSites84@data, panel == "OverSamp")   %>%
               select(siteID, stratum, long, lat),
@@ -120,7 +144,7 @@ write.table(filter(actonSites84@data, panel == "OverSamp")   %>%
 # arcPad requires one shapefile with all sites.
 # write one shapefile with all sites for use with arcPad
 writeOGR(obj = actonSites84, 
-         dsn = paste(rootDir, "acton", sep=""), 
+         dsn = paste(rootDir, "acton2", sep=""), 
          layer = "actonSites84",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
@@ -135,20 +159,20 @@ actonSites84ListByPanel[[2]]@data        #should be OverSamp sites
 
 # Write 'mainSites' shapefile to disk
 writeOGR(obj = actonSites84ListByPanel[[1]], # pulls out 'mainSites' shapefile from list.  Should confirm.
-         dsn = paste(rootDir, "acton", sep=""), 
+         dsn = paste(rootDir, "acton2", sep=""), 
          layer = "actonSites84mainSites",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
 # Write 'OverSamp' shapefile to disk
 writeOGR(obj = actonSites84ListByPanel[[2]], # pulls out 'OverSamp' shapefile from list.  Should confirm.
-         dsn = paste(rootDir, "acton", sep=""), 
+         dsn = paste(rootDir, "acton2", sep=""), 
          layer = "actonSites84OverSamp",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
 
 # SIMPLE VISUALIZATION WITH BASIC R --------
 plot(actonEqArea)
-points(actonSites$xcoord, actonSites$ycoord)
+points(actonSitesEqArea$xcoord, actonSitesEqArea$ycoord)
 
 # VISUALIZE SURVEY DESIGN WITH GGMAPS--------
 # Get ggmap
