@@ -59,41 +59,44 @@ caesarCreekSitesEqArea <- readOGR(dsn = paste(rootDir, "caesarCreek", sep=""), #
 
 # add fill-able fields, preparation for analyzing GRTS results
 caesarCreekSitesEqArea@data <- mutate(caesarCreekSitesEqArea@data, 
-                                deployDate = "",    # adding all of these colums to the 
-                                deployTime = "",    # shape file to be filled in the field
-                                chamStTime = "",    # tried to enter them in the order they will be filled
-                                chamEndTime = "",
-                                bubblingObs = "",                                
-                                waterDepth = "",                          
-                                Temp_F_S = "",
-                                DOPercent_S = "",
-                                DO_mg_L_S = "",
-                                SpCond_ms_S = "",
+                                deplyDt = "",    # adding all of these colums to the 
+                                deplyTm = "",    # shape file to be filled in the field
+                                chmStTm = "",  # tried to enter them in the order they will be filled
+                                chm_vol = "",
+                                bbblngO = "",                                
+                                wtrDpth = "", 
+                                smDpthS = "",
+                                Tmp_C_S = "",
+                                DOPrc_S = "",
+                                DO__L_S = "",
+                                SpCn__S = "",
                                 pH_S = "",
                                 ORP_S = "",
-                                TurbidNTU_S = "",
+                                TrNTU_S = "",
                                 chla_S = "",
-                                Temp_F_D = "",
-                                DOPercent_D = "",
-                                DO_mg_L_D = "",
-                                SpCond_ms_D = "",
+                                smDpthD = "",
+                                Tmp_C_D = "",
+                                DOPrc_D = "",
+                                DO__L_D = "",
+                                SpCn__D = "",
                                 pH_D = "",
                                 ORP_D = "",
-                                TurbidNTU_D = "",
+                                TrNTU_D = "",
                                 chla_D = "",
-                                AirExtnrs = "",
-                                DG_Extnrs = "",
+                                ArExtnrs = "",
+                                DG_Extn = "",
                                 H2O_vol = "",
                                 HeVol = "",
-                                BarPrssr = "",
-                                RtrvDate = "",
-                                RtrvTime = "",
-                                TotTrapVol = "",
-                                TrapExtnrs = "",
+                                BrPrssr = "",
+                                RtrvDat = "",
+                                RtrvTim = "",
+                                TtTrpVl = "",
+                                TrapExtn = "",
                                 Notes = "",
                                 LatSamp = "",
-                                LongSamp = ""
+                                LongSmp = ""
 )
+
 
 
 # re-write this mutated file, will keep the equal area projection

@@ -19,14 +19,7 @@ plot(rockyForkEqArea) # visualize polygon
 
 
 # EXTRACT ATTRIBUTE TABLE -----------
-# This is referenced in the GRTS att.frame argument.  If src.frame is
-# 'shapefile' and the shapefile was created with the sp2shape function, then the the shapefile 
-# is stored on disk and does not exist in environment.  Therefore we need to create an obect in
-# the environment that contains the information needed for the att.frame argument of the grts
-# function.  IF we could get grts to work while specifying src.frame = 'sp.object', then the 
-# spatial object (i.e. shapefile) could be read into environment and we could reference 
-# shapefile@data in the att.frame argument.  This worked with the UT_ecoregions demo, but we
-# can't get it to work here.  
+
 attRockyFork <- read.dbf(filename = paste(rootDir, "rockyFork/rockyForkEqArea", sep=""))
 
 
@@ -36,28 +29,84 @@ attRockyFork <- read.dbf(filename = paste(rootDir, "rockyFork/rockyForkEqArea", 
 set.seed(4447864)      #4447864
 
 # Create the design list
-rockyForkDsgn <- list(None=list(panel=c(mainSites=15), # unstratified, therefore 1 list
-                                 seltype="Equal",
-                                 over = 20)) # Equal probability, have been using 20 for oversample sites
+rockyForkDsgn <- llist("open_water" = list(panel=c(mainSites=10),
+                                           seltype="Equal",
+                                           over=20),
+                       "trib"=list(panel=c(mainSites=5),
+                                   seltype="Equal",
+                                   over=10))
 
 
 # Execute survey design  
-rockyForkSites <- grts(design=rockyForkDsgn,
-                        DesignID="U", # U for unstratified
-                        type.frame="area",
-                        src.frame="shapefile",
-                        in.shape=paste(rootDir, "rockyFork/rockyForkEqArea", sep=""),
-                        att.frame=attRockyFork,
-                        shapefile=TRUE,
-                        prjfilename = paste(rootDir, "rockyFork/rockyForkEqArea", sep=""),
-                        out.shape=paste(rootDir, "rockyFork/rockyForkSites", sep=""))
+rockyForkSitesEqArea <- grts(design=rockyForkDsgn,
+                             DesignID="S", # s for stratified
+                             type.frame="area",
+                             src.frame="shapefile",
+                             in.shape=paste(rootDir, "rockyFork/rockyForkEqArea", sep=""),
+                             att.frame=attRockyFork,
+                             stratum="strata",
+                             shapefile=TRUE,
+                             prjfilename = paste(rootDir, "rockyFork/rockyForkEqArea", sep=""),
+                             out.shape=paste(rootDir, "rockyFork/rockyForkSitesEqArea", sep=""))
+
 
 # Print the initial six lines of the survey design ------------
-head(rockyForkSites@data)
+head(rockyForkSitesEqArea@data)
 
 
 # Print the survey design summary
-summary(rockyForkSites)
+summary(rockyForkSitesEqArea)
+
+rockyForkSitesEqArea <- readOGR(dsn = paste(rootDir, "rockyFork", sep=""), # Could use read.shape from spsurvey package
+                                 layer = "rockyForkSitesEqArea")  # shapefile name
+
+rockyForkSitesEqArea@data <- mutate(rockyForkSitesEqArea@data, 
+                                    deplyDate = "",    # adding all of these colums to the 
+                                    deplyTm = "",    # shape file to be filled in the field
+                                    chmStTm = "",  # tried to enter them in the order they will be filled
+                                    chm_vol = "",
+                                    bbblngO = "",                                
+                                    wtrDpth = "", 
+                                    smDpthS = "",
+                                    Tmp_C_S = "",
+                                    DOPrc_S = "",
+                                    DO__L_S = "",
+                                    SpCn__S = "",
+                                    pH_S = "",
+                                    ORP_S = "",
+                                    TrNTU_S = "",
+                                    chla_S = "",
+                                    smDpthD = "",
+                                    Tmp_C_D = "",
+                                    DOPrc_D = "",
+                                    DO__L_D = "",
+                                    SpCn__D = "",
+                                    pH_D = "",
+                                    ORP_D = "",
+                                    TrNTU_D = "",
+                                    chla_D = "",
+                                    ArExtnrs = "",
+                                    DG_Extn = "",
+                                    H2O_vol = "",
+                                    HeVol = "",
+                                    BrPrssr = "",
+                                    RtrvDat = "",
+                                    RtrvTim = "",
+                                    TtTrpVl = "",
+                                    TrapExtn = "",
+                                    Notes = "",
+                                    LatSamp = "",
+                                    LongSmp = ""
+)
+
+
+
+#new feature added 14 June 2016
+writeOGR(obj = rockyForkSitesEqArea,  # write projected shapefile to disk for use on field computer
+         dsn = paste(rootDir, "rockyFork", sep=""), 
+         layer = "rockyForkSitesEqArea",
+         driver = "ESRI Shapefile",
+         overwrite_layer = TRUE)
 
 # PROJECT, SUBSET, AND WRITE SHAPEFILES FOR PLOTTING-------
 # Project spatial polygon into WGS84 for plotting in ggmap/ggplot 
@@ -74,9 +123,9 @@ rockyForkEqArea84.f <- merge(rockyForkEqArea84.f, rockyForkEqArea84@data,
                               by="id")  # bring attributes back in 
 
 # Read and project spatial points dataframe for plotting
-rockyForkSitesPlot <- readOGR(dsn = paste(rootDir, "rockyFork", sep=""), 
-                               layer = "rockyForkSites")  # shapefile created with grts function
-rockyForkSites84 <- spTransform(x = rockyForkSitesPlot, #reproject
+rockyForkSitesEqAreaPlot <- readOGR(dsn = paste(rootDir, "rockyFork", sep=""), 
+                               layer = "rockyForkSitesEqArea")  # shapefile created with grts function
+rockyForkSites84 <- spTransform(x = rockyForkSitesEqAreaPlot, #reproject
                                  CRS("+proj=longlat +datum=WGS84")) # projection needed for google maps
 rockyForkSites84@data <- mutate(rockyForkSites84@data, 
                                  long=coordinates(rockyForkSites84)[,1], # add long to @data slot
@@ -149,7 +198,7 @@ writeOGR(obj = rockyForkSites84ListByPanel[[2]], # pulls out 'OverSamp' shapefil
 
 # SIMPLE VISUALIZATION WITH BASIC R --------
 plot(rockyForkEqArea)
-points(rockyForkSites$xcoord, rockyForkSites$ycoord)
+points(rockyForkSitesEqArea$xcoord, rockyForkSitesEqArea$ycoord)
 
 # VISUALIZE SURVEY DESIGN WITH GGMAPS--------
 # Get ggmap
