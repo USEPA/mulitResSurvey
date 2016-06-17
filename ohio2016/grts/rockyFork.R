@@ -1,10 +1,11 @@
 # STRATIFIED, EQUAL PROBABILITY GRTS DESIGN
 ## WHEN MODIFIYING FOR ANOTHER LAKE MAKE THE FOLLOWING CHANGES: 
-##    MODIFY THE GRTS DESIGN LIST FOR THE NUMBER OF MAIN AND OVERSAMPLE SITES WANTED IN EACH STRATA
-##      NOMINAL OPEN WATER MAIN SITES = 10
-##      NOMINAL OPEN WATER OVER SAMPLE = 20
-##      NOMINAL TRIBUTARY MAIN SITES = 5
-##      NOMINAL TRIBUTARY OVER SAMPLE = 10
+##    MODIFY THE GRTS DESIGN LIST FOR THE NUMBER OF MAIN AND OVERSAMPLE SITES 
+##    WANTED IN EACH STRATA, NOMINALLY
+##       OPEN WATER MAIN SITES = 10
+##       OPEN WATER OVER SAMPLE = 20
+##       TRIBUTARY MAIN SITES = 5
+##       TRIBUTARY OVER SAMPLE = 10
 ##    CHANGE THE ZOOM FACTOR ON LINE 179
 ##    FIND AND REPLACE ALL INSTANCES OF THE LAKE NAME
 
@@ -26,13 +27,8 @@ rockyForkEqArea <- readOGR(dsn = paste(rootDir, "rockyFork", sep=""), # Could us
                             layer = "rockyForkEqArea")  # shapefile name
 plot(rockyForkEqArea) # visualize polygon
 
-
-
 # EXTRACT ATTRIBUTE TABLE -----------
-
 attRockyFork <- read.dbf(filename = paste(rootDir, "rockyFork/rockyForkEqArea", sep=""))
-
-
 
 # SET UP FOR AND RUN GRTS FUNCTION   -------------
 # Call the set.seed function so that the survey designs can be replicate
@@ -45,7 +41,6 @@ rockyForkDsgn <- list("open_water" = list(panel=c(mainSites=10),
                        "trib"=list(panel=c(mainSites=5),
                                    seltype="Equal",
                                    over=10))
-
 
 # Execute survey design  
 rockyForkSitesEqArea <- grts(design=rockyForkDsgn,
@@ -112,7 +107,6 @@ rockyForkSitesEqArea@data <- mutate(rockyForkSitesEqArea@data,
 # In case you want to check again:
 # Print the initial six lines of the survey design ------------
 head(rockyForkSitesEqArea@data)
-
 
 # Print the survey design summary
 summary(rockyForkSitesEqArea)
