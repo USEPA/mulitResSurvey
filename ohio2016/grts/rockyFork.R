@@ -1,8 +1,18 @@
+# STRATIFIED, EQUAL PROBABILITY GRTS DESIGN
+## WHEN MODIFIYING FOR ANOTHER LAKE MAKE THE FOLLOWING CHANGES: 
+##    MODIFY THE GRTS DESIGN LIST FOR THE NUMBER OF MAIN AND OVERSAMPLE SITES WANTED IN EACH STRATA
+##      NOMINAL OPEN WATER MAIN SITES = 10
+##      NOMINAL OPEN WATER OVER SAMPLE = 20
+##      NOMINAL TRIBUTARY MAIN SITES = 5
+##      NOMINAL TRIBUTARY OVER SAMPLE = 10
+##    CHANGE THE ZOOM FACTOR ON LINE 179
+##    FIND AND REPLACE ALL INSTANCES OF THE LAKE NAME
+
 # ROCKY FORK LAKE GRTS DESIGN
 # SAMPLE LAKE FOR WEEK 2 OF STUDY, JUNE 6 - 10
 # MEDIUM-LARGE LAKE (8 km^2) WITH ONE MAIN TRIBUTARY.
 # TRIBUTARY AREA IS SMALL, SO LETS TRY AN:
-# UNSTRATIFIED-EQUAL PROBABILITY GRTS DESIGN
+# STRATIFIED-EQUAL PROBABILITY GRTS DESIGN
 
 # LIBRARY----------
 source("ohio2016/scriptsAndRmd/masterLibrary.R")
@@ -29,7 +39,7 @@ attRockyFork <- read.dbf(filename = paste(rootDir, "rockyFork/rockyForkEqArea", 
 set.seed(4447864)      #4447864
 
 # Create the design list
-rockyForkDsgn <- llist("open_water" = list(panel=c(mainSites=10),
+rockyForkDsgn <- list("open_water" = list(panel=c(mainSites=10),
                                            seltype="Equal",
                                            over=20),
                        "trib"=list(panel=c(mainSites=5),
@@ -99,6 +109,13 @@ rockyForkSitesEqArea@data <- mutate(rockyForkSitesEqArea@data,
                                     LongSmp = ""
 )
 
+# In case you want to check again:
+# Print the initial six lines of the survey design ------------
+head(rockyForkSitesEqArea@data)
+
+
+# Print the survey design summary
+summary(rockyForkSitesEqArea)
 
 
 #new feature added 14 June 2016
@@ -129,34 +146,8 @@ rockyForkSites84 <- spTransform(x = rockyForkSitesEqAreaPlot, #reproject
                                  CRS("+proj=longlat +datum=WGS84")) # projection needed for google maps
 rockyForkSites84@data <- mutate(rockyForkSites84@data, 
                                  long=coordinates(rockyForkSites84)[,1], # add long to @data slot
-                                 lat=coordinates(rockyForkSites84)[,2], # add lat to @data slot
-                                 deployDate = "",    # adding all of these colums to the 
-                                 deployTime = "",    # shape file to be filled in the field
-                                 waterDepth = "",    # tried to enter them in the order they will be filled                      
-                                 Temp_F_S = "",
-                                 DOPercent_S = "",
-                                 DO_mg_L_S = "",
-                                 SpCond_ms_S = "",
-                                 pH_S = "",
-                                 ORP_S = "",
-                                 TurbidNTU_S = "",
-                                 chla_S = "",
-                                 Temp_F_D = "",
-                                 DOPercent_D = "",
-                                 DO_mg_L_D = "",
-                                 SpCond_ms_D = "",
-                                 pH_D = "",
-                                 ORP_D = "",
-                                 TurbidNTU_D = "",
-                                 chla_D = "",
-                                 AirExtnrs = "",
-                                 DG_Extnrs = "",
-                                 BarPrssr = "",
-                                 RtrvDate = "",
-                                 RtrvTime = "",
-                                 TotTrapVol = "",
-                                 TrapExtnrs = "",
-                                 Notes = ""
+                                 lat=coordinates(rockyForkSites84)[,2] # add lat to @data slot
+                                 
 )
 
 # write out table of overdraw sites for reference in field
@@ -203,7 +194,7 @@ points(rockyForkSitesEqArea$xcoord, rockyForkSitesEqArea$ycoord)
 # VISUALIZE SURVEY DESIGN WITH GGMAPS--------
 # Get ggmap
 bbox <- make_bbox(data=rockyForkSites84@data, #defines map extent based on sample site lat/lon
-                  long, lat, f = 0.5) # f is zoom.  Large #, less zoom. tweak for each lake.  
+                  long, lat, f = 1) # f is zoom.  Large #, less zoom. tweak for each lake.  
 rockyForkSat <- get_map(location = bbox,
                          color = "color",
                          source = "google",
@@ -214,8 +205,8 @@ rockyForkSat <- get_map(location = bbox,
 ggmap(rockyForkSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
-  geom_polygon(data=rockyForkEqArea84.f, aes(long, lat, group=group, fill="Open Water")) +
-  scale_fill_manual(values = c("#000066")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+  geom_polygon(data=rockyForkEqArea84.f, aes(long, lat, group=group, fill=strata)) +
+  scale_fill_manual(values = c("#000066", "#333399")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   geom_point(data=filter(rockyForkSites84@data, panel == "mainSites"), #only main sites
              aes(x=long, y=lat),
              size = 2, color = "#F8766D") + # specify color to be consistent across maps
@@ -233,8 +224,8 @@ ggsave(filename=paste(rootDir, "rockyFork/rockyForkmainSites.tiff", sep=""),
 ggmap(rockyForkSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
-  geom_polygon(data=rockyForkEqArea84.f, aes(long, lat, group=group, fill="Open Water")) +
-  scale_fill_manual(values = c("#000066")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+  geom_polygon(data=rockyForkEqArea84.f, aes(long, lat, group=group, fill=strata)) +
+  scale_fill_manual(values = c("#000066", "#333399")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   #geom_polygon(data=rockyForkEqArea84.f, aes(long, lat, group=group, fill=strata)) +
   #scale_fill_manual(values = c("#000066", "#333366")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   geom_point(data=filter(rockyForkSites84@data, panel == "OverSamp"), #only main sites
@@ -256,8 +247,8 @@ ggsave(filename=paste(rootDir, "rockyFork/rockyForkOversampleSites.tiff", sep=""
 ggmap(rockyForkSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
-  geom_polygon(data=rockyForkEqArea84.f, aes(long, lat, group=group, fill="Open Water")) +
-  scale_fill_manual(values = c("#000066")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+  geom_polygon(data=rockyForkEqArea84.f, aes(long, lat, group=group, fill=strata)) +
+  scale_fill_manual(values = c("#000066", "#333399")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   geom_point(data=rockyForkSites84@data, 
              aes(x=long, y=lat, color = panel),       
              size = 2) +
