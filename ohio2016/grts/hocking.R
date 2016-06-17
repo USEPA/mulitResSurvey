@@ -233,7 +233,7 @@ ggsave(filename=paste(rootDir, "hocking/hockingOversampleSites.tiff", sep=""),
 ggmap(hockingSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
-  geom_polygon(data=hockingEqArea84.f, aes(long, lat, group=group, fill=strata)) +
+  geom_polygon(data=hockingEqArea84.f, aes(long, lat, group=group, fill=section)) +
   scale_fill_manual(values = c("#000066", "#666699")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
   geom_point(data=hockingSites84@data, 
              aes(x=long, y=lat, color = panel),
@@ -245,7 +245,7 @@ ggmap(hockingSat) +
   scale_color_discrete(name = "Sites",
                        labels = c("Main", "Oversample")) +
   coord_equal() +
-  ggtitle("All Measurement locations for MJ Kirwan (West Branch)")
+  ggtitle("All Measurement locations for Hocking (aka Logan) Lake")
 
 ggsave(filename=paste(rootDir, "hocking/hockingAllSites.tiff", sep=""),
        width=8,height=5.5, units="in",
