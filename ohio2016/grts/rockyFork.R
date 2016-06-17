@@ -27,13 +27,8 @@ rockyForkEqArea <- readOGR(dsn = paste(rootDir, "rockyFork", sep=""), # Could us
                             layer = "rockyForkEqArea")  # shapefile name
 plot(rockyForkEqArea) # visualize polygon
 
-
-
 # EXTRACT ATTRIBUTE TABLE -----------
-
 attRockyFork <- read.dbf(filename = paste(rootDir, "rockyFork/rockyForkEqArea", sep=""))
-
-
 
 # SET UP FOR AND RUN GRTS FUNCTION   -------------
 # Call the set.seed function so that the survey designs can be replicate
@@ -46,7 +41,6 @@ rockyForkDsgn <- list("open_water" = list(panel=c(mainSites=10),
                        "trib"=list(panel=c(mainSites=5),
                                    seltype="Equal",
                                    over=10))
-
 
 # Execute survey design  
 rockyForkSitesEqArea <- grts(design=rockyForkDsgn,
@@ -113,7 +107,6 @@ rockyForkSitesEqArea@data <- mutate(rockyForkSitesEqArea@data,
 # In case you want to check again:
 # Print the initial six lines of the survey design ------------
 head(rockyForkSitesEqArea@data)
-
 
 # Print the survey design summary
 summary(rockyForkSitesEqArea)

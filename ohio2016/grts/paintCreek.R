@@ -237,7 +237,6 @@ ggsave(filename=paste(rootDir, "paintCreek/paintCreekOversampleSites.tiff", sep=
        dpi=800,compression="lzw")
 
 
-
 # Third map contains all sites
 ggmap(paintCreekSat) +
   ylab("Latitude") +
