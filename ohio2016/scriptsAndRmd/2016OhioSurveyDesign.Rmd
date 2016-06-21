@@ -101,20 +101,23 @@ Four of USACE LD reservoirs are located in Ohio and are
 included in the NID data set.  Will strip these out to avoid duplicates.
 ```{r}
 # Reservoir geometry
-ldGeom <- read.xls("ohio2016/inputData/WA 3-93 reservoirsurfacegeometry.xlsx", sheet="Task 1a", stringsAsFactors = FALSE)
+ldGeom <- read.xls("ohio2016/inputData/WA 3-93 reservoirsurfacegeometry.xlsx", 
+                   sheet="Task 1a", stringsAsFactors = FALSE)
 ldGeom <- ldGeom[1:20, c("Reservoir", "NHDArea.sqkm.", "NHDPerimeter.mi.", "Fetch..m.")]  # Subset
 names(ldGeom) <- c("Reservoir", "Reservoir.Area.sqkm", "Reservoir.Perimeter.km", "Fetch.m.")  # Rename perimeter to km
 ldGeom$Reservoir.Perimeter.km <- ldGeom$Reservoir.Perimeter.km * 1.609  # Converts mile to kilometer
 
 # Watershed land use
-ldLu <- read.xls("ohio2016/inputData/WatershedAreaCharacterization.xlsx", sheet="FinalForm", stringsAsFactors = FALSE)
+ldLu <- read.xls("ohio2016/inputData/WatershedAreaCharacterization.xlsx", 
+                 sheet="FinalForm", stringsAsFactors = FALSE)
 str(ldLu)
 ldLu <- subset(ldLu, select=-c(Code, State, X))
 names(ldLu) = c("Reservoir", "Watershed.area.km2", "prop.crops", "prop.pasture", "prop.range", "prop.water",
               "prop.wetland", "prop.urban", "prop.forest")
 
 # Reservoir Hydrology
-ldHyd <- read.xls("ohio2016/inputData/LouisDistReservoirHydrology.xlsx", sheet="hydrology", stringsAsFactors=FALSE)
+ldHyd <- read.xls("ohio2016/inputData/LouisDistReservoirHydrology.xlsx", 
+                  sheet="hydrology", stringsAsFactors=FALSE)
 ldHyd <- select(ldHyd, -Lake)
 
 # Merge reservoir geometry, land use, and hydrology data
@@ -181,7 +184,7 @@ Note that reservoir area and the relative drainage area
 # Reservoir depth
 ggplot(survRes, aes(x=max.depth.ft)) + #convert to km2
   geom_histogram(binwidth=5) +
-  xlab("Reservoir area (km2)")
+  xlab("Max Reservoir Depth (ft)")
 
 # Reservoir area
 ggplot(survRes, aes(x=reservoir.area.m2/1000000)) + #convert to km2
