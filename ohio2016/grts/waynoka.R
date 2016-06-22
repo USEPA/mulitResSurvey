@@ -180,7 +180,7 @@ points(waynokaSitesEqArea$xcoord, waynokaSitesEqArea$ycoord)
 # VISUALIZE SURVEY DESIGN WITH GGMAPS--------
 # Get ggmap
 bbox <- make_bbox(data=waynokaSites84@data, #defines map extent based on sample site lat/lon
-                  long, lat, f = 0.4) # f is zoom.  Large #, less zoom. tweak for each lake.  
+                  long, lat, f = 0.2) # f is zoom.  Large #, less zoom. tweak for each lake.  
 waynokaSat <- get_map(location = bbox,
                     color = "color",
                     source = "google",
@@ -200,7 +200,7 @@ ggmap(waynokaSat) +
             aes(label=siteID, x=long, y=lat),
             hjust=1.2, vjust=0, size=2, color = "#F8766D") +    #alternate color: "#00BFC4"
   coord_equal() +
-  ggtitle("Main Measurement locations for Waynoka Lake")
+  ggtitle("Main Measurement locations for Lake Waynoka")
 
 ggsave(filename=paste(rootDir, "waynoka/waynokaMainSites.tiff", sep=""),
        width=8,height=5.5, units="in",
@@ -221,7 +221,7 @@ ggmap(waynokaSat) +
             aes(label=siteID, x=long, y=lat),
             hjust=1.2, vjust=0, size=2, color = "#00BFC4") +      #alternate color: "#F8766D"
   coord_equal() +
-  ggtitle("Oversample locations for Waynoka Lake")
+  ggtitle("Oversample locations for Lake Waynoka")
 
 ggsave(filename=paste(rootDir, "waynoka/waynokaOversampleSites.tiff", sep=""),
        width=8,height=5.5, units="in",
@@ -245,7 +245,7 @@ ggmap(waynokaSat) +
   scale_color_discrete(name = "Sites",
                        labels = c("Main", "Oversample")) +
   coord_equal() +
-  ggtitle("All Measurement locations for Waynoka Lake")
+  ggtitle("All Measurement locations for Lake Waynoka")
 
 ggsave(filename=paste(rootDir, "waynoka/waynokaAllSites.tiff", sep=""),
        width=8,height=5.5, units="in",
