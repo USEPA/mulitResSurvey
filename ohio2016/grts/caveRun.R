@@ -48,14 +48,14 @@ caveRunDsgn <- list("open_water" = list(panel=c(mainSites=15),
                                           caty.n=c("middle" = 5,
                                                    "dam" = 5,
                                                    "marina" = 5),
-                                          over=20),
+                                          over=30),
                       "trib"=list(panel=c(mainSites=13),
                                   seltype="Unequal",
                                   caty.n=c("confluence" = 3,
                                            "upper_licking" = 2,
                                            "lower_licking" = 4,
                                            "n_licking" = 4),
-                                  over=25))
+                                  over=26))
 
 caveRunSitesEqArea <- grts(design=caveRunDsgn,
                              DesignID="SU", # SU for stratified, unequal
