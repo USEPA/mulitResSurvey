@@ -43,7 +43,7 @@ brookevilleDsgn <- list("open_water" = list(panel=c(mainSites=15),
                                         seltype="Unequal",
                                         caty.n=c("north" = 8,
                                                  "south" = 7),
-                                        over=10),
+                                        over=15),
                     "trib"=list(panel=c(mainSites=5),
                                 seltype="Equal",
                                 over=10))
