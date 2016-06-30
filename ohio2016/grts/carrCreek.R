@@ -1,7 +1,8 @@
 # STRATIFIED, UNEQUAL PROBABILITY GRTS DESIGN
 
 # CARR CREEK LAKE GRTS DESIGN
-# SMALL LAKE (2 km^2) WITH ONE MAIN TRIBUTARY ARM, TO THE NE.
+# SMALL LAKE (2 km^2) WITH MAIN AND SECONDARY TRIBUTARY ARMS 
+# TO THE NE AND NORTH CENTRAL, RESPECTIVELY.
 # TRIBUTARY AREA IS RELATIVELY SMALL, USING STRATIFIED DESIGN
 # UNEQUAL IN AN ATTEMPT TO MAKE SAMPLING EASIER ON THE CREW
 
@@ -48,12 +49,12 @@ carrCreekDsgn <- list("open_water" = list(panel=c(mainSites=7),
                                           seltype="Unequal",
                                           caty.n=c("west" = 5,
                                                    "middle" = 2),
-                                          over=10),
+                                          over=21),
                       "trib"=list(panel=c(mainSites=8),
                                   seltype="Unequal",
                                   caty.n=c("east" = 5,
                                            "north" = 3),
-                                  over=15))
+                                  over=16))
 
 carrCreekSitesEqArea <- grts(design=carrCreekDsgn,
                              DesignID="SU", # SU for stratified, unequal
