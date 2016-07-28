@@ -188,7 +188,7 @@ points(appleValleySitesEqArea$xcoord, appleValleySitesEqArea$ycoord)
 # VISUALIZE SURVEY DESIGN WITH GGMAPS--------
 # Get ggmap
 bbox <- make_bbox(data=appleValleySites84@data, #defines map extent based on sample site lat/lon
-                  long, lat, f = 0.5) # f is zoom.  Large #, less zoom. tweak for each lake.  
+                  long, lat, f = 1.8) # f is zoom.  Large #, less zoom. tweak for each lake.  
 appleValleySat <- get_map(location = bbox,
                         color = "color",
                         source = "google",
