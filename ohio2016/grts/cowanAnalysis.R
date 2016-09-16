@@ -11,11 +11,21 @@ rootDir <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDe
 # READ FINAL SHAPEFILE ---------
 # This is the point shapefile in equal area projection
 cowanData <- readOGR(dsn = paste(rootDir, "cowan", sep=""), # Could use read.shape from spsurvey package
-                        layer = "cowanSitesEqAreaData")  # shapefile name
+                     layer = "cowanSitesEqAreaData", # shapefile name
+                     stringsAsFactors = FALSE)  
 
-# Determine number of rows in dataframe
-cowanNr <- nrow(cowanData@data)
 
+# Columns that should be converted to numeric
+cols <- c("chm_vol", "wtrDpth", "smDpthS", "Tmp_C_S", "DOPrc_S", "DO__L_S",   
+          "SpCn__S", "pH_S", "ORP_S", "TrNTU_S", "chla_S", "smDpthD", "Tmp_C_D", "DOPrc_D", "DO__L_D",   
+          "SpCn__D", "pH_D", "ORP_D", "TrNTU_D", "chla_D", "BrPrssr", "TtTrpVl", "LatSamp", "LongSmp")
+
+cowanData@data[, cols] <- as.numeric(unlist(cowanData@data[, cols])) # convert to numeric
+
+# Preview data
+ggplot(cowanData@data, aes(siteID, chla_S)) + geom_point() # one outlier
+cowanData@data[cowanData@data$chla_S > 400 & !is.na(cowanData@data$chla_S), "chla_S"] = NA
+ggplot(cowanData@data, aes(siteID, TtTrpVl)) + geom_point() # one outlier
 
 # ADJUST WEIGHTS
 cowanSitesAdj <- ifelse(cowanData@data$EvalStatus == "sampled",
@@ -34,38 +44,48 @@ cowanFramesizeAdj <- c(owFramesizeAdj[1,1], tribFramesizeAdj[1,1])
 attributes(cowanFramesizeAdj) <- NULL
 names(cowanFramesizeAdj) <- c("open_water", "trib")
 
-adjwgt(cowanSitesAdj, cowanWgtAdj, cowanWgtCat, cowanFramesizeAdj)
+cowanData@data$adjWgt <- adjwgt(cowanSitesAdj, cowanWgtAdj, cowanWgtCat, cowanFramesizeAdj)
 
 
 
-# ANALYSIS OF SITE STATUS EVALUATION VARIABLE-----------------------
-# Evaluation status indicates whether a site is in the population or not.
-# This information can be used to estimate the size of the resource, which
-# is then used to to correct design estimates via the 'popsize' argument.
+# ANALYSIS OF QUANTITATIVE VARIABLE-----------------------
+# Framesize
+owFramesize <- filter(cowanData@data, stratum == "open_water") %>%
+  select(Area_km2) %>% distinct(Area_km2)
+owFramesize <- owFramesize$Area_km2
 
+tribFramesize <- filter(cowanData@data, stratum == "trib") %>%
+  select(Area_km2) %>% distinct(Area_km2)
+tribFramesize <- tribFramesize$Area_km2
 
-addmargins(table(SC_estuaries$Status)) # look at # of sampled and NonTarget sites
+framesize <- c("open_water" = owFramesize, "trib" = tribFramesize)
+
+# Determine number of rows in dataframe
+cowanNr <- nrow(cowanData@data)
 
 # Create the sites data frame.
-sites <- data.frame(siteID=SC_estuaries$siteID,
-                    Use=rep(TRUE, nr))  # use sampled AND nonTarget sites
+sites <- data.frame(siteID=cowanData@data$siteID,
+                    Use=cowanData@data$EvalStatus == "sampled")  # use sampled sites
 
 #Create the subpop data frame.
-subpop <- data.frame(siteID=SC_estuaries$siteID,
-                     All_Estuaries=rep("All Estuaries", nr),
-                     Estuary_Type=SC_estuaries$Stratum)
+subpop <- data.frame(siteID=cowanData@data$siteID,
+                     lake=rep("lake", cowanNr),
+                     stratum=cowanData@data$stratum)
 
 #Create the design data frame.
-design <- data.frame(siteID=SC_estuaries$siteID,
-                     wgt=SC_estuaries$wgt,
-                     xcoord=SC_estuaries$xcoord,
-                     ycoord=SC_estuaries$ycoord)
+design <- data.frame(siteID=cowanData@data$siteID,
+                     wgt=cowanData@data$adjWgt,
+                     xcoord=cowanData@data$xcoord,
+                     ycoord=cowanData@data$ycoord)
 
-#Create the data.cat data frame.
-data.cat <- data.frame(siteID=SC_estuaries$siteID,
-                       Status=SC_estuaries$Status)  # categorical variable to be evaluated
+#Create the data.cont data frame.
+data.cont <- data.frame(siteID=cowanData@data$siteID,
+                       trpVol=cowanData@data$TtTrpVl, # volume of gas in trap
+                       chla=cowanData@data$chla_S)
 
-# Calculate extent estimates for the site status evaluation variables
-Extent_Estimates <- cat.analysis(sites, subpop, design, data.cat)
-print(Extent_Estimates)
+# CDF estimates
+cowanCdf <- cont.analysis(sites, subpop, design, data.cont,
+                               popsize=list(lake=sum(framesize),
+                                            stratum=as.list(framesize)))
 
+filter(cowanCdf$Pct, grepl("Mean", x = Statistic))
