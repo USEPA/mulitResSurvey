@@ -157,7 +157,8 @@ caesarCreekSites84@data <- mutate(caesarCreekSites84@data,
 
 # write out table of overdraw sites for reference in field
 write.table(filter(caesarCreekSites84@data, panel == "OverSamp")   %>%
-              select(siteID, stratum, mdcaty, long, lat),
+              select(siteID, stratum, mdcaty, long, lat) %>%
+              arrange(stratum, mdcaty, siteID),
             file = paste(rootDir, "caesarCreek/caesarCreekOverSampList.txt", sep=""),
             row.names = FALSE, sep="\t")
 
