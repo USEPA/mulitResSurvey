@@ -7,7 +7,7 @@
 ## CHANGE THE ZOOM FACTOR ON LINE 179 
 ## FIND AND REPLACE ALL INSTANCES OF THE LAKE NAME
 
-# DEMO:  KISER LAKE DESIGN (UPDATED 6/17/16)
+# KISER LAKE DESIGN (UPDATED 6/17/16)
 # SHALLOW LAKE WITH NO OBVIOUS 'TRIBUTARY AREA'.
 # WILL USE AN UNSTRATIFIED-EQUAL PROBABILITY GRTS DESIGN
 
@@ -20,14 +20,14 @@ source("ohio2016/scriptsAndRmd/masterLibrary.R")
 rootDir <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
 
 # READ/PLOT SHAPEFILE ---------
-kiserEqArea <- readOGR(dsn = paste(rootDir, "kiserLakeDemo", sep=""), # Could use read.shape from spsurvey package
+kiserEqArea <- readOGR(dsn = paste(rootDir, "kiserLake", sep=""), # Could use read.shape from spsurvey package
                        layer = "kiserLakeEqArea")  # shapefile name
-plot(kiserLakeEqArea) # visualize polygon
+plot(kiserEqArea) # visualize polygon
 
 
 
 # EXTRACT ATTRIBUTE TABLE -----------  
-attkiser <- read.dbf(filename = paste(rootDir, "kiserLakeDemo/kiserLakeEqArea", sep=""))
+attkiser <- read.dbf(filename = paste(rootDir, "kiserLake/kiserLakeEqArea", sep=""))
 
 # SET UP FOR AND RUN GRTS FUNCTION   -------------
 # Call the set.seed function so that the survey designs can be replicate
@@ -44,21 +44,21 @@ kiserSitesEqArea <- grts(design=kiserDsgn,
                          DesignID="U", # U for unstratified
                          type.frame="area",
                          src.frame="shapefile",
-                         in.shape=paste(rootDir, "kiserLakeDemo/kiserLakeEqArea", sep=""),
+                         in.shape=paste(rootDir, "kiserLake/kiserLakeEqArea", sep=""),
                          att.frame=attkiser,
                          shapefile=TRUE,
-                         prjfilename = paste(rootDir, "kiserLakeDemo/kiserLakeEqArea", sep=""),
-                         out.shape=paste(rootDir, "kiserLakeDemo/kiserSitesEqArea", sep=""))
+                         prjfilename = paste(rootDir, "kiserLake/kiserLakeEqArea", sep=""),
+                         out.shape=paste(rootDir, "kiserLake/kiserSitesEqArea", sep=""))
 
 # new feature added 14 June 2016
 # Set up for mutating the kiserSitesEqArea file to include all of the fill-able fields
 # necessary in order to keep the Equal Area projection
-kiserSitesEqArea <- readOGR(dsn = paste(rootDir, "kiserLakeDemo", sep=""), # Could use read.shape from spsurvey package
+kiserSitesEqArea <- readOGR(dsn = paste(rootDir, "kiserLake", sep=""), # Could use read.shape from spsurvey package
                             layer = "kiserSitesEqArea")  # shapefile name
 
 # add fill-able fields, preparation for analyzing GRTS results
 kiserSitesEqArea@data <- mutate(kiserSitesEqArea@data, 
-                                deplyDate = "",    # adding all of these colums to the 
+                                deplyDt = "",    # adding all of these colums to the 
                                 deplyTm = "",    # shape file to be filled in the field
                                 chmStTm = "",  # tried to enter them in the order they will be filled
                                 chm_vol = "",
@@ -98,7 +98,7 @@ kiserSitesEqArea@data <- mutate(kiserSitesEqArea@data,
 
 # re-write this mutated file, will keep the equal area projection
 writeOGR(obj = kiserSitesEqArea,  # write projected shapefile to disk for use on field computer
-         dsn = paste(rootDir, "kiserLakeDemo", sep=""), 
+         dsn = paste(rootDir, "kiserLake", sep=""), 
          layer = "kiserSitesEqArea",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
@@ -107,15 +107,12 @@ writeOGR(obj = kiserSitesEqArea,  # write projected shapefile to disk for use on
 head(kiserSitesEqArea@data)
 
 
-# Print the survey design summary
-summary(kiserSitesEqArea)
-
 # PROJECT, SUBSET, AND WRITE SHAPEFILES FOR PLOTTING-------
 # Project spatial polygon into WGS84 for plotting in ggmap/ggplot 
 kiserEqArea84 <- spTransform(x = kiserEqArea, 
                              CRS("+proj=longlat +datum=WGS84")) # specifies projection
 writeOGR(obj = kiserEqArea84,  # write projected shapefile to disk for use on field computer
-         dsn = paste(rootDir, "kiserLakeDemo", sep=""), 
+         dsn = paste(rootDir, "kiserLake", sep=""), 
          layer = "kiserEqArea84",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
@@ -125,7 +122,7 @@ kiserEqArea84.f <- merge(kiserEqArea84.f, kiserEqArea84@data,
                          by="id")  # bring attributes back in 
 
 # Read and project spatial points dataframe for plotting
-kiserSitesPlot <- readOGR(dsn = paste(rootDir, "kiserLakeDemo", sep=""), 
+kiserSitesPlot <- readOGR(dsn = paste(rootDir, "kiserLake", sep=""), 
                           layer = "kiserSitesEqArea")  # shapefile created with grts function
 kiserSites84 <- spTransform(x = kiserSitesPlot, #reproject
                             CRS("+proj=longlat +datum=WGS84")) # projection needed for google maps
@@ -136,7 +133,7 @@ kiserSites84@data <- mutate(kiserSites84@data,
 # write out table of overdraw sites for reference in field
 write.table(filter(kiserSites84@data, panel == "OverSamp")   %>%
               select(siteID, stratum, long, lat),
-            file = paste(rootDir, "kiserLakeDemo/kiserOverSampList.txt", sep=""),
+            file = paste(rootDir, "kiserLake/kiserOverSampList.txt", sep=""),
             row.names = FALSE, sep="\t")
 
 
@@ -144,7 +141,7 @@ write.table(filter(kiserSites84@data, panel == "OverSamp")   %>%
 # arcPad requires one shapefile with all sites.
 # write one shapefile with all sites for use with arcPad
 writeOGR(obj = kiserSites84, 
-         dsn = paste(rootDir, "kiserLakeDemo", sep=""), 
+         dsn = paste(rootDir, "kiserLake", sep=""), 
          layer = "kiserSites84",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
@@ -159,13 +156,13 @@ kiserSites84ListByPanel[[2]]@data        #should be OverSamp sites
 
 # Write 'mainSites' shapefile to disk
 writeOGR(obj = kiserSites84ListByPanel[[1]], # pulls out 'mainSites' shapefile from list.  Should confirm.
-         dsn = paste(rootDir, "kiserLakeDemo", sep=""), 
+         dsn = paste(rootDir, "kiserLake", sep=""), 
          layer = "kiserSites84mainSites",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
 # Write 'OverSamp' shapefile to disk
 writeOGR(obj = kiserSites84ListByPanel[[2]], # pulls out 'OverSamp' shapefile from list.  Should confirm.
-         dsn = paste(rootDir, "kiserLakeDemo", sep=""), 
+         dsn = paste(rootDir, "kiserLake", sep=""), 
          layer = "kiserSites84OverSamp",
          driver = "ESRI Shapefile",
          overwrite_layer = TRUE)
@@ -199,7 +196,7 @@ ggmap(kiserSat) +
   coord_equal() +
   ggtitle("Main Measurement locations for Kiser Lake")
 
-ggsave(filename=paste(rootDir, "kiserLakeDemo/kisermainSites.tiff", sep=""),
+ggsave(filename=paste(rootDir, "kiserLake/kisermainSites.tiff", sep=""),
        width=8,height=5.5, units="in",
        dpi=800,compression="lzw")
 
@@ -220,7 +217,7 @@ ggmap(kiserSat) +
   coord_equal() +
   ggtitle("Oversample locations for Kiser Lake")
 
-ggsave(filename=paste(rootDir, "kiserLakeDemo/kiserOversampleSites.tiff", sep=""),
+ggsave(filename=paste(rootDir, "kiserLake/kiserOversampleSites.tiff", sep=""),
        width=8,height=5.5, units="in",
        dpi=800,compression="lzw")
 
@@ -244,7 +241,7 @@ ggmap(kiserSat) +
   coord_equal() +
   ggtitle("All Measurement locations for Kiser Lake")
 
-ggsave(filename=paste(rootDir, "kiserLakeDemo/kiserAllSites.tiff", sep=""),
+ggsave(filename=paste(rootDir, "kiserLake/kiserAllSites.tiff", sep=""),
        width=8,height=5.5, units="in",
        dpi=800,compression="lzw")
 
