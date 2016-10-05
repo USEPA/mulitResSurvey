@@ -63,7 +63,7 @@ senecavilleSitesEqArea <- readOGR(dsn = paste(rootDir, "senecaville", sep=""), #
                                  layer = "senecavilleSitesEqArea")  # shapefile name
 
 senecavilleSitesEqArea@data <- mutate(senecavilleSitesEqArea@data, 
-                                     deplyDate = "",    # adding all of these colums to the 
+                                     deplyDt = "",    # adding all of these colums to the 
                                      deplyTm = "",    # shape file to be filled in the field
                                      chmStTm = "",  # tried to enter them in the order they will be filled
                                      chm_vol = "",
