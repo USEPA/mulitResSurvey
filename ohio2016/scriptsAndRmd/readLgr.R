@@ -3,27 +3,34 @@
 # PROGRAMMED TO RECORD EVERY 20 SECONDS.
 
 # LIBRARIES
-library(ggplot2)
-library(scales)
+# library(ggplot2) # load from masterLibrary
+# library(scales)  # load from masterLibrary
+source("ohio2016/scriptsAndRmd/masterLibrary.R")
 
 
+# READ DATA-----------------
 # List of .txt files containing data
 txtFiles <- list.files("L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/data/greenhouseGasAnalyzer/", 
-                       pattern="*.txt")
+                       pattern="*.txt$", recursive = TRUE) # $ matches end of string
 
-for (i in 1:length(txtFiles)) {  # loop to read and format each file
+# Directories contain _s and _l files that don't contain data of interest.
+# Strip these files out.
+txtFiles <- txtFiles[!grepl(pattern = "_s|_l", x = txtFiles)] # exclude files with _l or _s
+
+ggaList <- list()  # Empty list to hold results
+length(txtFiles)
+for (i in 1:2) {  # loop to read and format each file
   gga.i <- read.table(paste("L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/data/greenhouseGasAnalyzer/", 
                             txtFiles[i], sep=""),
                       sep=",",  # comma separate
                       skip=1,  # Skip first line of file.  Header info
+                      colClasses = c("character", rep("numeric", 21), rep("NULL", 71)),
                       as.is=TRUE, # Prevent conversion to factor
                       header=TRUE, # Import column names
                       fill=TRUE)  # Needed to deal with empty cells in last column
-  #str(gga.i)
-  #head(gga.i)
-  
+
   # FORMAT DATA
-  gga.i <- gga.i[1:(which(gga.i$Time == "-----BEGIN PGP MESSAGE-----") - 1), ]  # Remove PGP message
+# gga.i <- gga.i[1:(which(gga.i$Time == "-----BEGIN PGP MESSAGE-----") - 1), ]  # Remove PGP message
   gga.i$Time <- gsub("^\\s+|\\s+$", "", gga.i$Time)  #  Strip white spaces
   gga.i$Date <- substr(gga.i$Time, start=1, stop=10)  # Extract date
   gga.i$Second <- round(  # extract second, round to integer
@@ -37,12 +44,16 @@ for (i in 1:length(txtFiles)) {  # loop to read and format each file
   #                               format="%m/%d/%Y%H:%M:%S")  # POSIXlt object
   gga.i$RDateTime <- as.POSIXct(paste(gga.i$Date, gga.i$hms,sep=""),
                                 format="%m/%d/%Y%H:%M:%S")  # POSIXct
-  assign(paste("gga", i, sep = ""), gga.i)  # rename gga.i to gga1, gga2....
+  gga.i$Time <- gga.i$hms  # Remove hms
+  gga.i$RDate <- as.Date(gga.i$Date, format = "%m/%d/%Y")  # Remove Date
+  names(gga.i)[grep("ppm", names(gga.i))] = gsub("^X.", "", names(gga.i)[grep("X", names(gga.i))])
+  gga.i <- select(gga.i, Time, RDate, RDateTime, CH4._ppm, CO2._ppm)
+  
+  ggaList[[i]] <- gga.i  # dump in list
 }  # End of loop
 
 # Merge files
-gga <- Reduce(function(...) merge(..., all=T), 
-              list(gga1, gga2))  # Change if additional files added
+gga <- do.call("rbind", ggaList)  # Coerces list into dataframe.
 
 # Format files
 gga$Time <- gga$hms  # Remove hms
