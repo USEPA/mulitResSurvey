@@ -56,24 +56,21 @@ mylist3 <- lapply(mylist2, function(x){
     cbind(x, section = NA) # if 'section' doesn't exist, report new column of NAs
 })
                                           
+# 4.  Arrange columns in identical way to facilitate rbind
+mylist4 <- lapply(mylist3, function(x) {
+  select(x, noquote(order(colnames(x))))} # sort colnames alphabetically
+  ) 
 
-# eqAreaData <- do.call("rbind", mylist)  # This coerces the list into a dataframe. Cool...
+# 5.  Coerce list into dataframe via rbind
+ eqAreaData <- do.call("rbind", mylist4)  # Coerces list into dataframe.
 
-
-
-# 
-# STRATEGY TO FACILITATE merge
-# Buckhorn, Brookeville, Carr Cr, and Cave Run have 57 columns, compared to 53 or 54 from most other point shapefiles.  Extra columns are due to field included in geodatabase with original polygon shapefile.  
-#                              1.	 Rename GNIS_Name in above = Lake_Name in others
-#                              2.  omit Don’t need: "OBJECTID"   "Permanent_" "FDate"     
-#                              [13] "Resolution"   "Elevation"  "ReachCode"  "FType"     
-#                              [19] "FCode"      
-#                              
-#                              AND
-#                              Most 53 column files contain stuff we don’t need: "Connectivi" "Issue_Type"
-#                              [13] "Lake_Name_" "Reservoir_" "QC"       
-#                              
-#                              2.	 Rename deplyDate to deplyDt
-#                              3.	Add ‘section’ to equal area designs
-#                              5.	Confirm columns are in same order.
-
+# FORMAT DATAFRAME-----------
+ eqAreaData <- mutate(eqAreaData, 
+                      chmDeplyDtTm = as.POSIXct(paste(trim(deplyDt), # trim removes white space
+                                                      trim(chmStTm), sep=""),
+                                                format = "%m/%d/%Y%H:%M"),
+                      chmRetDtTm = chmDeplyDtTm + (5*60)) # this adds 5 min.  internally stored as delta seconds from origin
+ 
+ chmStTm
+ chm_vol 
+ deplyDt

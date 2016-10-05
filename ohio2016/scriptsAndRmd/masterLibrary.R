@@ -11,3 +11,8 @@ library(rgdal)   # For reading shapefiles
 library(spsurvey)  # survey design
 library(maptools) # for ggplot plotting of shapefile (fortify function)
 
+
+# Functions
+# returns string w/o leading or trailing whitespace
+trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+
