@@ -29,6 +29,7 @@ for (i in 1:length(unique(eqAreaData$Lake_Name))) {
   }
   
 # 4. framesizeAdj: named vector containing area of:
+  
   if(length(unique(data.i$stratum)) == 1) { # unstratified, therefore equal in this project
     framesizeAdj.i <- distinct(data.i, Area_km2) %>% select(Area_km2)
     framesizeAdj.i <- framesizeAdj.i[ , "Area_km2"]  
@@ -67,61 +68,13 @@ for (i in 1:length(unique(eqAreaData$Lake_Name))) {
   }
   
 # 5. Adjust weights
+  adjustedWgt.i <- adjwgt(sites.adj.i, wgtAdj.i, wgtCat.i, framesizeAdj.i)
+  
   myWgtList[[i]] <- data.frame(
     Lake_Name = data.i$Lake_Name,
     siteID = data.i$siteID,
-    adjWgt <- adjwgt(sites.adj.i, wgtAdj.i, wgtCat.i, framesizeAdj.i)
+    adjWgt = adjustedWgt.i
   )
 }
 
 
-
-
-
-
-# ADJUST WEIGHTS FOR STRATIFIED, EQUAL AREA
-cowanSitesAdj <- ifelse(cowanData@data$EvalStatus == "sampled",
-                        TRUE, FALSE)
-cowanWgtAdj <- cowanData@data$wgt
-cowanWgtCat <- cowanData@data$stratum  # stratum for equal area
-
-owFramesizeAdj <- filter(cowanData@data, stratum == "open_water") %>%
-  distinct(Area_km2) %>% select(Area_km2)
-
-tribFramesizeAdj <- filter(cowanData@data, stratum == "trib") %>%
-  distinct(Area_km2) %>% select(Area_km2)
-
-
-cowanFramesizeAdj <- c(owFramesizeAdj[1,1], tribFramesizeAdj[1,1])
-attributes(cowanFramesizeAdj) <- NULL
-names(cowanFramesizeAdj) <- c("open_water", "trib")
-
-cowanData@data$adjWgt <- adjwgt(cowanSitesAdj, cowanWgtAdj, cowanWgtCat, cowanFramesizeAdj)
-
-
-
-
-# ADJUST WEIGHTS FOR STRATIFIED, UNEQUAL AREA
-caesarCreekSitesAdj <- ifelse(caesarCreekData@data$EvalStatus == "sampled",
-                              TRUE, FALSE)
-caesarCreekWgtAdj <- caesarCreekData@data$wgt
-caesarCreekWgtCat <- caesarCreekData@data$mdcaty  # mdcaty for unequal probability
-
-# Need to define framesize by mdcaty (section) if unequal probability was used.
-owFramesizeAdj1 <- filter(caesarCreekData@data, section == "north") %>%
-  distinct(Area_km2) %>% select(Area_km2)
-
-owFramesizeAdj2 <- filter(caesarCreekData@data, section == "south") %>%
-  distinct(Area_km2) %>% select(Area_km2)
-
-tribFramesizeAdj <- filter(caesarCreekData@data, section == "Equal") %>% # section == "Equal"
-  distinct(Area_km2) %>% select(Area_km2)
-
-
-
-caesarCreekFramesizeAdj <- c(owFramesizeAdj1[1,1], owFramesizeAdj2[1,1],
-                             tribFramesizeAdj[1,1])
-attributes(caesarCreekFramesizeAdj) <- NULL
-names(caesarCreekFramesizeAdj) <- c("north", "south", "Equal")
-
-caesarCreekData@data$adjWgt <- adjwgt(caesarCreekSitesAdj, caesarCreekWgtAdj, caesarCreekWgtCat, caesarCreekFramesizeAdj)
