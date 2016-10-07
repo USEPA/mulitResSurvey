@@ -5,6 +5,7 @@
 # 3. wgtCat: stratum if equal area (stratified or unstratified), mdcaty if unequal
 # 4. framesizeAdj: named vector containing area of:
 #       -if unstratified, then whole lake
+#       -if unstratified-unequal (Charles Mill, Hocking), then section
 #       -if stratified-equal, then each strata
 #       -if stratified-unequal, then each section
 
@@ -30,14 +31,14 @@ for (i in 1:length(unique(eqAreaData$Lake_Name))) {
   
 # 4. framesizeAdj: named vector containing area of:
   
-  if(length(unique(data.i$stratum)) == 1) { # unstratified, therefore equal in this project
+  if(length(unique(data.i$stratum)) == 1 & length(unique(data.i$mdcaty) == 1)) { # unstratified and equal area
     framesizeAdj.i <- distinct(data.i, Area_km2) %>% select(Area_km2)
     framesizeAdj.i <- framesizeAdj.i[ , "Area_km2"]  
     attributes(framesizeAdj.i) <- NULL
     names(framesizeAdj.i) <- c("None")
   }
-  
-  if(length(unique(data.i$stratum)) > 1 & length(unique(data.i$mdcaty) == 1)) { # stratified, equal
+    
+  if(length(unique(data.i$stratum)) > 1 & length(unique(data.i$mdcaty) == 1)) { # unstratified, equal
     
     framesizeAdj.ow <- filter(data.i, stratum == "open_water") %>%
       distinct(Area_km2) %>% select(Area_km2)
@@ -50,7 +51,7 @@ for (i in 1:length(unique(eqAreaData$Lake_Name))) {
     names(framesizeAdj.i) <- c("open_water", "trib")
   }
   
-  if(length(unique(data.i$stratum)) > 1 & length(unique(data.i$mdcaty)) > 1) { # stratified, unequal
+  if(length(unique(data.i$stratum)) >= 1 & length(unique(data.i$mdcaty)) > 1) { # stratified or unstratified (CharlesM,Hocking), unequal
     nSection.i <- length(unique(data.i$section))
     section.i <- unique(data.i$section)
     
