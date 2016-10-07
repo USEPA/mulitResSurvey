@@ -2,7 +2,7 @@
 # AUGUST 2014 SURVEY OF CH4 EMISSIONS FROM HARSHA LAKE.  ANALYZER WAS
 # PROGRAMMED TO RECORD EVERY 20 SECONDS.
 
-# LIBRARIES
+# LIBRARIES---------------
 # library(ggplot2) # load from masterLibrary
 # library(scales)  # load from masterLibrary
 source("ohio2016/scriptsAndRmd/masterLibrary.R")
@@ -11,15 +11,15 @@ source("ohio2016/scriptsAndRmd/masterLibrary.R")
 # READ DATA-----------------
 # List of .txt files containing data
 txtFiles <- list.files("L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/data/greenhouseGasAnalyzer/", 
-                       pattern="*.txt$", recursive = TRUE) # $ matches end of string
+                       pattern="*.txt$", recursive = TRUE) # $ matches end of string, excludes '...txt.zip' file
 
-# Directories contain _s and _l files that don't contain data of interest.
+# Directories contain _s, _l, and _b files that don't contain data of interest.
 # Strip these files out.
-txtFiles <- txtFiles[!grepl(pattern = "_s|_l", x = txtFiles)] # exclude files with _l or _s
+txtFiles <- txtFiles[!grepl(pattern = "_s|_l|_b", x = txtFiles)] # exclude files with _l or _s or _b
 
 ggaList <- list()  # Empty list to hold results
-length(txtFiles)
-for (i in 1:2) {  # loop to read and format each file
+
+for (i in 1:length(txtFiles)) {  # loop to read and format each file
   gga.i <- read.table(paste("L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/data/greenhouseGasAnalyzer/", 
                             txtFiles[i], sep=""),
                       sep=",",  # comma separate
@@ -38,33 +38,25 @@ for (i in 1:2) {  # loop to read and format each file
       substr(gga.i$Time, start=nchar(gga.i$Time) - 5, stop=nchar(gga.i$Time))
     ), 
     digits=0)
-  gga.i$Second <- ifelse(gga.i$Second == 60, 59, gga.i$Second)  # Chron can't handle 60 seconds
+  gga.i$Second <- ifelse(gga.i$Second == 60, 59, gga.i$Second)  # POSIXcr can't handle 60 seconds
   gga.i$hms <- paste(substr(gga.i$Time, start=12, stop=17), gga.i$Second, sep="")  # time vector
-  #   gga.i$RDateTime <- strptime(paste(gga.i$Date, gga.i$hms,sep=""),
-  #                               format="%m/%d/%Y%H:%M:%S")  # POSIXlt object
   gga.i$RDateTime <- as.POSIXct(paste(gga.i$Date, gga.i$hms,sep=""),
-                                format="%m/%d/%Y%H:%M:%S")  # POSIXct
-  gga.i$Time <- gga.i$hms  # Remove hms
-  gga.i$RDate <- as.Date(gga.i$Date, format = "%m/%d/%Y")  # Remove Date
-  names(gga.i)[grep("ppm", names(gga.i))] = gsub("^X.", "", names(gga.i)[grep("X", names(gga.i))])
-  gga.i <- select(gga.i, Time, RDate, RDateTime, CH4._ppm, CO2._ppm)
+                                format="%m/%d/%Y%H:%M:%S",
+                                tz = "UTC")  # POSIXct
+  gga.i$RDate <- as.Date(gga.i$Date, format = "%m/%d/%Y")  # format as R Date oject
+  names(gga.i)[grep("ppm", names(gga.i))] = gsub("^X.", "", names(gga.i)[grep("X", names(gga.i))]) # replace "X." with ""
+  gga.i <- select(gga.i, RDate, RDateTime, CH4._ppm, CO2._ppm, GasT_C)  # select columns of interest
   
   ggaList[[i]] <- gga.i  # dump in list
-}  # End of loop
+}  # End of loop, < 1 minute
 
 # Merge files
 gga <- do.call("rbind", ggaList)  # Coerces list into dataframe.
 
-# Format files
-gga$Time <- gga$hms  # Remove hms
-gga$RDate <- as.Date(gga$Date, format = "%m/%d/%Y")  # Remove Date
-gga <- subset(gga, select = -c(hms, Date, Second))
-names(gga)[grep("ppm", names(gga))] = gsub("^X.", "", names(gga)[grep("X", names(gga))])
 
-# Add dome volume
-gga$volume.L <- 19  # Need to update
 
-# Basic plot
+
+# BASIC PLOTS-----------------
 ggplot(gga, aes(RDateTime, CH4._ppm)) + geom_point() + 
   scale_x_datetime(labels=date_format ("%m/%d %H:%M"))
 

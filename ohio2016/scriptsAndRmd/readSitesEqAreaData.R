@@ -68,9 +68,6 @@ mylist4 <- lapply(mylist3, function(x) {
  eqAreaData <- mutate(eqAreaData, 
                       chmDeplyDtTm = as.POSIXct(paste(trim(deplyDt), # trim removes white space
                                                       trim(chmStTm), sep=""),
-                                                format = "%m/%d/%Y%H:%M"),
-                      chmRetDtTm = chmDeplyDtTm + (5*60)) # this adds 5 min.  internally stored as delta seconds from origin
- 
- chmStTm
- chm_vol 
- deplyDt
+                                                format = "%m/%d/%Y%H:%M",
+                                                tz="UTC"))  # set tz!
+
