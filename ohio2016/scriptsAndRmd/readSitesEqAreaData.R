@@ -71,3 +71,20 @@ mylist4 <- lapply(mylist3, function(x) {
                                                 format = "%m/%d/%Y%H:%M",
                                                 tz="UTC"))  # set tz!
 
+ # Columns that should be converted to numeric
+ cols <- c("chm_vol", "wtrDpth", "smDpthS", "Tmp_C_S", "DOPrc_S", "DO__L_S",   
+           "SpCn__S", "pH_S", "ORP_S", "TrNTU_S", "chla_S", "smDpthD", "Tmp_C_D", "DOPrc_D", "DO__L_D",   
+           "SpCn__D", "pH_D", "ORP_D", "TrNTU_D", "chla_D", "BrPrssr", "TtTrpVl", "LatSamp", "LongSmp")
+ 
+ eqAreaData[, cols] <- lapply(eqAreaData[, cols], as.numeric) # convert to numeric
+ 
+ # NA in character fields (i.e. TrapExtn) shapefile are being read as character values.
+ # Convert to NA.
+ eqAreaData[, "TrapExtn"] <- ifelse(eqAreaData[, "TrapExtn"] == "NA", 
+                                    NA, 
+                                    eqAreaData[, "TrapExtn"])
+ 
+ 
+ # PREVIEW AND QUICK FIXES TO DATA
+ 
+ 
