@@ -62,7 +62,7 @@ alumCreekSitesEqArea <- grts(design=alumCreekDsgn,
                                stratum="strata",
                                mdcaty="section",
                                shapefile=TRUE,
-                               out.shape=paste(rootDir, "alumCreek/alumCreekSitesEqArea", sep=""),
+                               out.shape=paste(rootDir, "alumCreek/alumCreekSitesEqArea1", sep=""),
                                prjfilename=paste(rootDir, "alumCreek/alumCreekEqArea", sep=""))
 
 # new feature added 14 June 2016

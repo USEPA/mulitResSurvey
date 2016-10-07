@@ -1,6 +1,7 @@
 library(readxl)  # For reading Excel files
 library(gdata)   # Also for reading Excel files
 library(ggplot2) # For plotting
+library(gridExtra) # For plotting
 library(scales)  # For plotting
 library(reshape) # For merge_recurse function
 library(plyr)  # for 'join' in ggplot plotting of shapefile

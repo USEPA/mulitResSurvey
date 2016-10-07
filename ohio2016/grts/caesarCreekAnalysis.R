@@ -30,7 +30,7 @@ ggplot(caesarCreekData@data, aes(siteID, TtTrpVl)) + geom_point()
 caesarCreekSitesAdj <- ifelse(caesarCreekData@data$EvalStatus == "sampled",
                         TRUE, FALSE)
 caesarCreekWgtAdj <- caesarCreekData@data$wgt
-caesarCreekWgtCat <- caesarCreekData@data$mdcaty  # mdcaty for unequal probability
+caesarCreekWgtCat <- caesarCreekData@data$section  # mdcaty for unequal probability
 
 # Need to define framesize by mdcaty (section) if unequal probability was used.
 owFramesizeAdj1 <- filter(caesarCreekData@data, section == "north") %>%
@@ -39,7 +39,7 @@ owFramesizeAdj1 <- filter(caesarCreekData@data, section == "north") %>%
 owFramesizeAdj2 <- filter(caesarCreekData@data, section == "south") %>%
   distinct(Area_km2) %>% select(Area_km2)
 
-tribFramesizeAdj <- filter(caesarCreekData@data, section == "Equal") %>% # section == "Equal"
+tribFramesizeAdj <- filter(caesarCreekData@data, section == "trib") %>% # section == "Equal"
   distinct(Area_km2) %>% select(Area_km2)
 
 
@@ -47,7 +47,7 @@ tribFramesizeAdj <- filter(caesarCreekData@data, section == "Equal") %>% # secti
 caesarCreekFramesizeAdj <- c(owFramesizeAdj1[1,1], owFramesizeAdj2[1,1],
                              tribFramesizeAdj[1,1])
 attributes(caesarCreekFramesizeAdj) <- NULL
-names(caesarCreekFramesizeAdj) <- c("north", "south", "Equal")
+names(caesarCreekFramesizeAdj) <- c("north", "south", "trib")
 
 caesarCreekData@data$adjWgt <- adjwgt(caesarCreekSitesAdj, caesarCreekWgtAdj, caesarCreekWgtCat, caesarCreekFramesizeAdj)
 
