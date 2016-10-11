@@ -65,7 +65,7 @@ adjData <- c("Alum Creek Lake", "SU-02", "2016-06-07 15:10:05", "2016-06-07 15:1
              "Delaware Reservoir", "S-03", "2016-06-08 16:37:00", "2016-06-08 16:41:00", "2016-06-08 16:37:00", "2016-06-08 16:41:00",
              "Delaware Reservoir", "S-06", "2016-06-08 16:52:00", "2016-06-08 16:55:00", "2016-06-08 16:52:00", "2016-06-08 16:55:00",
              "Delaware Reservoir", "S-04", "2016-06-08 17:22:00", "2016-06-08 17:25:00", "2016-06-08 17:22:00", "2016-06-08 17:25:00",
-             "Delaware Reservoir", "S-08", "2016-06-08 17:46:00", "2016-06-08 17:50:00", "2016-06-08 17:41:00", "2016-06-08 17:46:00", #very high CH4, recheck
+             "Delaware Reservoir", "S-08", "2016-06-08 17:46:00", "2016-06-08 17:50:00", "2016-06-08 17:41:30", "2016-06-08 17:44:30", #very high CH4, recheck
              "Knox Lake", "S-37", "2016-06-09 15:17:00", "2016-06-09 15:20:00", "2016-06-09 15:17:00", "2016-06-09 15:20:00",
              "Knox Lake", "S-31", "2016-06-09 15:40:00", "2016-06-09 15:43:00", "2016-06-09 15:40:00", "2016-06-09 15:43:00",
              "Knox Lake", "S-35", "2016-06-09 15:54:00", "2016-06-09 15:57:00", "2016-06-09 15:54:00", "2016-06-09 15:57:00",
@@ -362,6 +362,11 @@ adjDataDf[, c("co2DeplyDtTm", "co2RetDtTm", "ch4DeplyDtTm", "ch4RetDtTm")] <-
     end.time.i <- max(do.call("c", data.i[, c("co2DeplyDtTm", "co2RetDtTm", "ch4DeplyDtTm", "ch4RetDtTm")]))
     attr(start.time.i, "tzone") <- "UTC"  # reset time zone!
     attr(end.time.i, "tzone") <- "UTC"  # reset time zone!
+    
+    #Delete original CO2 and CH4 deployment / retrieval times from gga file.  These will be replaced with 
+    #updated values.
+    gga[gga$Lake_Name == lake.i &  !is.na(gga$Lake_Name) & gga$siteID == site.i & !is.na(gga$Lake_Name), 
+        c("co2DeplyDtTm", "co2RetDtTm", "ch4DeplyDtTm", "ch4RetDtTm")] = NA
     
     #Logical indicator indicator block of gga data that should be updated
     #The extra minute and begining and end extend x-axis range for plotting,
