@@ -19,9 +19,6 @@ fileNames <- list.files(path = rootDir,
                         pattern = "SitesEqAreaData.dbf", # file names containing this pattern
                         recursive = TRUE) # look in all subdirectories
 
-# Omit Acton, which is currently screwed up
-fileNames <- fileNames[!grepl("acton", fileNames)]
-
 
 # 2.  Read in files
 mylist <- list()  # Create an empty list to hold data
