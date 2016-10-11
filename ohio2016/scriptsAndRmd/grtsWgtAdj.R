@@ -78,4 +78,4 @@ for (i in 1:length(unique(eqAreaData$Lake_Name))) {
   )
 }
 
-
+lapply(myWgtList, function(x) summarize(x,n = sum(x$adj > 0)))
