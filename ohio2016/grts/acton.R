@@ -60,7 +60,7 @@ actonSitesEqArea <- readOGR(dsn = paste(rootDir, "acton", sep=""), # Could use r
 
 # add fill-able fields, preparation for analyzing GRTS results
 actonSitesEqArea@data <- mutate(actonSitesEqArea@data, 
-                                deplyDate = "",    # adding all of these colums to the 
+                                deplyDt = "",    # adding all of these colums to the 
                                 deplyTm = "",    # shape file to be filled in the field
                                 chmStTm = "",  # tried to enter them in the order they will be filled
                                 chm_vol = "",
