@@ -89,6 +89,9 @@ mylist4 <- lapply(mylist3, function(x) {
                                     NA, 
                                     eqAreaData[, "TrapExtn"])
  
+ # Calculate chamber volume based on relationship between water level
+ # and volume.  See chamberDesign.xlsx in East Fork folder.
+ eqAreaData <- mutate(eqAreaData, chmVol.L = (42.057 + (-0.2189 * chm_vol)))
  
  # PREVIEW AND QUICK FIXES TO DATA
  

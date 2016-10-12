@@ -29,8 +29,33 @@ meanVariance[ , c("Subpopulation", "Indicator")] = apply(meanVariance[ , c("Subp
 meanVariance.m <- reshape2::melt(meanVariance)  # specify package.  reshape and reshape2 loaded
 meanVariance.c <- dcast(meanVariance.m, formula = Lake_Name + Subpopulation ~ Indicator + variable) # cast
 
+# Quick look at LU data
+meanVariance.c.lu <- merge(mutate(meanVariance.c, lake.name = tolower(Lake_Name)), survRes, by.x = "lake.name", by.y = "lake.name")
+
 
 # Quick plot for fun
+
+pdf("ohio2016/output/figures/dirtySummary.pdf", paper = "a4r") # landscape orientation
+
 ggplot(filter(meanVariance.c, Subpopulation == "lake"),
        aes(chla_Estimate, ebMlHrM2_Estimate)) +
   geom_point()
+
+ggplot(filter(meanVariance.c.lu, Subpopulation == "lake"),
+       aes( percent.agg.ag, ebMlHrM2_Estimate)) +
+  geom_point()
+
+ggplot(filter(meanVariance.c, Subpopulation == "lake") %>% arrange(ebMlHrM2_Estimate),
+       aes(ebMlHrM2_Estimate, Lake_Name)) +
+  geom_point()
+
+dev.off()
+
+a <- filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(percent.agg.ag)
+b <-filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(depth)
+z <- filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(ebMlHrM2_Estimate)
+
+
+# library not available in R 3.3.0
+#persp3D(x=a,y=d,z,phi=15,theta=-30,main = "Hypothesized Surface", xlab = "Ag %", ylab = "Max Depth",
+#        zlab = "Methane Emission Rate (mg/m^2/h)")
