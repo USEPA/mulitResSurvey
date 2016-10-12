@@ -1,0 +1,7 @@
+source("ohio2016/scritpAndRmd/masterLibrary.R")
+source("ohio2016/scritpAndRmd/readSitesEqAreaData.R")
+source("ohio2016/scritpAndRmd/readLgr.R")
+source("ohio2016/scriptsAndRmd/plotCleanLgr.R")
+source("ohio2016/scriptsAndRmd/calculateEbullitionRate.R")
+source("ohio2016/scriptsAndRmd/grtsWgtAdj.R")
+source("ohio2016/scriptsAndRmd/grtsMeanVariance.R")

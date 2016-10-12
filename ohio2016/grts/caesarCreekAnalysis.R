@@ -30,7 +30,7 @@ ggplot(caesarCreekData@data, aes(siteID, TtTrpVl)) + geom_point()
 caesarCreekSitesAdj <- ifelse(caesarCreekData@data$EvalStatus == "sampled",
                         TRUE, FALSE)
 caesarCreekWgtAdj <- caesarCreekData@data$wgt
-caesarCreekWgtCat <- caesarCreekData@data$section  # mdcaty for unequal probability
+caesarCreekWgtCat <- caesarCreekData@data$section  # section for unequal probability, stratum if equal
 
 # Need to define framesize by mdcaty (section) if unequal probability was used.
 owFramesizeAdj1 <- filter(caesarCreekData@data, section == "north") %>%
