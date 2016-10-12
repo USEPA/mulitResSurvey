@@ -465,11 +465,8 @@ for (i in 1:with(gga[!is.na(gga$Lake_Name), ], # this eliminates observations wi
   grid.arrange(plot.i, plot.ii, ncol = 2) # use to put two plots per page
 }
 
-<<<<<<< HEAD
+
 dev.off() #7 min 50sec, 10/12, 479 pages
-=======
-dev.off()  #7 min 50sec
->>>>>>> 5b319a4ae53c4e024a41186c6eb8fd85abf5775e
           #should be 483 pages: 29 lakes with 15 sites (=435) + 28 @ Cave Run + 20 @ Brookeville = 483, 32nd lake is Cowan, where syringe samples were taken when LGR was down
           #6 min 50sec, 472 pages
           #10/11 5:05 467 pages -- what?
@@ -477,10 +474,6 @@ dev.off()  #7 min 50sec
           #10/12 12:12pm 5 min, 480 pages
           #10/12 2:22 pm <5 min, 483 pages :)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5b319a4ae53c4e024a41186c6eb8fd85abf5775e
 
 
 
