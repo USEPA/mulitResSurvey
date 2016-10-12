@@ -38,7 +38,7 @@ for (i in 1:length(unique(eqAreaData$Lake_Name))) {
     names(framesizeAdj.i) <- c("None")
   }
     
-  if(length(unique(data.i$stratum)) > 1 & length(unique(data.i$mdcaty) == 1)) { # unstratified, equal
+  if(length(unique(data.i$stratum)) > 1 & length(unique(data.i$mdcaty) == 1)) { # stratified, equal
     
     framesizeAdj.ow <- filter(data.i, stratum == "open_water") %>%
       distinct(Area_km2) %>% select(Area_km2)
@@ -78,4 +78,21 @@ for (i in 1:length(unique(eqAreaData$Lake_Name))) {
   )
 }
 
+# 6. Verify that all lakes have >=15 sites with non zero weights
 lapply(myWgtList, function(x) summarize(x,n = sum(x$adj > 0)))
+
+
+# 7. Incorporate adjusted weights into eqAreaData
+wgtAdjDf <- do.call("rbind", myWgtList)  # Coerces list into dataframe.
+wgtAdjDf[, c("Lake_Name", "siteID")] <- lapply(wgtAdjDf[, c("Lake_Name", "siteID")], 
+                                               as.character) # convert to character
+
+str(eqAreaData) #1426 observations
+str(wgtAdjDf)  # 1426 observations
+eqAreaData <- merge(eqAreaData, wgtAdjDf) #1426 observations
+
+
+
+
+
+

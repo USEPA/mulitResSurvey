@@ -449,7 +449,7 @@ for (i in 1:with(gga[!is.na(gga$Lake_Name), ], # this eliminates observations wi
   
   grid.arrange(plot.i, plot.ii, ncol = 2) # use to put two plots per page
 }
-dev.off()  #6 min 50sec
+dev.off()  #7 min 50sec
 
 
 
