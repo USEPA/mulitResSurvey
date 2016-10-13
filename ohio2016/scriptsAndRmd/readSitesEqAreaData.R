@@ -89,11 +89,44 @@ mylist4 <- lapply(mylist3, function(x) {
                                     NA, 
                                     eqAreaData[, "TrapExtn"])
  
+ eqAreaData[, "ArExtnrs"] <- ifelse(eqAreaData[, "ArExtnrs"] == "NA", 
+                                    NA, 
+                                    eqAreaData[, "ArExtnrs"])
+ 
+ eqAreaData[, "DG_Extn"] <- ifelse(eqAreaData[, "DG_Extn"] == "NA", 
+                                    NA, 
+                                    eqAreaData[, "DG_Extn"])
+ 
+ # CHAMBER VOLUME
  # Calculate chamber volume based on relationship between water level
  # and volume.  See chamberDesign.xlsx in East Fork folder.
  eqAreaData <- mutate(eqAreaData, chmVol.L = (42.057 + (-0.2189 * chm_vol)))
  
- # PREVIEW AND QUICK FIXES TO DATA
+ # Deal with instances where chamber volume was not recorded in field.
+ # 1.  A site or two missed, whereas volume recorded at most other sites.
+ # Caeaser Cr.
+ toAdjChmVol <- with(eqAreaData, Lake_Name == "Caesar Creek Lake" & EvalStatus == "sampled" & is.na(chmVol.L))
+ adjChmVol <- with(eqAreaData, Lake_Name == "Caesar Creek Lake" & EvalStatus == "sampled" & !is.na(chmVol.L))
+ estChemVol <- mean(eqAreaData[adjChmVol, "chmVol.L"])
+ eqAreaData[toAdjChmVol, "chmVol.L"] =  estChemVol
  
+ # Apple Valley
+ toAdjChmVol <- with(eqAreaData, Lake_Name == "Apple Valley Lake" & EvalStatus == "sampled" & is.na(chmVol.L))
+ adjChmVol <- with(eqAreaData, Lake_Name == "Apple Valley Lake" & EvalStatus == "sampled" & !is.na(chmVol.L))
+ estChemVol <- mean(eqAreaData[adjChmVol, "chmVol.L"])
+ eqAreaData[toAdjChmVol, "chmVol.L"] =  estChemVol
  
+ # Lake Waynoka
+ toAdjChmVol <- with(eqAreaData, Lake_Name == "Lake Waynoka" & EvalStatus == "sampled" & is.na(chmVol.L))
+ adjChmVol <- with(eqAreaData, Lake_Name == "Lake Waynoka" & EvalStatus == "sampled" & !is.na(chmVol.L))
+ estChemVol <- mean(eqAreaData[adjChmVol, "chmVol.L"])
+ eqAreaData[toAdjChmVol, "chmVol.L"] =  estChemVol 
+ 
+ # 2.  Pleasent Hill (PH) sampled day before Charles Mill (CM).  No volume measurements
+ # made at CM; replace with mean from PH.
+ # First, create logical for conditions that need to be replaced
+ adjChmVol <- eqAreaData$Lake_Name == "Charles Mill Lake" & eqAreaData$EvalStatus == "sampled"
+ eqAreaData[adjChmVol, "chmVol.L"] = 
+   mean(eqAreaData[eqAreaData$Lake_Name == "Pleasant Hill Lake", "chmVol.L"], na.rm = TRUE)
+
  
