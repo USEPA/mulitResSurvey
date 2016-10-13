@@ -63,4 +63,4 @@ ggplot(gga, aes(RDateTime, CH4._ppm)) + geom_point() +
 ggplot(gga, aes(RDateTime, CO2._ppm)) + geom_point() + 
   scale_x_datetime(labels=date_format ("%m/%d %H:%M"))
 
-#looking for mjKirwin data
+

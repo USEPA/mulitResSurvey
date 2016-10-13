@@ -6,6 +6,7 @@ library(scales)  # For plotting
 # library(persp3d) # For plotting response surface in 3d; Not compatable w/R 3.3.0
 library(reshape) # For merge_recurse function
 library(reshape2) # For melt/dcast
+library(tidyr)  # for separate
 library(plyr)  # for 'join' in ggplot plotting of shapefile
 library(dplyr)   # For data manipulation
 library(knitr)   # To knit rmarkdown document
@@ -77,7 +78,9 @@ grtsMeanVariance <- function(x) {
   # DATA.CONF data frame.
   data.cont <- data.frame(siteID=x$siteID,
                           ebMlHrM2=x$ebMlHrM2, # volume of gas in trap
-                          chla=x$chla_S)
+                          chla=x$chla_S,
+                          ch4.drate.mg.m2.h = x$ch4.drate.mg.h.best,
+                          co2.drate.mg.m2.h = x$co2.drate.mg.h.best)
   
   
   # CALCULATE CDF ESTIMATES
