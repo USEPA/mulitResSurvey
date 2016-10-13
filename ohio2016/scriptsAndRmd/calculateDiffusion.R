@@ -1,21 +1,14 @@
 
 
 
-# EMISSION RATES AND K600 CALCULATIONS--------------------
+# EMISSION RATE CALCULATIONS--------------------
 # STEP 1:  CALCULATE EMISSION RATE VIA LINEAR AND NONLINEAR REGRESSION
 #          FOR SITES WHERE PERIODS OF LINEAR ACCUMULATION ARE INDICATED 
 #          IN "times.emission".
 # STEP 2: USE AIC TO DETERMINE WHETHER LINEAR OF NON-LINEAR FIT IS BEST.
 #         CONFIRM CHOICE BY INSPECTING RAW DATA
-# STEP 3: CALCULATE K FOR CO2 AND CH4
-# STEP 4: COMPARE CO2 AND CH4.  IF THE CH4 K LOOKS UNREASONABLE,
-#         CALCULATE CH4 DIFFUSION USING CO2 K.
-# STEP 5: IF CH4 DIFFUSION CAN'T BE CALCULATED DIRECTLY (i.e., CH4.start and CH4.stop
-#         are NA), THEN CALCULATE FROM CO2 K
-# STEP 6: IF NEITHER CH4 DIFFUSION NOR CO2 K CAN BE CALCULATED DIRECTLY, CALCULATE
-#         CH4 DIFFUSION FROM CH4 K MEASURED AT A NEARBY STATION 
-# STEP 7: CALCULATE TOTAL EMISSION RATE (diffusion + ebulition) as [CH4]final - [CH4]initial
-# STEP 8: CACLULATE EBULLITION RATE AS "TOTAL - DIFFUSIVE"
+# STEP 3: MERGE WITH eqAreaData
+
 
 
 # STEP 1: LINEAR AND NONLINEAR REGRESSION
@@ -240,10 +233,9 @@ plot(with(OUT,ifelse(ch4.lm.aic < ch4.ex.aic, ch4.lm.r2, ch4.ex.r2)))  # CH4:  s
 # STEP 3: MERGE DIFFUSION RATES WITH eqAreaData
 # First, strip NA from OUT
 OUT <- filter(OUT, !is.na(Lake_Name))
-eqAreaDataDif <- merge(eqAreaData, OUT, by.x = c("Lake_Name", "siteID"), 
+eqAreaData <- merge(eqAreaData, OUT, by.x = c("Lake_Name", "siteID"), 
       by.y = c("Lake_Name", "site"), all=TRUE)
 
 str(eqAreaData) # 1426 observations
-str(eqAreaDataDif) # 1426 observations, good
 
 

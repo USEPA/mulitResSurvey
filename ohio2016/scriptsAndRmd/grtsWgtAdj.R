@@ -87,7 +87,7 @@ wgtAdjDf <- do.call("rbind", myWgtList)  # Coerces list into dataframe.
 wgtAdjDf[, c("Lake_Name", "siteID")] <- lapply(wgtAdjDf[, c("Lake_Name", "siteID")], 
                                                as.character) # convert to character
 
-str(eqAreaData) #1426 observations
+str(eqAreaData) #1426 observations  # may need to merge with something else after ebulition calcs finished
 str(wgtAdjDf)  # 1426 observations
 eqAreaData <- merge(eqAreaData, wgtAdjDf) #1426 observations
 
