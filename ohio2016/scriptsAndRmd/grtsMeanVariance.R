@@ -41,6 +41,10 @@ ggplot(filter(meanVariance.c, Subpopulation == "lake"),
        aes(chla_Estimate, ebMlHrM2_Estimate)) +
   geom_point()
 
+ggplot(filter(meanVariance.c, Subpopulation == "lake"),
+       aes(chla_Estimate, ch4.drate.mg.m2.h_Estimate)) +
+  geom_point()
+
 ggplot(filter(meanVariance.c.lu, Subpopulation == "lake"),
        aes( percent.agg.ag, ebMlHrM2_Estimate)) +
   geom_point()
@@ -50,6 +54,9 @@ ggplot(filter(meanVariance.c, Subpopulation == "lake") %>% arrange(ebMlHrM2_Esti
   geom_point()
 
 dev.off()
+
+
+
 
 a <- filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(percent.agg.ag)
 b <-filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(depth)

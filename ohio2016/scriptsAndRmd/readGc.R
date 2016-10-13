@@ -1,6 +1,6 @@
 
 
-# READ GC DATA
+# READ GC DATA----------------
 # Read individual files.  Had trouble with read_excel
 
 rootDir <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/data/gcData/"
@@ -45,4 +45,34 @@ names(gas.all) = tolower(names(gas.all))
 
 #Check for duplicates.  Should be none.
 filter(gas.all, duplicated(sample,fromLast = TRUE) | duplicated(sample,fromLast = FALSE)) %>% arrange(sample)
-```
+
+#  PREPARE EXETAINER CODES----------------------
+# Extract from eqAreaData
+xtrCodes <- filter(eqAreaData, EvalStatus == "sampled") %>%
+  select(Lake_Name, siteID, ArExtnrs, DG_Extn, TrapExtn)
+
+# Remove white space
+xtrCodes[, c("ArExtnrs", "DG_Extn", "TrapExtn")] <- apply(X = xtrCodes[, c("ArExtnrs", "DG_Extn", "TrapExtn")],
+                                                         MARGIN = 2, 
+                                                         function(x) gsub(x, pattern = " ", replacement = ""))
+
+# Split codes into separate fields
+xtrCodes <- separate(xtrCodes, ArExtnrs, into = c("ar.xtr.1", "ar.xtr.2", "ar.xtr.3"), sep = ",") %>%
+  separate(DG_Extn, into = c("dg.xtr.1", "dg.xtr.2", "dg.xtr.3"), sep = ",") %>%
+  separate(TrapExtn, into = c("tp.xtr.1", "tp.xtr.2", "tp.xtr.3"), sep = ",")
+  
+xtrCodes.m <- melt(xtrCodes, id.vars = c("Lake_Name", "siteID")) %>% # melt
+  mutate(value = as.integer(as.character((value)))) %>%  # Should be able to go straight to integer if codes entered correctly
+filter(!is.na(value))  # remove NAs
+
+xtrCodes.m[grepl(pattern = ".1", x = xtrCodes.m$variable), "variable"] <- 
+  gsub(pattern = ".1", replacement = "", x = xtrCodes.m[grepl(pattern = ".1", x = xtrCodes.m$variable), "variable"])
+
+
+# Need to replace names of ar.xtr.1, .......
+
+xtrCodes.gas <- merge(xtrCodes.m, gas.all, by.x = "value", by.y = "sample")
+
+
+
+

@@ -6,6 +6,7 @@ library(scales)  # For plotting
 # library(persp3d) # For plotting response surface in 3d; Not compatable w/R 3.3.0
 library(reshape) # For merge_recurse function
 library(reshape2) # For melt/dcast
+library(tidyr)  # for separate
 library(plyr)  # for 'join' in ggplot plotting of shapefile
 library(dplyr)   # For data manipulation
 library(knitr)   # To knit rmarkdown document
