@@ -5,7 +5,7 @@
 # LIBRARIES---------------
 # library(ggplot2) # load from masterLibrary
 # library(scales)  # load from masterLibrary
-source("ohio2016/scriptsAndRmd/masterLibrary.R")
+# source("ohio2016/scriptsAndRmd/masterLibrary.R")
 
 
 # READ DATA-----------------
@@ -57,10 +57,10 @@ gga <- do.call("rbind", ggaList)  # Coerces list into dataframe.
 
 
 # BASIC PLOTS-----------------
-ggplot(gga, aes(RDateTime, CH4._ppm)) + geom_point() + 
-  scale_x_datetime(labels=date_format ("%m/%d %H:%M"))
-
-ggplot(gga, aes(RDateTime, CO2._ppm)) + geom_point() + 
-  scale_x_datetime(labels=date_format ("%m/%d %H:%M"))
+# ggplot(gga, aes(RDateTime, CH4._ppm)) + geom_point() + 
+#   scale_x_datetime(labels=date_format ("%m/%d %H:%M"))
+# 
+# ggplot(gga, aes(RDateTime, CO2._ppm)) + geom_point() + 
+#   scale_x_datetime(labels=date_format ("%m/%d %H:%M"))
 
 

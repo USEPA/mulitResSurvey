@@ -232,10 +232,13 @@ plot(with(OUT,ifelse(ch4.lm.aic < ch4.ex.aic, ch4.lm.r2, ch4.ex.r2)))  # CH4:  s
 
 # STEP 3: MERGE DIFFUSION RATES WITH eqAreaData
 # First, strip NA from OUT
-OUT <- filter(OUT, !is.na(Lake_Name))
+OUT <- filter(OUT, !is.na(Lake_Name)) # Just on NA slipped in
 eqAreaData <- merge(eqAreaData, OUT, by.x = c("Lake_Name", "siteID"), 
       by.y = c("Lake_Name", "site"), all=TRUE)
 
 str(eqAreaData) # 1426 observations
+
+# Any sites not have a rate?
+filter(eqAreaData, EvalStatus == "sampled", is.na(ch4.drate.mg.h.best)) #Cowan, need to be run on Gc
 
 

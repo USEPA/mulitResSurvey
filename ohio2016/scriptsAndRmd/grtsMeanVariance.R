@@ -35,8 +35,8 @@ meanVariance.c.lu <- merge(mutate(meanVariance.c, lake.name = tolower(Lake_Name)
 
 # Quick plot for fun
 
-pdf("ohio2016/output/figures/dirtySummary.pdf", paper = "a4r") # landscape orientation
-
+# pdf("ohio2016/output/figures/dirtySummary.pdf", paper = "a4r") # landscape orientation
+# 
 ggplot(filter(meanVariance.c, Subpopulation == "lake"),
        aes(chla_Estimate, ebMlHrM2_Estimate)) +
   geom_point()
@@ -52,15 +52,15 @@ ggplot(filter(meanVariance.c.lu, Subpopulation == "lake"),
 ggplot(filter(meanVariance.c, Subpopulation == "lake") %>% arrange(ebMlHrM2_Estimate),
        aes(ebMlHrM2_Estimate, Lake_Name)) +
   geom_point()
-
-dev.off()
-
-
+# 
+# dev.off()
 
 
-a <- filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(percent.agg.ag)
-b <-filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(depth)
-z <- filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(ebMlHrM2_Estimate)
+
+
+# a <- filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(percent.agg.ag)
+# b <-filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(depth)
+# z <- filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(ebMlHrM2_Estimate)
 
 
 # library not available in R 3.3.0

@@ -4,6 +4,7 @@ library(ggplot2) # For plotting
 library(gridExtra) # For plotting
 library(scales)  # For plotting
 # library(persp3d) # For plotting response surface in 3d; Not compatable w/R 3.3.0
+library(scatterplot3d)  # for plotting
 library(reshape) # For merge_recurse function
 library(reshape2) # For melt/dcast
 library(tidyr)  # for separate
