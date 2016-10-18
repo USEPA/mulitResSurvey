@@ -52,6 +52,9 @@ names(gas.all) = tolower(names(gas.all))
 # I think these labels got wet and exetainers mixed up.
 filter(gas.all, duplicated(sample,fromLast = TRUE) | duplicated(sample,fromLast = FALSE)) %>% arrange(sample)
 
+# A few fixes to be made upstream of merge with xtrCodes
+gas.all[gas.all$sample == 16023 & !is.na(gas.all$sample), "sample"] = 16230  # sample entered incorrectly in sequence
+
 # PREPARE EXETAINER CODES----------------------
 # Extract from eqAreaData
 xtrCodes <- filter(eqAreaData, EvalStatus == "sampled") %>%
@@ -83,16 +86,34 @@ xtrCodes.gas <- merge(xtrCodes.m, gas.all, by.x = "value", by.y = "sample", all 
 
 str(xtrCodes.m)  #981 observations
 str(gas.all) # 612 observations
-str(xtrCodes.gas) # 1101 observations
+str(xtrCodes.gas) # 1016 observations
+
+# Specific fixes
+omitCodes <- c(16170, # 16170 run on GC, but field notes indicate is bad
+               16189, # 16189 air sample run w/trap samples.  Discard.
+               16199, 16200, # contaminated, per field sheets
+               16206, # bad, per field data sheets
+               16023, # chromatogram overwritten due to sequence problem
+               16298, 16299, # contaminated, omit, per field sheets.
+               )
 
 
+xtrCodes.gas <- filter(xtrCodes.gas, !(value %in% omitCodes))
+
+
+                       
 # Sample run on GC, but not in data sheets
-filter(gas.all, !(sample %in% xtrCodes.m$value))  # a bunch
+filter(gas.all, !(sample %in% xtrCodes.m$value))  # only 35
 
 # Samples in data sheets, but GC data not yet read into R
 filter(xtrCodes.m, !(value %in% gas.all$sample))  # Many, but still analyzing GC samples
 
 # Ebul_Dgas_16_07_13_STD_UNK.xlsx contains unknown samples!!!!!!!!!!!!!!!!!!
+
+
+
+
+
 
 # QA/QC GC REPS--------------
 
