@@ -109,7 +109,7 @@ xtrCodes.m <- filter(xtrCodes.m, !logicalIndicator)
 xtrCodes.gas <- merge(xtrCodes.m, gas.all, by.x = "value", by.y = "sample", all = TRUE)
 
 str(xtrCodes.m)  #978 observations
-str(gas.all) # 698 observations
+str(gas.all) # 699 observations
 str(xtrCodes.gas) # 981 observations
 
 # Specific fixes
@@ -229,4 +229,26 @@ ggplot(xtrCodes.gas.agg, aes(siteID, ch4.ppm)) + # Everything appears to have ag
   geom_point() +
   facet_grid(~variable, scales="free_y")   # lot of low CH4 trap values to look into
 
-# 
+# MERGE RAW GC DATA WITH eqAreaData---------------
+# Only merge air and trap data now.  Need to push dg through
+# headspace equilibration calcs before using.
+# 1) Need to melt, which requires a data.frame, not a dplyr tbl_df.
+# 2) melt creates a 'variable' column, already have 'variable' column
+# in xtrCodes.gas.agg. Must rename first.
+xtrCodes.gas.agg <- rename(xtrCodes.gas.agg, type = variable) # rename 'variable'
+
+xtrCodes.gas.agg.m <- melt(as.data.frame(xtrCodes.gas.agg), # convert tbl_df to df
+id.vars = c("Lake_Name", "siteID", "type")) # specify id variable
+
+xtrCodes.gas.agg.m <- mutate(xtrCodes.gas.agg.m, type =  # adopt more intuitive names
+                             ifelse(type == "tp.xtr", "trap",
+                                    ifelse(type == "ar.xtr", "air", type)))
+  
+xtrCodes.gas.agg.c <- dcast(filter(xtrCodes.gas.agg.m, type != "dg.xtr"), # cast
+                            Lake_Name + siteID ~ type + variable) %>%
+  select(-air_o2.sd, -air_o2, -air_o2.cv, -air_ar.sd, -air_ar, -air_ar.cv, -air_n2.sd,
+         -air_n2, -air_n2.cv, -air_total)
+
+# Merge
+eqAreaData <- merge(xtrCodes.gas.agg.c, eqAreaData, all = TRUE)
+

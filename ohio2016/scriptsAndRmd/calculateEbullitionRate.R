@@ -4,4 +4,3 @@ eqAreaData <- mutate(eqAreaData, ebMlHrM2 = TtTrpVl /
 
                      
                      
-      
