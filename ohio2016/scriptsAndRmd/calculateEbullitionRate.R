@@ -6,7 +6,7 @@ eqAreaData <- mutate(eqAreaData,
                           ((3.14*.28^2)))) # diameter = 22.25in=0.56m, r=.28m))
 
 
-                     ebCh4MgM2h = mass.rate()
+                     ebCh4MgM2h = mass.rate()dd
 
 
                      
