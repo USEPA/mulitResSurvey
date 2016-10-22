@@ -5,29 +5,30 @@ eqAreaData <- mutate(eqAreaData,
                        (as.numeric(trapRtrvDtTm - trapDeplyDtTm) * 
                           ((3.14*.28^2)))) # diameter = 22.25in=0.56m, r=.28m))
 
-# Mass flux rate must be calculated by Lake.  Will use group_by in dplyr
+# Mass flux rate must be calculated by Lake.  Tried to apply by group using
+# by_group, ddply, and lapply.  I couldn't figure it out, resorted to for loop
 
+myEbList <- list()
+for (i in 1:length(unique(eqAreaData$Lake_Name))) {
+  lake.i <- unique(eqAreaData$Lake_Name)[i]
+  data.i <- filter(eqAreaData, Lake_Name == lake.i )
+  out.ch4 <- mass.rate(data.i, choice1 = "ch4") 
+  out.co2 <- mass.rate(data.i, choice1 = "co2")
+  out.n2o <- mass.rate(data.i, choice1 = "n2o")
+  
+  myEbList[[i]] <- data.frame(ebCh4mgM2h = out.ch4,
+                              ebCo2mgM2h = out.co2,
+                              ebN2omgM2h = out.n2o,
+                              Lake_Name = data.i$Lake_Name,
+                              siteID = data.i$siteID)
+}
 
+ebResults <- do.call("rbind", myEbList)  # This coerces the list into a dataframe. Cool..
 
+str(eqAreaData) # 1426 observations
+str(ebResults)  # 1426 observations
+eqAreaData <- merge(eqAreaData,ebResults, all = TRUE) 
+str(eqAreaData) # 1426 observations
 
-
-#32. Custom function with ddply.
-# May need to specify a 'translation' data set in function call.
-#http://stackoverflow.com/questions/20845409/how-do-i-pass-variables-to-a-custom-function-in-ddply
-# d <- data.frame(
-#   experiment = as.factor(c("foo", "foo", "foo", "bar", "bar", "bar")),
-#   si = runif(6),
-#   ti = runif(6)
-# )
-# ddply(d, .(experiment), function(d.sub) cor.test(d.sub$si, d.sub$ti)$statistic)
-# #   experiment         t
-# # 1        bar 0.1517205
-# # 2        foo 0.3387682
-
-
-
-ddply(eqAreaData, .(Lake_Name), function(x) mass.rate(x, choice1 = "ch4"))
-
-
- #Still trying to figure this out.                    
-                     
+ggplot(eqAreaData, aes(co2.drate.mg.h.best, ebCo2mgM2h)) +
+  geom_point()
