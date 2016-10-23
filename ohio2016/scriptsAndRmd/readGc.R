@@ -19,6 +19,8 @@ gas.5 <- read.xls(paste(rootDir, "Ebul_Dgas_16_07_13_STD_UNK.xlsx", sep=""),
                   as.is=TRUE, skip=36)
 gas.6 <- read.xls(paste(rootDir, "Ebul_Dgas_16_08_31_STD_UNK.xlsx", sep=""),
                   as.is=TRUE, skip=31)
+gas.7 <- read.xls(paste(rootDir, "Ebullition_16_10_12_STD_UNK.xlsx", sep=""),
+                  as.is=TRUE, skip=46)
 
 # Need to strip a few samples before all are merged.
 # These are floating chamber gas samples collected manually at Cowan Lake.  Were
@@ -27,7 +29,7 @@ gas.6 <- read.xls(paste(rootDir, "Ebul_Dgas_16_08_31_STD_UNK.xlsx", sep=""),
 gas.5 <- filter(gas.5, !(Sample %in% c(16126:16129, 16133:16136)))
 
 # Merge gas data.
-gas.all <- Reduce(function(...) merge(..., all=T), list(gas.1, gas.2, gas.3, gas.4, gas.5, gas.6))  
+gas.all <- Reduce(function(...) merge(..., all=T), list(gas.1, gas.2, gas.3, gas.4, gas.5, gas.6, gas.7))  
 
 # Need to make a few fixes before exetainer code is converted to integer
 # The labels were lost from several Kiser Lake samples.  These samples were
@@ -60,6 +62,7 @@ names(gas.all) = tolower(names(gas.all))
 
 
 # Check for duplicates.  Should be none.
+# Need to follow up on 16242
 filter(gas.all, duplicated(sample,fromLast = TRUE) | duplicated(sample,fromLast = FALSE)) %>% arrange(sample)
 
 # A few fixes to be made upstream of merge with xtrCodes
@@ -109,17 +112,20 @@ xtrCodes.m <- filter(xtrCodes.m, !logicalIndicator)
 xtrCodes.gas <- merge(xtrCodes.m, gas.all, by.x = "value", by.y = "sample", all = TRUE)
 
 str(xtrCodes.m)  #978 observations
-str(gas.all) # 699 observations
-str(xtrCodes.gas) # 981 observations
+str(gas.all) # 838 observations
+str(xtrCodes.gas) # 1001 observations
 
 # Specific fixes
+# Still need to add codes for MIT trap redeployment
+
 omitCodes <- c(16170, # run on GC, but field notes indicate is bad and not entered in field sheets
                16189, # 16189 air sample run w/trap samples.  Discard.
                16199, 16200, # contaminated, per field sheets
                16206, # bad, per field data sheets
                16023, # chromatogram overwritten due to sequence problem
-               16298, 16299 # contaminated, omit, per field sheets.
-               )
+               16298, 16299, # contaminated, omit, per field sheets.
+               16235, 16281, 16257,161262,161266, 161258, # Cowan Lake cntl traps
+               16237,16151,16265, 16165,161279,16158) # Cowan Lake cntl traps
 
 
 xtrCodes.gas <- filter(xtrCodes.gas, !(value %in% omitCodes))
@@ -127,7 +133,7 @@ xtrCodes.gas <- filter(xtrCodes.gas, !(value %in% omitCodes))
 
                        
 # Sample run on GC, but not in data sheets
-filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value)  # only 1
+filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value)  # only 13
 # No record of 16825 having been collected
 
 

@@ -23,7 +23,6 @@ library(minpack.lm) # for non linear diffusion model
 # returns string w/o leading or trailing whitespace
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
-
 # GRTS ANALYSIS FUNCTION------------------
 # Analyze continuous variable from grts survey design.
 grtsMeanVariance <- function(x) {
@@ -79,11 +78,16 @@ grtsMeanVariance <- function(x) {
   
   
   # DATA.CONF data frame.
-  data.cont <- data.frame(siteID=x$siteID,
-                          ebMlHrM2=x$ebMlHrM2, # volume of gas in trap
-                          chla=x$chla_S,
+  data.cont <- data.frame(siteID = x$siteID,
+                          ebMlHrM2 = x$ebMlHrM2, # volume of gas in trap
+                          chla = x$chla_S,
                           ch4.drate.mg.m2.h = x$ch4.drate.mg.h.best,
-                          co2.drate.mg.m2.h = x$co2.drate.mg.h.best)
+                          co2.drate.mg.m2.h = x$co2.drate.mg.h.best,
+                          ch4.erate.mg.h = x$ch4.erate.mg.h,
+                          co2.erate.mg.h = x$co2.erate.mg.h,
+                          n2o.erate.mg.h = x$n2o.erate.mg.h,
+                          co2.trate.mg.h = x$co2.trate.mg.h,
+                          ch4.trate.mg.h = x$ch4.trate.mg.h)
   
   
   # CALCULATE CDF ESTIMATES
@@ -100,7 +104,7 @@ grtsMeanVariance <- function(x) {
   cdf.final
 }
 
-# EBULLITION MASS FLUX FUNCTION
+# EBULLITION MASS FLUX FUNCTION------------------------
 
 # Function for calculating mass flux rate                  
 mass.rate <- function(X1, choice1){

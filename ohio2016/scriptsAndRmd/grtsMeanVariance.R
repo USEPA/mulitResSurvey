@@ -33,30 +33,11 @@ meanVariance.c <- dcast(meanVariance.m, formula = Lake_Name + Subpopulation ~ In
 meanVariance.c.lu <- merge(mutate(meanVariance.c, lake.name = tolower(Lake_Name)), survRes, by.x = "lake.name", by.y = "lake.name")
 
 
-# Quick plot for fun
-
-# pdf("ohio2016/output/figures/dirtySummary.pdf", paper = "a4r") # landscape orientation
-# 
-ggplot(filter(meanVariance.c, Subpopulation == "lake"),
-       aes(chla_Estimate, ebMlHrM2_Estimate)) +
-  geom_point()
-
-ggplot(filter(meanVariance.c, Subpopulation == "lake"),
-       aes(chla_Estimate, ch4.drate.mg.m2.h_Estimate)) +
-  geom_point()
-
-ggplot(filter(meanVariance.c.lu, Subpopulation == "lake"),
-       aes( percent.agg.ag, ebMlHrM2_Estimate)) +
-  geom_point()
-
-ggplot(filter(meanVariance.c, Subpopulation == "lake") %>% arrange(ebMlHrM2_Estimate),
-       aes(ebMlHrM2_Estimate, Lake_Name)) +
-  geom_point()
-# 
-# dev.off()
 
 
 
+
+# 3d Surface plots.  Won't run in R 3.3.0--------------------------
 
 # a <- filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(percent.agg.ag)
 # b <-filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(depth)

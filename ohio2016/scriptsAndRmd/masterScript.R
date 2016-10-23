@@ -9,10 +9,7 @@ source("ohio2016/scriptsAndRmd/readGc.R")
 
 # Calculate derived quantities
 source("ohio2016/scriptsAndRmd/plotCleanLgr.R")
-source("ohio2016/scriptsAndRmd/calculateDiffusion.R")
-
-
-source("ohio2016/scriptsAndRmd/calculateEbullitionRate.R")
+source("ohio2016/scriptsAndRmd/calculateEmissions.R")
 
 # grts calculations
 source("ohio2016/scriptsAndRmd/grtsWgtAdj.R")
