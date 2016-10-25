@@ -125,7 +125,9 @@ omitCodes <- c(16170, # run on GC, but field notes indicate is bad and not enter
                16023, # chromatogram overwritten due to sequence problem
                16298, 16299, # contaminated, omit, per field sheets.
                16235, 16281, 16257,161262,161266, 161258, # Cowan Lake cntl traps
-               16237,16151,16265, 16165,161279,16158) # Cowan Lake cntl traps
+               16237,16151,16265, 16165,161279,16158, # Cowan Lake cntl traps
+               161267, 161268, 161269, # Harsha Lake MIT redeployment
+               16242, 16143, 161244) # Caesar Cr. MIT redeployment
 
 
 xtrCodes.gas <- filter(xtrCodes.gas, !(value %in% omitCodes))
@@ -133,7 +135,7 @@ xtrCodes.gas <- filter(xtrCodes.gas, !(value %in% omitCodes))
 
                        
 # Sample run on GC, but not in data sheets
-filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value)  # only 13
+filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value)  # only 8
 # No record of 16825 having been collected
 
 

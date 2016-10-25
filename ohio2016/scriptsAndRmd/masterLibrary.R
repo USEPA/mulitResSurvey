@@ -106,7 +106,7 @@ grtsMeanVariance <- function(x) {
 
 # EBULLITION MASS FLUX FUNCTION------------------------
 
-# Function for calculating mass flux rate                  
+# Function for calculating mass flux rate-----------------                  
 mass.rate <- function(X1, choice1){
   # trap gas data to use if measured values aren't available
   trap_ch4.ppm <- ifelse(is.na(X1$trap_ch4.ppm), mean(X1$trap_ch4.ppm, na.rm=TRUE), X1$trap_ch4.ppm) 
@@ -137,3 +137,46 @@ mass.rate <- function(X1, choice1){
   # return mass flux rate in mg ch4-co2-n2o /day/m2
   mass.flux.rate
 }
+
+# ORDER Lake_Name FUNCTION-------------------------
+orderLake <- function(x, choice1) {
+  if(choice1 == "ch4.d") {
+    column <- "ch4.drate.mg.m2.h_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
+  } else if(choice1 == "ch4.e") {
+    column <- "ch4.erate.mg.h_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
+  } else if(choice1 == "ch4.t") {
+    column <- "ch4.trate.mg.h_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
+  } else if(choice1 == "co2.d") {
+    column <- "co2.drate.mg.m2.h_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
+  } else if(choice1 == "co2.e") {
+    column <- "co2.erate.mg.h_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
+  } else if(choice1 == "co2.t") {
+    column <- "co2.trate.mg.h_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
+  }
+  
+}
+
+
+lakeLevels <- meanVariance.c.lake[order(meanVariance.c.lake$co2.trate.mg.h_Estimate), "Lake_Name"]
+
+meanVariance.c.lake <- mutate(meanVariance.c.lake,
+                              fLake_Name = factor(Lake_Name,
+                                                  levels = lakeLevels))
