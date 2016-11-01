@@ -21,6 +21,8 @@ gas.6 <- read.xls(paste(rootDir, "Ebul_Dgas_16_08_31_STD_UNK.xlsx", sep=""),
                   as.is=TRUE, skip=31)
 gas.7 <- read.xls(paste(rootDir, "Ebullition_16_10_12_STD_UNK.xlsx", sep=""),
                   as.is=TRUE, skip=46)
+gas.8 <- read.xls(paste(rootDir, "Ebul_Trap_6ml_16_10_20_UNK_STD.xlsx", sep = ""),
+                  as.is = TRUE, skip = 46)
 
 # Need to strip a few samples before all are merged.
 # These are floating chamber gas samples collected manually at Cowan Lake.  Were
@@ -29,7 +31,7 @@ gas.7 <- read.xls(paste(rootDir, "Ebullition_16_10_12_STD_UNK.xlsx", sep=""),
 gas.5 <- filter(gas.5, !(Sample %in% c(16126:16129, 16133:16136)))
 
 # Merge gas data.
-gas.all <- Reduce(function(...) merge(..., all=T), list(gas.1, gas.2, gas.3, gas.4, gas.5, gas.6, gas.7))  
+gas.all <- Reduce(function(...) merge(..., all=T), list(gas.1, gas.2, gas.3, gas.4, gas.5, gas.6, gas.7, gas.8))  
 
 # Need to make a few fixes before exetainer code is converted to integer
 # The labels were lost from several Kiser Lake samples.  These samples were
@@ -37,6 +39,11 @@ gas.all <- Reduce(function(...) merge(..., all=T), list(gas.1, gas.2, gas.3, gas
 # figure out what samples they were, therefore removing from data set.
 logicalIndicator <- !(grepl(pattern = "unkgas", x = gas.all$Sample)) #sample code with"unkgas"
 gas.all <- gas.all[logicalIndicator, ]  # remove unkgas samples
+
+# Strip out a few 2015 samples that were included with the cryo run
+# from the 6 mL vials.
+gas.all <- filter(gas.all, !Sample %in% c("2015 T 104", "2015 T919", "2015 T102"))
+
 
 # Format gas data
 gas.all <- select(gas.all, select = -Sample.code, -Sample.abb, # Exlcude variables
@@ -111,9 +118,9 @@ xtrCodes.m <- filter(xtrCodes.m, !logicalIndicator)
 
 xtrCodes.gas <- merge(xtrCodes.m, gas.all, by.x = "value", by.y = "sample", all = TRUE)
 
-str(xtrCodes.m)  #978 observations
-str(gas.all) # 838 observations
-str(xtrCodes.gas) # 1001 observations
+str(xtrCodes.m)  #980 observations
+str(gas.all) # 901 observations
+str(xtrCodes.gas) # 1003 observations
 
 # Specific fixes
 # Still need to add codes for MIT trap redeployment
@@ -124,10 +131,14 @@ omitCodes <- c(16170, # run on GC, but field notes indicate is bad and not enter
                16206, # bad, per field data sheets
                16023, # chromatogram overwritten due to sequence problem
                16298, 16299, # contaminated, omit, per field sheets.
-               16235, 16281, 16257,161262,161266, 161258, # Cowan Lake cntl traps
-               16237,16151,16265, 16165,161279,16158, # Cowan Lake cntl traps
+               161235, 161281, 161257, 161262, 161266, 161258, # Cowan Lake cntl traps
+               161237, 16151, 161265, 16165, 161279, 16158, # Cowan Lake cntl traps
                161267, 161268, 161269, # Harsha Lake MIT redeployment
-               16242, 16143, 161244) # Caesar Cr. MIT redeployment
+               16242, 16143, 161244, # Caesar Cr. MIT redeployment
+               16576,  # Empty short tube run on GC
+               16603, # trap sample, but no record in field sheets.
+               16825) # no record in field sheets
+               
 
 
 xtrCodes.gas <- filter(xtrCodes.gas, !(value %in% omitCodes))
@@ -135,12 +146,11 @@ xtrCodes.gas <- filter(xtrCodes.gas, !(value %in% omitCodes))
 
                        
 # Sample run on GC, but not in data sheets
-filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value)  # only 8
-# No record of 16825 having been collected
+filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value)  # 0
 
 
 # Samples in data sheets, but GC data not yet read into R
-filter(xtrCodes.gas, is.na(xtrCodes.gas$co2.ppm)) %>% arrange(value)  # Many, but still analyzing GC samples
+filter(xtrCodes.gas, is.na(xtrCodes.gas$co2.ppm)) %>% arrange(variable, value)  # Many, but still analyzing GC samples
 
 
 
