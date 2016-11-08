@@ -3,7 +3,7 @@ library(dplyr)
 library(ggplot2)
 
 # Read data
-ohioWB <- readOGR(dsn = "inputData/spatial", layer = "NHDWaterbody")
+ohioWB <- readOGR(dsn = "ohio2016/inputData/spatial", layer = "NHDWaterbody")
 str(ohioWB@data)
 
 # FCodes codes for reservoirs from http://nhd.usgs.gov/userguide.html
