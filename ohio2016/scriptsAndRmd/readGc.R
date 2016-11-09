@@ -137,7 +137,8 @@ omitCodes <- c(16170, # run on GC, but field notes indicate is bad and not enter
                16242, 16143, 161244, # Caesar Cr. MIT redeployment
                16576,  # Empty short tube run on GC
                16603, # trap sample, but no record in field sheets.
-               16825) # no record in field sheets
+               16825, # no record in field sheets
+               16070) # Karen noted loose cap. Came from trap, but looks like air.
                
 
 
@@ -151,8 +152,6 @@ filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value)  # 0
 
 # Samples in data sheets, but GC data not yet read into R
 filter(xtrCodes.gas, is.na(xtrCodes.gas$co2.ppm)) %>% arrange(variable, value)  # Many, but still analyzing GC samples
-
-
 
 
 # QA/QC GC REPS--------------
