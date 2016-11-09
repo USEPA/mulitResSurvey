@@ -14,3 +14,6 @@ source("ohio2016/scriptsAndRmd/calculateEmissions.R")
 # grts calculations
 source("ohio2016/scriptsAndRmd/grtsWgtAdj.R")
 source("ohio2016/scriptsAndRmd/grtsMeanVariance.R")
+
+# Data analysis
+source("ohio2016/scriptsAndRmd/exploratoryPlots.R")

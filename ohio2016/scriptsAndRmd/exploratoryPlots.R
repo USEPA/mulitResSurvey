@@ -101,7 +101,9 @@ meanVariance.c.lu <- merge(mutate(meanVariance.c.lake,
                                       lLake_Name = tolower(Lake_Name)),
                                survRes, 
                            by.x = "lLake_Name",
-                           by.y = "Lake_Name")
+                           by.y = "Lake_Name") %>%
+  mutate(rda = watershed.area.m2 / reservoir.area.m2,
+         si = res.perimeter.m / reservoir.area.m2)
 
 
 # CO2 total vs land use
@@ -145,17 +147,18 @@ ggplot(meanVariance.c.lu,
   xlab("maximum depth (ft)")
 
 
-# STATISTICAL MODELS
-# Basic correlation matrix.  
-# 0.38 with watershed area
+# UNTRANSFORMED STATISTICAL MODELS
+# Basic correlation matrix.
 cor(select(meanVariance.c.lu, 
            ch4.trate.mg.h_Estimate,
-           chla_Estimate,
+           chla_Estimate, #0.19
            max.depth.ft,
            res.perimeter.m,
-           res.fetch.m,
-           reservoir.area.m2,
-           watershed.area.m2),
+           res.fetch.m, #-0.13
+           reservoir.area.m2, #-0.19
+           watershed.area.m2,#0.39
+           rda, #0.56 
+           si), # 0.22
     use = "pairwise.complete.obs")
 
 # Initial hypothesis: land use * depth
@@ -215,14 +218,11 @@ summary(m12) #max depth, watershed/lake * max depth)
 
 
 # 3D surface plot for depth and watershed:reservoir area
-# fit data (the four methane emission rates from Jake, 
-# which I situated essentially at the corners of the explanatory
-# variable plane)
 summary(out <- lm(ch4.trate.mg.h_Estimate ~ I(watershed.area.m2 / reservoir.area.m2) *
                     max.depth.ft, 
                   data = meanVariance.c.lu))
 
-# hypothesized function for methane emission
+# function for methane emission
 ch4fun <- function(a,d){out$coefficients[1] + out$coefficients[2]*a + out$coefficients[3]*d + out$coefficients[4]*a*d}
 
 # look at the surface, as a contour plot and as a surface
@@ -236,9 +236,20 @@ d <- seq(min(meanVariance.c.lu$max.depth.ft),
 z <- outer(a,d,ch4fun)
 
 #3D surface plot
+#Can't do in R3.3.0
 persp3D(x = a, y = d, z, phi = 15, theta = 30, main = "Modeled Response Surface", 
         xlab = "watershed:reservoir surface area", 
         ylab = "Max Depth",
         zlab = "Methane emission rate",
         ticktype = "detailed")
+
+#Interactive 3D surface plot
+persp3d(x = a, y = d, z, phi = 15, theta = 30, 
+        xlab = "watershed:reservoir surface area", 
+        ylab = "Max Depth",
+        zlab = "Methane emission rate",
+        ticktype = "detailed")
+
+# LOG TRANSFORMED DATA----------
+
 
