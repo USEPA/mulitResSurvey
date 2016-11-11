@@ -82,6 +82,7 @@ grtsMeanVariance <- function(x) {
   data.cont <- data.frame(siteID = x$siteID,
                           ebMlHrM2 = x$ebMlHrM2, # volume of gas in trap
                           chla = x$chla_S,
+                          tp = x$TP,
                           ch4.drate.mg.m2.h = x$ch4.drate.mg.h.best,
                           co2.drate.mg.m2.h = x$co2.drate.mg.h.best,
                           ch4.erate.mg.h = x$ch4.erate.mg.h,

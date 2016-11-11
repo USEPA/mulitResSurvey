@@ -29,21 +29,4 @@ meanVariance[ , c("Subpopulation", "Indicator")] = apply(meanVariance[ , c("Subp
 meanVariance.m <- reshape2::melt(meanVariance)  # specify package.  reshape and reshape2 loaded
 meanVariance.c <- dcast(meanVariance.m, formula = Lake_Name + Subpopulation ~ Indicator + variable) # cast
 
-# Quick look at LU data
-meanVariance.c.lu <- merge(mutate(meanVariance.c, lake.name = tolower(Lake_Name)), survRes, by.x = "lake.name", by.y = "lake.name")
 
-
-
-
-
-
-# 3d Surface plots.  Won't run in R 3.3.0--------------------------
-
-# a <- filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(percent.agg.ag)
-# b <-filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(depth)
-# z <- filter(meanVariance.c.lu, Subpopulation == "lake") %>% select(ebMlHrM2_Estimate)
-
-
-# library not available in R 3.3.0
-#persp3D(x=a,y=d,z,phi=15,theta=-30,main = "Hypothesized Surface", xlab = "Ag %", ylab = "Max Depth",
-#        zlab = "Methane Emission Rate (mg/m^2/h)")
