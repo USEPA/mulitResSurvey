@@ -8,7 +8,7 @@
 
 # Missing chem data from:
 # Acton Lake (ACN, 2016-05-31), site ids U04 and U18 in chem file for this
-# sampling date.
-# Hocking County Lake (HOK, 2016-06-20), corresponds to HOC in chem file
+# sampling date.  I think this is correct, double check at office.
+
 # Lake Loramie (LOR, 2016-08-03), chem file contains LR and LRN from 08-02?
-# Senecaville Lake (SNC, 2016-09-13), entered as SEN in chem file
+# Not sure, will wait until I get to office to confirm.

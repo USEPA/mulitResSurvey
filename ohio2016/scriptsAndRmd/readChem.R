@@ -65,7 +65,27 @@ distinct(chem, UNIT) # all ug, except mg C/L for TOC
 
 #############################################
 # Pull out data from multi res survey 2016
-unique(chem$site) # many!
+# Hocking Lake was coded in chem samples as HOC, but should be HOK.
+# Senecaville Lake (SNC, 2016-09-13), entered as SEN in chem file
+# Acton Lake (ACN, 2016-05-31), site ids U04 and U18 in chem file for this
+chem <- mutate(chem, site = 
+                 # fix Hocking
+                 ifelse(grepl(pattern = "HOC", x = site),
+                        gsub(pattern = "HOC", 
+                             replacement = "HOK", 
+                             site),
+                        
+                 # Fix Senacaville
+                 ifelse(grepl(pattern = "SEN", x = site),
+                         gsub(pattern = "SEN", 
+                              replacement = "SNC", 
+                              site),
+                               
+                 # Fix Acton
+                 ifelse(site %in% c("U04", "U18"),
+                        paste("ACN", site, sep = ""),
+                              site))))
+
 
 # Pull out site values that contain the 3 letter code for each reservoir.
 matchPattern <- paste(translationKeydf$site, # 3 letter code in "or" statement
@@ -81,10 +101,10 @@ fChem <- mutate(fChem, finalConc = ifelse(analyte == "TP",
 #############################################
 # Add unique identifiers and fix issues with fChem
 fChem <- mutate(fChem, siteAbb = substr(site, 1, 3))
-length(unique(fChem$siteAbb))  # 28, missing data from 4 lakes
+length(unique(fChem$siteAbb))  # 31, missing data from 1 lake. see issues.R
 
 # Which lakes missing?
-filter(translationKeydf, !(site %in% fChem$siteAbb))  
+filter(translationKeydf, !(site %in% fChem$siteAbb)) # Loramie, see issues.R
 
 # Merge in Lake_Name
 fChem <- merge(fChem, translationKeydf, by.x = "siteAbb", by.y = "site")
@@ -95,7 +115,7 @@ fChem <- merge(fChem, translationKeydf, by.x = "siteAbb", by.y = "site")
 fChem <- mutate(fChem, site = gsub(pattern = "_", replacement = "", x = site))
 
 # nchar for site ranges from 3 (S04) to 4 (SU31)
-# indicator for site nchar
+# Define indicator for site nchar
 ncharSite <- with(fChem, ifelse(grepl(pattern = c("SU|US"), x = site),
                    4, 3))
 
@@ -148,10 +168,11 @@ fChem <- mutate(fChem,
 
 
 # Verify all Lake_Name x siteID combinations are in eqAreaData
+# Don't inlcude blanks because they don't all have a siteID.
 # sum = 0, therefore all match
-sum(!(with(fChem, paste(Lake_Name, siteID)) %in% 
-  with(eqAreaData, paste(Lake_Name, siteID))))
-
+sum(!(with(filter(fChem, TYPE != "BLANK"), # fChem, no blanks 
+           paste(Lake_Name, siteID)) %in% # paste Lake_Name and siteID
+  with(eqAreaData, paste(Lake_Name, siteID)))) # compare to lake x site in eqArea
 
 # Nitrite is listed as NO2 and TNO2.  Should all be TNO2
 fChem <- mutate(fChem, analyte = ifelse(analyte == "NO2",
@@ -174,7 +195,7 @@ fChem <-  filter(fChem, TYPE != "BLANK") %>%
 ggplot(fChem, aes(Lake_Name, finalConc)) + 
   geom_point(aes(color = TYPE)) + 
   facet_wrap(~analyte, scales = "free_y") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
 
 # Aggregate by Lake_Name x site x variable for merging with eqAreaData
