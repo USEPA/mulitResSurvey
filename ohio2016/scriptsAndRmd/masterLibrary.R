@@ -83,6 +83,10 @@ grtsMeanVariance <- function(x) {
                           ebMlHrM2 = x$ebMlHrM2, # volume of gas in trap
                           chla = x$chla_S,
                           tp = x$TP,
+                          tn = x$TN,
+                          tnh4 = x$TNH4,
+                          tno2 = x$TNO2,
+                          #tno2-3 = x$TNO-3, # this breaks code.  need to remove dash
                           ch4.drate.mg.m2.h = x$ch4.drate.mg.h.best,
                           co2.drate.mg.m2.h = x$co2.drate.mg.h.best,
                           ch4.erate.mg.h = x$ch4.erate.mg.h,

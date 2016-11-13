@@ -1,5 +1,6 @@
 # SCRIPT TO READ IN WATER CHEM
 
+# LAKE ABBREVIATIONS---------------------
 # Unique ID for Chem samples includes a 3-letter code for Lake_Name.
 # The following key can be used to translate.
 

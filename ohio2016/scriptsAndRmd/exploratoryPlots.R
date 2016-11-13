@@ -141,22 +141,38 @@ ggsave('ohio2016/output/figures/ch4byDepth.tiff',  # export as .tif
 
 # CH4 total vs watershed:reservoir
 ggplot(meanVariance.c.lu,
-       aes((watershed.area.m2 / reservoir.area.m2), ch4.trate.mg.h_Estimate)) +
+       aes(rda, ch4.trate.mg.h_Estimate)) +
   geom_point() +
   ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
-  xlab("maximum depth (ft)")
+  xlab("RDA")
 
+# CH4 total vs TP
+ggplot(meanVariance.c.lu,
+       aes(tp_Estimate, ch4.trate.mg.h_Estimate)) +
+  geom_point() +
+  ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
+  xlab("TP (ug/L")
+
+# CH4 total vs TN
+ggplot(meanVariance.c.lu,
+       aes(tn_Estimate, ch4.trate.mg.h_Estimate)) +
+  geom_point() +
+  ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
+  xlab("TN (ug/L")
 
 # UNTRANSFORMED STATISTICAL MODELS
 # Basic correlation matrix.
 cor(select(meanVariance.c.lu, 
            ch4.trate.mg.h_Estimate,
            chla_Estimate, #0.19
+           tp_Estimate,
+           tn_Estimate,
            max.depth.ft,
            res.perimeter.m,
            res.fetch.m, #-0.13
            reservoir.area.m2, #-0.19
            watershed.area.m2,#0.39
+           percent.agg.ag, #Ag and TN are 0.8!
            rda, #0.56 
            si), # 0.22
     use = "pairwise.complete.obs")
@@ -250,6 +266,23 @@ persp3d(x = a, y = d, z, phi = 15, theta = 30,
         zlab = "Methane emission rate",
         ticktype = "detailed")
 
-# LOG TRANSFORMED DATA----------
+# ZUUR'S PROTOCOL----------
+# Independent variables to consider
+# %ag, depth, reservoir size, watershed size, rda, si, TP, Chl a
+# TP and chla are correlated: 0.7
+# %ag and chla are correlated: 0.5
+# %ag and TP are correlated: 0.31
+# reservoir area and watershed area are correlated
+# rda and watershed area are correlated
+# si is correlated with reservoir area and res.fetch
+# res area and depth are correlated: 0.48
 
+# First model is based on watershed and morphometric characterisitic,
+# no correlated variables included.  Next model will use chem data.
+# Can't use res area and depth (they are correlated).
+# using depth in first model.
+m1 <- lm(ch4.trate.mg.h_Estimate ~ rda * max.depth.ft * percent.agg.ag, 
+         data = meanVariance.c.lu.lake)
+summary(m1);anova(m1)  # a few things going
+plot(m1) # normality not so hot.
 

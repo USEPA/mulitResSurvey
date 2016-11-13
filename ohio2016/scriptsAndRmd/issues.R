@@ -12,3 +12,12 @@
 
 # Lake Loramie (LOR, 2016-08-03), chem file contains LR and LRN from 08-02?
 # Not sure, will wait until I get to office to confirm.
+
+# Change TNO2-3 name.  It fucks with grtsMeanVariance function.  Eliminate
+# dash.
+
+
+# calculateEmissions.R
+# Need to strip out diffusion fits with an r2 < xx.
+# Set CH4 diffusion for Brookville SU-11 to NA.  Model fit to a portion
+# of data after ebullition is way to big.
