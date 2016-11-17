@@ -18,7 +18,6 @@ library(rgdal)   # For reading shapefiles
 library(spsurvey)  # survey design
 library(maptools) # for ggplot plotting of shapefile (fortify function)
 library(minpack.lm) # for non linear diffusion model
-library(AED)
 
 
 # TRIM FUNCTION--------------------------

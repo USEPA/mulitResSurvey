@@ -2,16 +2,19 @@
 
 # Need to follow up on 16242.  readGcdata
 
-# Check on Cave Run water chem sampling sites.  Listed as SU-07 and SU-50
-# in eqAreaData.  However, chem data indicate SU-04, SU-07, and SU-46; however
-# SU-46 and SU-04 seem to be from same site.
+# Check on Cave Run water chem sampling sites.  Listed as SU-07 (depth profile 
+# site) and SU-50 (shallow and deep sonde measurements recorded) in eqAreaData.
+# But chem samples collected from SU-07 and SU-46 (confirmed on karens data
+# sheets); however SU-46 and SU-04 seem to be from same site.  CONFIRMED,
+# NEED TO CORRECT.
 
 # Missing chem data from:
 # Acton Lake (ACN, 2016-05-31), site ids U04 and U18 in chem file for this
-# sampling date.  I think this is correct, double check at office.
+# sampling date.  CONFIRMED, NEED TO CORRECT.
 
 # Lake Loramie (LOR, 2016-08-03), chem file contains LR and LRN from 08-02?
-# Not sure, will wait until I get to office to confirm.
+# These are stream sites. Karen has no record of processing LOR samples.  Check
+# 4th floor lab.
 
 # Change TNO2-3 name.  It fucks with grtsMeanVariance function.  Eliminate
 # dash.
