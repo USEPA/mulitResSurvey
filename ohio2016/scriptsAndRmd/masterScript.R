@@ -1,6 +1,8 @@
 
 # Load libraries and functions
 source("ohio2016/scriptsAndRmd/masterLibrary.R")
+# For VIF function (Zuur pg.386, http://www.highstat.com/book2.htm)
+source("ohio2016/scriptsAndRmd/HighstatLibV6.R") 
 
 # Read raw data
 source("ohio2016/scriptsAndRmd/readSitesEqAreaData.R") # Reads shapefiles
