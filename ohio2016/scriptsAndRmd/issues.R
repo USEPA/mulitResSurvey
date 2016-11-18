@@ -12,9 +12,9 @@
 # Acton Lake (ACN, 2016-05-31), site ids U04 and U18 in chem file for this
 # sampling date.  CONFIRMED, NEED TO CORRECT.
 
-# Lake Loramie (LOR, 2016-08-03), chem file contains LR and LRN from 08-02?
-# These are stream sites. Karen has no record of processing LOR samples.  Check
-# 4th floor lab.
+# Lake Loramie (LOR, 2016-08-03).  Found samples in lab.  Karen will run.
+
+# Brookeville, found samples in lab.
 
 # Change TNO2-3 name.  It fucks with grtsMeanVariance function.  Eliminate
 # dash.

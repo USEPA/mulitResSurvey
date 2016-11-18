@@ -29,4 +29,8 @@ meanVariance[ , c("Subpopulation", "Indicator")] = apply(meanVariance[ , c("Subp
 meanVariance.m <- reshape2::melt(meanVariance)  # specify package.  reshape and reshape2 loaded
 meanVariance.c <- dcast(meanVariance.m, formula = Lake_Name + Subpopulation ~ Indicator + variable) # cast
 
-
+# Add sample date to meanVariance.c
+sample.dates <- select(eqAreaData, Lake_Name, deplyDt) %>% 
+  distinct(Lake_Name, deplyDt) %>% 
+  filter(!is.na(deplyDt))
+meanVariance.c <- merge(meanVariance.c, sample.dates)

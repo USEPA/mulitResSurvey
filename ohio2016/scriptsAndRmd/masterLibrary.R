@@ -10,8 +10,7 @@ library(scatterplot3d)  # for plotting
 library(reshape) # For merge_recurse function
 library(reshape2) # For melt/dcast
 library(tidyr)  # for separate
-library(plyr)  # for 'join' in ggplot plotting of shapefile
-library(dplyr)   # For data manipulation
+
 library(knitr)   # To knit rmarkdown document
 library(ggmap)   # For ggmap plot of reservoirs
 library(rgdal)   # For reading shapefiles
@@ -23,7 +22,14 @@ library(minpack.lm) # for non linear diffusion model
 # http://www.statmethods.net/stats/rdiagnostics.html)
 library(car) # vif function
 library(fmsb) # variance inflation factor 'VIF' function
-library(relaimpo)
+library(relaimpo)  # dependent on MASS, which masks dplyr select
+
+# Always load dplyr after plyr and relaimpo!  These packages mask
+# dplyr functions.
+library(plyr)  # for 'join' in ggplot plotting of shapefile
+library(dplyr)   # For data manipulation
+
+
 
 # TRIM FUNCTION--------------------------
 # returns string w/o leading or trailing whitespace
@@ -187,8 +193,12 @@ orderLake <- function(x, choice1) {
     orderList <- order(x[, column])
     lakeLevels <- x[orderList, "Lake_Name"]
     factor(x$Lake_Name, levels = lakeLevels)
+  } else if (choice1 == "ch4.ppm.trap") {
+    column <- "trap_ch4.ppm_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
   }
-  
 }
 
 
