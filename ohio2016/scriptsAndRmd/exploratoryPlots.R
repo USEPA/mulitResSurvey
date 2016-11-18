@@ -4,18 +4,36 @@
 # Initial looks at emission rates
 
 # DOT PLOT LAKE SPECIFIC DATA--------------
-# Pull out whole lake data
-meanVariance.c.lake <- filter(meanVariance.c, Subpopulation == "lake")
+##---------------------------------------------------------------------------##
+# Volumetric rates
+# Highlight Harsha Lake data with color
+plotColor <- ifelse(meanVariance.c.lu$Lake_Name == "William H Harsha Lake", 
+                    "red", "black")
 
+# Set plotting order for volumetric emission rate
+meanVariance.c.lu$fLake_Name <- orderLake(meanVariance.c.lu, choice1 = "vol")
+ggplot(meanVariance.c.lu,
+       aes(ebMlHrM2_Estimate, fLake_Name)) +
+  geom_point(color = plotColor) +
+  geom_errorbarh(aes(xmax = ebMlHrM2_UCB95Pct, 
+                     xmin = ebMlHrM2_LCB95Pct), 
+                 color = plotColor)
+
+ggsave('ohio2016/output/figures/ch4VolDotChart.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=6,   # 1 column
+       height=6, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
 ##---------------------------------------------------------------------------##
 # CH4 rates first
 # Highlight Harsha Lake data with color
-plotColor <- ifelse(meanVariance.c.lake$Lake_Name == "William H Harsha Lake", "red", "black")
+plotColor <- ifelse(meanVariance.c.lu$Lake_Name == "William H Harsha Lake", "red", "black")
 
 # Diffusive CH4  flux
 # Reset plotting order for CH4 diffusion
-meanVariance.c.lake$fLake_Name <- orderLake(meanVariance.c.lake, choice1 = "ch4.d")
-ggplot(meanVariance.c.lake,
+meanVariance.c.lu$fLake_Name <- orderLake(meanVariance.c.lu, choice1 = "ch4.d")
+ggplot(meanVariance.c.lu,
        aes(ch4.drate.mg.m2.h_Estimate, fLake_Name)) +
   geom_point(color = plotColor) +
   geom_errorbarh(aes(xmax = ch4.drate.mg.m2.h_UCB95Pct, 
@@ -23,8 +41,8 @@ ggplot(meanVariance.c.lake,
 
 # Ebullition CH4 mass flux
 # Reset plotting order for CH4 ebullition
-meanVariance.c.lake$fLake_Name <- orderLake(meanVariance.c.lake, choice1 = "ch4.e")
-ggplot(meanVariance.c.lake,
+meanVariance.c.lu$fLake_Name <- orderLake(meanVariance.c.lu, choice1 = "ch4.e")
+ggplot(meanVariance.c.lu,
        aes(ch4.erate.mg.h_Estimate, fLake_Name)) +
   geom_point(color = plotColor) +
   geom_errorbarh(aes(xmax = ch4.erate.mg.h_UCB95Pct, 
@@ -32,8 +50,8 @@ ggplot(meanVariance.c.lake,
 
 # CH4 total rate
 # Reset plotting order for CH4 ebullition
-meanVariance.c.lake$fLake_Name <- orderLake(meanVariance.c.lake, choice1 = "ch4.t")
-ggplot(meanVariance.c.lake,
+meanVariance.c.lu$fLake_Name <- orderLake(meanVariance.c.lu, choice1 = "ch4.t")
+ggplot(meanVariance.c.lu,
        aes(ch4.trate.mg.h_Estimate, fLake_Name)) +
   geom_point(color = plotColor) +
   geom_errorbarh(aes(xmax = ch4.trate.mg.h_UCB95Pct, 
@@ -55,8 +73,8 @@ compression = "lzw")
 
 # Diffusive CO2  flux
 # Reset plotting order for CO2 diffusion
-meanVariance.c.lake$fLake_Name <- orderLake(meanVariance.c.lake, choice1 = "co2.d")
-ggplot(meanVariance.c.lake,
+meanVariance.c.lu$fLake_Name <- orderLake(meanVariance.c.lu, choice1 = "co2.d")
+ggplot(meanVariance.c.lu,
        aes(co2.drate.mg.m2.h_Estimate, fLake_Name)) +
   geom_point(color = plotColor) +
   geom_errorbarh(aes(xmax = co2.drate.mg.m2.h_UCB95Pct, 
@@ -64,8 +82,8 @@ ggplot(meanVariance.c.lake,
 
 # CO2 ebullition
 # Reset plotting order for CO2 ebullition
-meanVariance.c.lake$fLake_Name <- orderLake(meanVariance.c.lake, choice1 = "co2.e")
-ggplot(meanVariance.c.lake,
+meanVariance.c.lu$fLake_Name <- orderLake(meanVariance.c.lu, choice1 = "co2.e")
+ggplot(meanVariance.c.lu,
        aes(co2.erate.mg.h_Estimate, fLake_Name)) +
   geom_point(color = plotColor) +
   geom_errorbarh(aes(xmax = co2.erate.mg.h_UCB95Pct, 
@@ -74,8 +92,8 @@ ggplot(meanVariance.c.lake,
 
 # CO2 total rate
 # Reset plotting order for CO2 ebullition
-meanVariance.c.lake$fLake_Name <- orderLake(meanVariance.c.lake, choice1 = "co2.t")
-ggplot(meanVariance.c.lake,
+meanVariance.c.lu$fLake_Name <- orderLake(meanVariance.c.lu, choice1 = "co2.t")
+ggplot(meanVariance.c.lu,
        aes(co2.trate.mg.h_Estimate, fLake_Name)) +
   geom_point(color = plotColor) +
   geom_errorbarh(aes(xmax = co2.trate.mg.h_UCB95Pct, xmin = co2.trate.mg.h_LCB95Pct), color = plotColor)
@@ -83,7 +101,7 @@ ggplot(meanVariance.c.lake,
 
 # CORRELATIONS----------------------------
 # Merge with landuse data.
-# Need to adopt lake names consistent with meanVariance.c.lake
+# Need to adopt lake names consistent with meanVariance.c.lu
 survRes$Lake_Name <- ifelse(survRes$lake.name == "BVR",
                             "brookville lake",
                             ifelse(survRes$lake.name == "BHR",
@@ -96,8 +114,8 @@ survRes$Lake_Name <- ifelse(survRes$lake.name == "BVR",
                                                         "cave run lake",
                                                         survRes$lake.name)))))
 
-# Lake_Name in meanVariance.c.lake must be lowercase
-meanVariance.c.lu <- merge(mutate(meanVariance.c.lake, 
+# Lake_Name in meanVariance.c.lu must be lowercase
+meanVariance.c.lu <- merge(mutate(meanVariance.c.lu, 
                                       lLake_Name = tolower(Lake_Name)),
                                survRes, 
                            by.x = "lLake_Name",
@@ -105,6 +123,36 @@ meanVariance.c.lu <- merge(mutate(meanVariance.c.lake,
   mutate(rda = watershed.area.m2 / reservoir.area.m2,
          si = res.perimeter.m / reservoir.area.m2)
 
+
+# Volumetric emissions by land use
+m <- lm(ebMlHrM2_Estimate ~ percent.agg.ag, # univariate model
+        data = meanVariance.c.lu)
+# Set up 
+eq <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2, 
+                 list(a = format(coef(m)[1], digits = 4), 
+                      b = format(coef(m)[2], digits = 4), 
+                      r2 = format(summary(m)$r.squared, digits = 3)))
+
+dftext <- data.frame(percent.agg.ag = 30, 
+                     ebMlHrM2_Estimate = 60, 
+                     eq = as.character(as.expression(eq)))
+
+ggplot(meanVariance.c.lu,
+       aes(percent.agg.ag, ebMlHrM2_Estimate)) +
+  geom_point() +
+  # geom_errorbar(aes(ymax = ebMlHrM2_UCB95Pct,  
+  #                   ymin = ebMlHrM2_LCB95Pct)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  #geom_text(aes(label = eq), data = dftext, parse = TRUE) +
+  ylab(expression(volumetric~flux~(mL~ m^{2}~ hr^{-1}))) +
+  xlab("% agricultural land use in watershed")
+
+ggsave('ohio2016/output/figures/volbyLU.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=5,   # 1 column
+       height=5, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
 
 # CO2 total vs land use
 ggplot(meanVariance.c.lu,
@@ -118,9 +166,9 @@ ggplot(meanVariance.c.lu,
   ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
   xlab("% agricultural land use in watershed")
 
-ggsave('ohio2016/output/figures/ch4byLU.tiff',  # export as .tif
+ggsave('ohio2016/output/figures/ch4TotByLU.tiff',  # export as .tif
        units="in",  # specify units for dimensions
-       width=4,   # 1 column
+       width=5,   # 1 column
        height=5, # Whatever works
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")
@@ -134,7 +182,7 @@ ggplot(meanVariance.c.lu,
 
 ggsave('ohio2016/output/figures/ch4byDepth.tiff',  # export as .tif
        units="in",  # specify units for dimensions
-       width=4,   # 1 column
+       width=5,   # 1 column
        height=5, # Whatever works
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")

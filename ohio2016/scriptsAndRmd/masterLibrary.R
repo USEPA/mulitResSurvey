@@ -19,6 +19,11 @@ library(spsurvey)  # survey design
 library(maptools) # for ggplot plotting of shapefile (fortify function)
 library(minpack.lm) # for non linear diffusion model
 
+# car for variance inflation factor (vif)
+# http://www.statmethods.net/stats/rdiagnostics.html)
+library(car) # vif function
+library(fmsb) # variance inflation factor 'VIF' function
+library(relaimpo)
 
 # TRIM FUNCTION--------------------------
 # returns string w/o leading or trailing whitespace
@@ -86,6 +91,7 @@ grtsMeanVariance <- function(x) {
                           tn = x$TN,
                           tnh4 = x$TNH4,
                           tno2 = x$TNO2,
+                          trap_ch4.ppm = x$trap_ch4.ppm,
                           #tno2-3 = x$TNO-3, # this breaks code.  need to remove dash
                           ch4.drate.mg.m2.h = x$ch4.drate.mg.h.best,
                           co2.drate.mg.m2.h = x$co2.drate.mg.h.best,
@@ -112,7 +118,7 @@ grtsMeanVariance <- function(x) {
 
 # EBULLITION MASS FLUX FUNCTION------------------------
 
-# Function for calculating mass flux rate-----------------                  
+# Function for calculating mass flux rate--                  
 mass.rate <- function(X1, choice1){
   # trap gas data to use if measured values aren't available
   trap_ch4.ppm <- ifelse(is.na(X1$trap_ch4.ppm), mean(X1$trap_ch4.ppm, na.rm=TRUE), X1$trap_ch4.ppm) 
@@ -176,13 +182,84 @@ orderLake <- function(x, choice1) {
     orderList <- order(x[, column])
     lakeLevels <- x[orderList, "Lake_Name"]
     factor(x$Lake_Name, levels = lakeLevels)
+  } else if (choice1 == "vol") {
+    column <- "ebMlHrM2_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
   }
   
 }
 
 
-lakeLevels <- meanVariance.c.lake[order(meanVariance.c.lake$co2.trate.mg.h_Estimate), "Lake_Name"]
 
-meanVariance.c.lake <- mutate(meanVariance.c.lake,
-                              fLake_Name = factor(Lake_Name,
-                                                  levels = lakeLevels))
+# Custom variance inflation factor----------------------
+# See blog at https://www.r-bloggers.com/collinearity-and-stepwise-vif-selection/
+# Can source function from gist; but can't get to work
+"https://gist.githubusercontent.com/fawda123/4717702/raw/a84b776b6145c9c8f2adf93de517eab97d42cfa9/vif_fun.r"
+# Define function here
+vif_func<-function(in_frame,thresh=10,trace=T,...){
+  
+  require(fmsb)
+  
+  if(class(in_frame) != 'data.frame') in_frame<-data.frame(in_frame)
+  
+  #get initial vif value for all comparisons of variables
+  vif_init<-NULL
+  var_names <- names(in_frame)
+  for(val in var_names){
+    regressors <- var_names[-which(var_names == val)]
+    form <- paste(regressors, collapse = '+')
+    form_in <- formula(paste(val, '~', form))
+    vif_init<-rbind(vif_init, c(val, VIF(lm(form_in, data = in_frame, ...))))
+  }
+  vif_max<-max(as.numeric(vif_init[,2]))
+  
+  if(vif_max < thresh){
+    if(trace==T){ #print output of each iteration
+      prmatrix(vif_init,collab=c('var','vif'),rowlab=rep('',nrow(vif_init)),quote=F)
+      cat('\n')
+      cat(paste('All variables have VIF < ', thresh,', max VIF ',round(vif_max,2), sep=''),'\n\n')
+    }
+    return(var_names)
+  }
+  else{
+    
+    in_dat<-in_frame
+    
+    #backwards selection of explanatory variables, stops when all VIF values are below 'thresh'
+    while(vif_max >= thresh){
+      
+      vif_vals<-NULL
+      var_names <- names(in_dat)
+      
+      for(val in var_names){
+        regressors <- var_names[-which(var_names == val)]
+        form <- paste(regressors, collapse = '+')
+        form_in <- formula(paste(val, '~', form))
+        vif_add<-VIF(lm(form_in, data = in_dat, ...))
+        vif_vals<-rbind(vif_vals,c(val,vif_add))
+      }
+      max_row<-which(vif_vals[,2] == max(as.numeric(vif_vals[,2])))[1]
+      
+      vif_max<-as.numeric(vif_vals[max_row,2])
+      
+      if(vif_max<thresh) break
+      
+      if(trace==T){ #print output of each iteration
+        prmatrix(vif_vals,collab=c('var','vif'),rowlab=rep('',nrow(vif_vals)),quote=F)
+        cat('\n')
+        cat('removed: ',vif_vals[max_row,1],vif_max,'\n\n')
+        flush.console()
+      }
+      
+      in_dat<-in_dat[,!names(in_dat) %in% vif_vals[max_row,1]]
+      
+    }
+    
+    return(names(in_dat))
+    
+  }
+  
+}
+
