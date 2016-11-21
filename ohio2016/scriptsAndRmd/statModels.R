@@ -145,8 +145,9 @@ vif_func(in_frame = select(meanVariance.c.lake.lu,
          thresh = 5, trace = TRUE)
 
 
+# TOTAL VOLUMETRIC RATE FIRST
 # Set up model with non correlated variables
-m.chem1 <- lm(ch4.trate.mg.h_Estimate ~ (chla_Estimate + 
+m.chem1 <- lm(ebMlHrM2_Estimate ~ (chla_Estimate + 
                                            tp_Estimate +
                                            tn_Estimate)^2, # include 2-way interactions
               data = meanVariance.c.lake.lu)
@@ -154,10 +155,26 @@ summary(m.chem1);anova(m.chem1)  # nothing looks promising
 plot(m.chem1) # normality looks bad
 
 # Move forward with stepwise model selection
-m.null <- lm(ch4.trate.mg.h_Estimate ~ 1, data = meanVariance.c.lake.lu)
-m.step <- step(m.null, # model to start with
-               scope = list(lower = m.null, upper = m.chem1), # range to fit
-               direction ="both")
+m.step <- step(m.chem1,  direction ="both")
+anova(m.step);summary(m.step) # TN retained, r2 = 0.21, p = 0.01
+
+
+# TOTAL EMISSION RATE
+# Set up model with non correlated variables
+# Missing TN values is screwing things up, remove NAs before analysis
+data.trate.chem <- select(meanVariance.c.lake.lu, ch4.trate.mg.h_Estimate,
+                          chla_Estimate, tp_Estimate, tn_Estimate, Lake_Name) %>%
+  na.omit()
+m.chem1 <- lm(ch4.trate.mg.h_Estimate ~ (chla_Estimate + 
+                                           tp_Estimate +
+                                           tn_Estimate)^2, # include 2-way interactions
+              data = data.trate.chem)
+summary(m.chem1);anova(m.chem1)  # nothing looks promising
+plot(m.chem1) # normality looks bad
+
+# Move forward with stepwise model selection
+m.step <- step(m.chem1, # model to start with
+               direction ="both",  na.action = na.omit)
 anova(m.step);summary(m.step) # no variables retained
 
 

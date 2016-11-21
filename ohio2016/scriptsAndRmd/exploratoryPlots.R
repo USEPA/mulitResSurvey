@@ -125,6 +125,23 @@ ggplot(meanVariance.c.lake.lu,
   geom_errorbarh(aes(xmax = co2.trate.mg.h_UCB95Pct, xmin = co2.trate.mg.h_LCB95Pct), color = plotColor)
 
 
+##---------------------------------------------------------------------------##
+# Chlorophyll
+meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "chl")
+ggplot(meanVariance.c.lake.lu,
+       aes(chla_Estimate, fLake_Name)) +
+  geom_point() +
+  geom_errorbarh(aes(xmax = chla_UCB95Pct, xmin = chla_LCB95Pct)) +
+  xlab(expression(chl~a~{mu}*g~L^{-1})) +
+  theme(axis.title.y = element_blank())
+
+ggsave('ohio2016/output/figures/chlaDotPlot.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=5,   # 1 column
+       height=5, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
+
 # CORRELATIONS----------------------------
 # Volumetric emissions by land use
 m <- lm(ebMlHrM2_Estimate ~ percent.agg.ag, # univariate model
@@ -194,8 +211,9 @@ ggsave('ohio2016/output/figures/ch4byDepth.tiff',  # export as .tif
 ggplot(meanVariance.c.lake.lu,
        aes(rda, ch4.trate.mg.h_Estimate)) +
   geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
   ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
-  xlab("RDA")
+  xlab("Watershed:reservoir area")
 
 ggsave('ohio2016/output/figures/ch4TotbyRDA.tiff',  # export as .tif
        units="in",  # specify units for dimensions
@@ -274,3 +292,8 @@ ggplot(filter(eqAreaData,
   geom_point() +
   ylab(expression(bubble~CH[4]~content~('%'))) +
   xlab("bubble rate")
+
+# Nutrients and chlorophyll
+ggplot(meanVariance.c.lake.lu, aes(tp_Estimate, chla_Estimate)) +
+  geom_point() +
+  ylab(expression(chl~a~{mu}*g~L^{-1}))
