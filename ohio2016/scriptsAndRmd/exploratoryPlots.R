@@ -1,6 +1,6 @@
 # EXPLORATORY PLOTS
 
-# Merge grtsMeanVariance.c with landuse data.
+# Merge meanVariance.c with landuse data.
 # Need to adopt lake names consistent with meanVariance.c
 survRes$Lake_Name <- ifelse(survRes$lake.name == "BVR",
                             "brookville lake",
