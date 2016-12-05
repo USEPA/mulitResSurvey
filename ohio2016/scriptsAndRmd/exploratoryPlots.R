@@ -130,8 +130,8 @@ ggplot(meanVariance.c.lake.lu,
 meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "chl")
 ggplot(meanVariance.c.lake.lu,
        aes(chla_Estimate, fLake_Name)) +
-  geom_point() +
-  geom_errorbarh(aes(xmax = chla_UCB95Pct, xmin = chla_LCB95Pct)) +
+  geom_point(color = plotColor) +
+  geom_errorbarh(aes(xmax = chla_UCB95Pct, xmin = chla_LCB95Pct), color = plotColor) +
   xlab(expression(chl~a~{mu}*g~L^{-1})) +
   theme(axis.title.y = element_blank())
 
@@ -193,6 +193,8 @@ ggsave('ohio2016/output/figures/ch4TotByLU.tiff',  # export as .tif
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")
 
+
+
 # CH4 total vs depth
 ggplot(meanVariance.c.lake.lu,
        aes(max.depth.ft, ch4.trate.mg.h_Estimate)) +
@@ -200,12 +202,14 @@ ggplot(meanVariance.c.lake.lu,
   ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
   xlab("maximum depth (ft)")
 
-ggsave('ohio2016/output/figures/ch4byDepth.tiff',  # export as .tif
+ggsave('ohio2016/output/figures/ch4TotbyDepth.tiff',  # export as .tif
        units="in",  # specify units for dimensions
        width=5,   # 1 column
        height=5, # Whatever works
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")
+
+
 
 # CH4 total vs watershed:reservoir
 ggplot(meanVariance.c.lake.lu,
@@ -222,6 +226,9 @@ ggsave('ohio2016/output/figures/ch4TotbyRDA.tiff',  # export as .tif
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")
 
+
+
+
 # CH4 total vs TP
 ggplot(meanVariance.c.lake.lu,
        aes(tp_Estimate, ch4.trate.mg.h_Estimate)) +
@@ -229,12 +236,16 @@ ggplot(meanVariance.c.lake.lu,
   ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
   xlab("TP (ug/L")
 
+
+
 # CH4 total vs TN
 ggplot(meanVariance.c.lake.lu,
        aes(tn_Estimate, ch4.trate.mg.h_Estimate)) +
   geom_point() +
   ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
   xlab("TN (ug/L")
+
+
 
 
 # Trap CH4 concentration
@@ -256,11 +267,15 @@ ggsave('ohio2016/output/figures/ch4.ppmTrap.tiff',  # export as .tif
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")
 
+
+# Trap CH4 by date
 ggplot(meanVariance.c.lake.lu, aes(deplyDt, (trap_ch4.ppm_Estimate/10000))) +
   geom_point() +
   geom_text(aes(label = Lake_Name),
             hjust = 0, vjust = 0, size = 2)
 
+
+# Trap CH4 by land use
 ggplot(meanVariance.c.lake.lu,
        aes(percent.agg.ag, (trap_ch4.ppm_Estimate/10000))) +
   geom_point() +
@@ -274,18 +289,24 @@ ggsave('ohio2016/output/figures/ch4.ppmTrapByLU.tiff',  # export as .tif
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")
  
+
+# Trap CH4 by ebullition
 ggplot(meanVariance.c.lake.lu,
        aes(ebMlHrM2_Estimate, (trap_ch4.ppm_Estimate/10000))) +
   geom_point() +
   ylab(expression(bubble~CH[4]~content~('%'))) +
   xlab("bubble rate")
 
+
+# Trap CH4 by volumetric ebullition 
 ggplot(eqAreaData,
        aes(ebMlHrM2, (trap_ch4.ppm/10000))) +
   geom_point() +
   ylab(expression(bubble~CH[4]~content~('%'))) +
   xlab("bubble rate")
 
+
+# Trap CH4 by volumetric ebullition, excluding Acton, Alum, Cowan
 ggplot(filter(eqAreaData,
               !(Lake_Name %in% c("Acton Lake", "Alum Creek Lake", "Cowan Lake"))),
        aes(ebMlHrM2, (trap_ch4.ppm/10000))) +
