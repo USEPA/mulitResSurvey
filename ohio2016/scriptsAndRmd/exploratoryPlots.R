@@ -178,9 +178,16 @@ ggplot(meanVariance.c.lake.lu,
        aes(percent.agg.ag, co2.trate.mg.h_Estimate)) +
   geom_point()
 
-# CH4 total vs land use
+# CH4 total vs land use, excluding Acton, Alum, and Cowan
 ggplot(filter(meanVariance.c.lake.lu, 
               !(Lake_Name %in% c("Acton Lake", "Alum Creek Lake", "Cowan Lake"))),
+       aes(percent.agg.ag, ch4.trate.mg.h_Estimate)) +
+  geom_point() +
+  ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
+  xlab("% agricultural land use in watershed")
+
+# CH4 total vs land use
+ggplot(meanVariance.c.lake.lu,
        aes(percent.agg.ag, ch4.trate.mg.h_Estimate)) +
   geom_point() +
   ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
