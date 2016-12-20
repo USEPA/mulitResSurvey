@@ -1,47 +1,6 @@
 # SCRIPT TO READ IN WATER CHEM
 
-# LAKE ABBREVIATIONS---------------------
-# Unique ID for Chem samples includes a 3-letter code for Lake_Name.
-# The following key can be used to translate.
 
-translationKey <- 
-c("Acton Lake", "ACN",
-"Alum Creek Lake", "ALC",
-"Apple Valley Lake", "AVL",         
-"Atwood Lake", "ATW",
-"Brookville Lake", "BVR",
-"Buckhorn Lake", "BHR",             
-"Burr Oak Reservoir", "BOR",
-"Caesar Creek Lake", "CCK",
-"Carr Fork Lake", "CFK",            
-"Cave Run Lake", "CRR",
-"Charles Mill Lake", "CML",
-"Cowan Lake", "CWN",                
-"Delaware Reservoir", "DEL",
-"Dillon Lake", "DIL",
-"Hocking County Lake", "HOK",       
-"Kiser Lake", "KIS",
-"Knox Lake", "KNX",
-"La Due Reservoir", "LDR",          
-"Lake Loramie", "LOR",
-"Lake Milton", "MIL",
-"Lake Mohawk", "MHK",               
-"Lake Roaming Rock", "RRK",
-"Lake Waynoka", "WKA",
-"Michael J Kirwan Reservoir", "MJK",
-"Paint Creek Lake", "PTC",
-"Piedmont Lake", "PDT",
-"Pleasant Hill Lake", "PHL",        
-"Rocky Fork Lake", "RFL",
-"Senecaville Lake", "SNC",
-"Tappan Lake", "TPN",               
-"William H Harsha Lake", "EFR",
-"Wingfoot Lake", "WGF") 
-
-# Coerce to data.frame  
-translationKeydf <- data.frame(Lake_Name = translationKey[seq(1,length(translationKey), 2)],
-                        site = translationKey[seq(2,length(translationKey), 2)],
-                        stringsAsFactors = FALSE)
 
 # READ AND FORMAT WATER CHEM---------------
 # Data retrieved from L drive on 11/09/2016
@@ -89,6 +48,7 @@ chem <- mutate(chem, site =
 
 
 # Pull out site values that contain the 3 letter code for each reservoir.
+# translationKeydf is from masterLibrary
 matchPattern <- paste(translationKeydf$site, # 3 letter code in "or" statement
                       collapse = "|")
 fChem <- filter(chem, grepl(pattern = matchPattern, x = site))

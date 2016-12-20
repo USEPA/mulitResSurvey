@@ -109,7 +109,7 @@ chlFinal <- merge(select(chl.c, nmsampleID, chla.ug, pheo),
                   all.y = TRUE)  # keep all obs from Karen's data sheet
 
 # 8. Calculate chl a of original sample
-#  See APHA 10-18 for details.
+# See APHA 10-18 for details.
 # 5cm path length, 10mL extraction volume
 chlFinal <- mutate(chlFinal,
                    # 1000000 convert from mL to m^3
@@ -118,24 +118,62 @@ chlFinal <- mutate(chlFinal,
                    pheo.sample = pheo * 0.01 / ((volume.filtered..mL./1000000) * 5))
 
 
-# 9. Pull out calibration samples
+# 9. Separate calibration and regular samples
 chlCal <- filter(chlFinal, grepl(pattern = "CAL", x = nmsampleID))
 chlFinal <- filter(chlFinal, !grepl(pattern = "CAL", x = nmsampleID))
 
-#10. Merge data into eqAreaData
-charIds <- strsplit(chlFinal$nmsampleID,split = "\\.")
+#10. Create unique identifiers for merge into eqAreaData
+charIds <- strsplit(chlFinal$nmsampleID,split = "\\.") %>% # split on periods
+  lapply(function(x) { # apply function to each element of list
+    x[2:3] # extract second and third elements (lake name and site)
+  }) %>%
+  unlist()  # unlist into vector
 
-charIds <-lapply(charIds, function(x) {
-  x[2:3]
-})
+# Coerce into df and format
+charIds <- data.frame(Lake = charIds[seq(1, length(charIds), 2)], # extract lake
+                      siteID = charIds[seq(2, length(charIds), 2)], # extract site
+                      stringsAsFactors = FALSE) %>% 
+  mutate(siteID = ifelse(siteID == 46,  # site SU-46 at Cave Run not coded right
+                         "SU-46",
+                  ifelse(siteID == 0, # site S-09 at Roaming not coded right
+                          "S-09",
+                  ifelse(siteID == "SU7", # BVR site not entered right
+                          "SU-07",
+                  ifelse(siteID == "U14",
+                         "SU-14",
+                  ifelse(!grepl("-", siteID) & nchar(siteID) == 4, # add "-"
+                         paste(substr(siteID, 1,2), "-", substr(siteID,3,4), sep = ""),
+                  ifelse(!grepl("-", siteID) & nchar(siteID) == 3, # add "-"
+                        paste(substr(siteID, 1, 1), "-", substr(siteID,2, 3), sep = ""),
+                        siteID)))))),
+         # Bring in true lake name.  key is derived from masterLibrary
+         Lake_Name = translationKeydf[match(Lake, translationKeydf$site), "Lake_Name"])
 
-charIds <- unlist(charIds)
+# 11. merge properly formatted siteID back into chlFinal.
+chlFinal <- cbind(select(chlFinal, chla.sample, pheo.sample), 
+                  select(charIds, Lake_Name, siteID))
 
-charIds <- data.frame(Lake = charIds[seq(1, length(charIds), 2)],
-                      siteID = charIds[seq(2, length(charIds), 2)])
+# 12. merge chl data into eqAreaData
+str(eqAreaData) #1426 observations
+eqAreaData <- merge(chlFinal, eqAreaData, all = TRUE)
+str(eqAreaData) # Still 1426, merged as expected
 
-# now merge back in.
+# 13. Read in chlorophyll measured in lab using data sonde
+sondeChl <- read_excel(paste(rootDir, 
+                             "sondeChlCalibrationChecks.xlsx", 
+                             sep = "")) 
 
+# Strip unusual character names from column titles.
+# The escape (\\) is needed to get R to treat them as character.
+names(sondeChl) = gsub(pattern = c("\\(| |#|)|/"), 
+                       replacement = ".", 
+                       x = names(sondeChl))
+sondeChl <- mutate(sondeChl, FILTER.DATE = as.Date(FILTER.DATE))
 
-
-
+# 14. Format lab based chl measurement of cal samples for merge
+# Pull out Filter date from spec based chl measurements.
+chlCal  <- mutate(chlCal, FILTER.DATE = substr(nmsampleID, 1, 8),
+                  FILTER.DATE = as.Date(FILTER.DATE, 
+                                        format = "%m%d%Y"))
+chlCal <- merge(sondeChl, 
+                select(chlCal, chla.sample, FILTER.DATE))
