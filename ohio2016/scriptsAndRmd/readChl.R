@@ -3,16 +3,12 @@
 # LIBRARY----------
 # source("ohio2016/scriptsAndRmd/masterLibrary.R")
 
-# READ IN DATA FILES DELIVERED FROM -------------------
+# READ IN DATA FILES DELIVERED FROM KIMBERLY WYATT-------------------
 
 # 1. Create a list of files to read in.  The completed data files all
-# contain the pattern Beaulieu....xls and are stored in 
-# L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/inputData/
-# directory.
+# contain the pattern Beaulieu....xls
 
-rootDir <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/inputData/J. Beaulieu Chlorophyll 2016/"
-
-fileNames <- list.files(path = rootDir, 
+fileNames <- list.files(path = "ohio2016/inputData/J. Beaulieu Chlorophyll 2016", 
                         pattern = "Beaulieu", # file names containing this pattern
                         recursive = TRUE) # look in all subdirectories
 
@@ -159,9 +155,7 @@ eqAreaData <- merge(chlFinal, eqAreaData, all = TRUE)
 str(eqAreaData) # Still 1426, merged as expected
 
 # 13. Read in chlorophyll measured in lab using data sonde
-sondeChl <- read_excel(paste(rootDir, 
-                             "sondeChlCalibrationChecks.xlsx", 
-                             sep = "")) 
+sondeChl <- read_excel("ohio2016/inputData/J. Beaulieu Chlorophyll 2016/sondeChlCalibrationChecks.xlsx") 
 
 # Strip unusual character names from column titles.
 # The escape (\\) is needed to get R to treat them as character.
