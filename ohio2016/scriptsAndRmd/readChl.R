@@ -17,7 +17,8 @@ fileNames <- list.files(path = "ohio2016/inputData/J. Beaulieu Chlorophyll 2016"
 mylist <- list()  # Create an empty list to hold data
 
 for (i in 1:length(fileNames)){  # for each file
-  data.i <- read_excel(paste(rootDir, fileNames[i], sep = ""), skip = 4)
+  data.i <- read_excel(paste("ohio2016/inputData/J. Beaulieu Chlorophyll 2016/", 
+                             fileNames[i], sep = ""), skip = 4)
   mylist[[i]] <- data.i
 }
 
