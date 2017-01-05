@@ -16,7 +16,8 @@ for (i in 1:length(unique(eqAreaData$Lake_Name))) {
 # Extract portion of interest from list components  
 myMeanVarianceList <- lapply(myMeanVarianceList, function(x) {  # apply function to each list element
   filter(x$Pct, Statistic == "Mean") %>%  # Pct is the portion we want
-    select(Lake_Name, Subpopulation, Indicator, Estimate, LCB95Pct, UCB95Pct)  
+    select(Lake_Name, Subpopulation, Indicator, Estimate, LCB95Pct, UCB95Pct, StdError) %>%
+    mutate(StdError = as.numeric(StdError)) # Comes out as a char of class "Asis"?
 })
 
 
