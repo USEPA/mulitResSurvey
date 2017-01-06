@@ -282,9 +282,15 @@ str(eqAreaData) # 1426 observations
 
 
 # CALCULATE TOTAL EMISSION RATES------------------
+# If CH4 ebul is measured, but CH4 diff couldn't be calculated,
+# CH4 tot = CH4 ebb.  In all other cases TOT = diff + ebul,
+# resulting tot = NA if is.na(ebul) or is.na(diff).
 eqAreaData <- mutate(eqAreaData, 
                      co2.trate.mg.h = co2.drate.mg.h.best + co2.erate.mg.h,
-                     ch4.trate.mg.h = ch4.drate.mg.h.best + ch4.erate.mg.h)
+                     ch4.trate.mg.h = ifelse(is.na(ch4.drate.mg.h.best) &
+                                               !is.na(ch4.erate.mg.h),
+                                             ch4.erate.mg.h,
+                                             ch4.drate.mg.h.best +ch4.erate.mg.h))
 
 
 

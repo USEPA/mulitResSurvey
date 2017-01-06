@@ -65,6 +65,14 @@ ggplot(meanVariance.c.lake.lu,
   geom_errorbarh(aes(xmax = ch4.drate.mg.m2.h_UCB95Pct, 
                      xmin = ch4.drate.mg.m2.h_LCB95Pct), color = plotColor)
 
+ggsave('ohio2016/output/figures/ch4DifDotChart.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=6,   # 1 column
+       height=6, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
+
+
 # Ebullition CH4 mass flux
 # Reset plotting order for CH4 ebullition
 meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "ch4.e")
@@ -73,6 +81,13 @@ ggplot(meanVariance.c.lake.lu,
   geom_point(color = plotColor) +
   geom_errorbarh(aes(xmax = ch4.erate.mg.h_UCB95Pct, 
                      xmin = ch4.erate.mg.h_LCB95Pct), color = plotColor)
+
+ggsave('ohio2016/output/figures/ch4EbDotChart.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=6,   # 1 column
+       height=6, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
 
 # CH4 total rate
 # Reset plotting order for CH4 ebullition
@@ -84,7 +99,8 @@ ggplot(meanVariance.c.lake.lu,
                      xmin = ch4.trate.mg.h_LCB95Pct), 
                  color = plotColor) +
   xlab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
-  theme(axis.title.y = element_blank())  # Eliminate x-axis title
+  theme(axis.title.y = element_blank()) +  # Eliminate x-axis title
+ ggtitle("Mean (95% CI) from grts function")
 
 ggsave('ohio2016/output/figures/ch4TotDotChart.tiff',  # export as .tif
 units="in",  # specify units for dimensions
