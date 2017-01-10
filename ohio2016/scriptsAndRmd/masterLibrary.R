@@ -205,7 +205,17 @@ orderLake <- function(x, choice1) {
     orderList <- order(x[, column])
     lakeLevels <- x[orderList, "Lake_Name"]
     factor(x$Lake_Name, levels = lakeLevels)
-  }
+  } else if (choice1 == "TP") {
+    column <- "tp_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
+  } else if (choice1 == "TN") {
+    column <- "tn_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
+  } 
 }
 
 
