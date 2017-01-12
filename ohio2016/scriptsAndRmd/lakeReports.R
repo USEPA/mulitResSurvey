@@ -111,7 +111,11 @@ mylist1 <- lapply(mylist, function(x) select(x, -matches(columnsToRemove))) # ma
 
 
 actonTable<-eqAreaData[eqAreaData$Lake_Name == "Acton Lake" &
-                          eqAreaData$EvalStatus == "sampled", 2:8]
+                          eqAreaData$EvalStatus == "sampled", C(2:8, 11)]
+
+# dplyr package
+filter(eqAreaData, Lake_Name == "Acton Lake", EvalStatus == "sampled") %>%
+  select(co2.erate.mg.h, n2o.erate.mg.h)
 
 
 

@@ -22,8 +22,7 @@
 
 # calculateEmissions.R
 # Need to strip out diffusion fits with an r2 < xx.
-# Set CH4 diffusion for Brookville SU-11 to NA.  Model fit to a portion
-# of data after ebullition is way to big.
+
 
 
 # exploratoryPlots.R
