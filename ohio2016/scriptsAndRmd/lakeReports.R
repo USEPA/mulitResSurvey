@@ -17,12 +17,14 @@
 # added TP and TN to the orderLake main function in masterLibrary
 # choice1 = "TP" for phosphorus and "TN" for nitrogen
 
-# total CH4 emissions copied directly from exploratoryPlots.R
+
 # Highlight Harsha Lake (lake of interest) data with color
 plotColor <- ifelse(meanVariance.c.lake.lu$Lake_Name == "William H Harsha Lake", "red", "black")
 
+# total CH4 emissions copied directly from exploratoryPlots.R
 # CH4 total emission rate
-# Reset plotting order for CH4 ebullition
+# Reset plotting order for CH4 total emissions
+# "orderLake" is a function defined in the masterLibrary.R script
 meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "ch4.t")
 ggplot(meanVariance.c.lake.lu,
        aes(ch4.trate.mg.h_Estimate, fLake_Name)) +
@@ -100,22 +102,29 @@ ggsave('ohio2016/output/figures/TNDotChart.tiff',  # export as .tif
 
 ######################################################################
 #### Item #5: Table of Water Quality Values by Site
-## work in progress
+## work in progress. Goal: produce a table for each lake with water quality and 
+## GHG emissions info, including data that was not in the plots. Need to isolate
+## the relevant data for each lake, rename the column headings, and add units
 
-#define object for the table
-columnsToRemove <- c("air_n2o.sd|air_n2o.ppm|air_n2o.cv|air_co2.sd|air_co2.ppm|air_co2.cv|air_ch4.sd|air_ch4.ppm|air_ch4.cv|trap_o2.sd|trap_o2|trap_o2.cv|trap_ar.sd|trap_ar|trap_n2.sd|trap_n2|trap_n2.cv|trap_total|Area_km2|BrPrssr|chm_vol")
+# dplyr package 
+actonTable<-filter(eqAreaData, Lake_Name == "Acton Lake", EvalStatus == "sampled") %>%
+  select(siteID, LatSamp, LongSmp, stratum, wtrDpth,  #site identification  
+         TN, TNH4, TNO2, TNO2-3, TP, TRP, chla.sample, pheo.sample,  #nutrient data
+         chla_S, DO__L_S,  DOPrc_S,  ORP_S,  pH_S, SpCn__S, Tmp_C_S,  TrNTU_S, #shallow sonde data
+         smDpthD, chla_D, DO__L_D, DOPrc_D, ORP_D, pH_D, SpCn__D, Tmp_C_D, TrNTU_D, #deep sonde data
+         co2.trate.mg.h, n2o.erate.mg.h, ch4.erate.mg.h, ch4.trate.mg.h ) #ghg emission rates
+          #"filter" command filters rows of interest. We're filtering the dataset for the sampled sites at a given lake
+          #"select" command selects the columns we want to show. The order they are listed in the () is the order they will appear
 
-#Lake_Name|ArExtnrs|bbblngO|chmStTm|deplyDt|deplyTm|DG_Extn|EvalReason
-# remove columns from all dfs in list
-mylist1 <- lapply(mylist, function(x) select(x, -matches(columnsToRemove))) # ma
+actonColNames<-c("Site ID", "Latitude", "Longitude", "Location Type", "Site Depth (m)",
+                 "Total N (units)", "NH4", "NO2", "NO2 + NO3", "Total P", "Total Reduced P", "Chl a", "Pheo",
+                 "Shallow Chl a", "Shallow DO (mg/L)", "Shallow DO (%)", "Shallow ORP", "Shallow pH", "Shallow Specific Conductivity", "Shallow Temperature (C)", "Shallow Turbidity",
+                 "'Deep' Sample Depth (m)", "Deep Chl a", "Deep DO (mg/L)", "Deep DO (%)", "Deep ORP", "Deep pH", "Deep Specific Conductivity", "Deep Temperature (C)", "Deep Turbidity",
+                 "CO2 Emission Rate (mg/h)", "N2O Emission Rate (mg/h)", "CH4 Ebullition Rate (mg/h)", "Total CH4 Emission Rate (mg/h)")
 
+write.table(actonTable, file = "actonTable.txt", sep = ",", quote = F, row.names = F, col.names = actonColNames)
 
-actonTable<-eqAreaData[eqAreaData$Lake_Name == "Acton Lake" &
-                          eqAreaData$EvalStatus == "sampled", 2:8]
-
-
-
-
+str(actonColNames)
 
 kable(actonTable)
 
