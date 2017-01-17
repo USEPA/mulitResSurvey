@@ -18,6 +18,9 @@ library(spsurvey)  # survey design
 library(maptools) # for ggplot plotting of shapefile (fortify function)
 library(minpack.lm) # for non linear diffusion model
 
+library(plot3D)
+library(plot3Drgl)   
+
 # car for variance inflation factor (vif)
 # http://www.statmethods.net/stats/rdiagnostics.html)
 library(car) # vif function
