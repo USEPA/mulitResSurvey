@@ -9,8 +9,8 @@ chem <- read_excel("ohio2016/inputData/2016_ESF-EFWS_NutrientData_Updated1107201
 
 # Replace spaces and unusual characters in column names with ".".
 # Note that "(" is a special character in R.  Must precdede with \\ for
-# R to reach as character.
-names(chem) = gsub(pattern = c("\\(| |#|)|/"), replacement = ".", x = names(chem))
+# R to read as character.
+names(chem) = gsub(pattern = c("\\(| |#|)|/|-"), replacement = ".", x = names(chem))
 chem <- rename(chem, rdate = cdate.yymmdd10.,
                finalConc = Peak.Concentration..corrected.for.dilution.factor.,
                analyte = Analyte.Name..ANALY.,
@@ -170,6 +170,11 @@ fChemAgBySite <- ddply(.data = fChem, .(Lake_Name, siteID, analyte), summarize,
 # Cast to wide for merge with eqAreaData
 fChemAgBySiteW <- dcast(fChemAgBySite, Lake_Name + siteID ~ analyte, 
                         value.var = "finalConc")
+
+# Strip ugly characters from analyte names
+names(fChemAgBySiteW) = gsub(pattern = c("\\(| |#|)|/|-"), 
+                             replacement = ".", 
+                             x = names(fChemAgBySiteW))
 
 # Merge with eqAreaData
 str(eqAreaData) #1426 observations
