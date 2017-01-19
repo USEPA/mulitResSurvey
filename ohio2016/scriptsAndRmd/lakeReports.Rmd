@@ -20,8 +20,11 @@ output: html_document
 ```{r setup}
 #setwd('C:/Users/JBEAULIE/GitRepository/mulitResSurvey')
 #knitr::opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016')
-myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey"
+#myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey"
 globalWd <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
+
+myWd <- "C:/R_Projects/mulitResSurvey"
+
 ```
 
 Get the data and libraries
@@ -88,7 +91,7 @@ actonSitesPlot@data <- merge(actonSitesPlot@data, # add emission to point shp
                                select(ch4.trate.mg.h, siteID))
 
 # load external script (this is the scatterplot3d function, but changed a bit with to add more user control over style)
-source("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/scriptsAndRmd/scatterplot3d_edit.R")
+source(paste(myWd, "/ohio2016/scriptsAndRmd/scatterplot3d_edit.R", sep = ""))
 
 # grab coordinates from polygon (in order to plot as a line on the xy plane of 3D plot)
 coords = fortify(actonEqArea)
