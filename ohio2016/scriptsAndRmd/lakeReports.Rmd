@@ -2,7 +2,7 @@
 title: "Untitled"
 author: "J. Beaulieu"
 date: "January 18, 2017"
-output: html_document
+output: pdf_document
 ---
  Lake reports should include the following
 
@@ -20,10 +20,10 @@ output: html_document
 ```{r setup}
 #setwd('C:/Users/JBEAULIE/GitRepository/mulitResSurvey')
 #knitr::opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016')
-#myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey"
+myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey"
 globalWd <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
 
-myWd <- "C:/R_Projects/mulitResSurvey"
+#myWd <- "C:/R_Projects/mulitResSurvey"
 
 ```
 
