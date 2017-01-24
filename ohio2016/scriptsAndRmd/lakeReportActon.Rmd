@@ -1,23 +1,38 @@
 ---
-title: "Untitled"
-author: "J. Beaulieu"
+title: "Water Quality and Methane Emissions at Acton Lake"
+author: "J. Beaulieu and S. Waldo"
 date: "January 18, 2017"
-output: pdf_document
+output: 
+  pdf_document:
+    includes: 
+      in_header: header.tex
 ---
- Lake reports should include the following
+## 1. Background:
 
- 1.  Introductory text desribing study and sampling specifics for the lake.
- 2.  2D map of sampled sites.
- 3.  3D scatterplot of 1) total CH4 emissions, 2) chl a, and 3) DO
- 4.  Ordered dotplot of total CH4 emissions, TP, TN, and chl a.  
-     Lake of interest should be highlighted with a different color.
- 5.  Table of other water quality values at each site  
- 6.  EPA disclaimer
+The US Environmental Protection Agency (USEPA) is conducting an investigation of methane dynamics in reservoirs. Methane is a potent greenhouse gas that is produced by microorganisms in reservoir sediments. The USEPA is supporting research to estimate the magnitude of methane emissions from reservoirs in the United States. 
 
- Probably work up a separate .rmd file for each report.  knit out to .pdf.
+The USEPA measured methane emissions from 32 reservoirs in Ohio, Indiana, and Kentucky during the summer of 2016. We typically designated 15 sites in each lake, where we measured methane emissions and several water quality indicators. Methane emissions were measured using a device which captures methane rich bubbles as they rise through the water column toward the atmosphere. A sonde was used to measure chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, and turbidity at the water surface at each of the 15 sites. Additionally, nutrient chemistry was analyzed at one shallow and one deep site for each reservoir.  
+
+This report presents results from the USEPA 2016 meausurement campaign relevant to Acton Lake. It contains:  
+
+1. This background information
+2. A map showing the location of the sampled sites
+3. 3D plots showing the results for each site within the reservoir for:
+  + Methane emissions
+  + Chlorophyll a
+  + Dissolved oxygen
+4. Figures showing how Acton Lake compared to the other 31 reservoirs in the study in terms of total-reservoir:
+  + Methane emissions
+  + Total phosphorus 
+  + Total nitrogen
+  + Chlorophyll a
+5. A table summarizing the other measured water quality values at each site within Acton Lake    
+ 
+Thank you for your help in including Acton Lake in this project. 
 
 
-```{r setup}
+
+```{r setup, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
 #setwd('C:/Users/JBEAULIE/GitRepository/mulitResSurvey')
 #knitr::opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016')
 #myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey"
@@ -27,8 +42,10 @@ myWd <- "C:/R_Projects/mulitResSurvey"
 
 ```
 
-Get the data and libraries
+
 ```{r results='hide', message=FALSE, warning=FALSE, echo=FALSE}
+#Get the data and libraries
+
 # knit() creates a new session and therefore can't read objects directly from
 # workspace.  Run this file outside of project session and load project
 # workspace.
@@ -41,10 +58,13 @@ library(dplyr)
 library(knitr)
 library(rgdal)
 
+
+
+
 ```
 
 
-## 2. 2D MAP OF SAMPLED SITES
+## 2. Map of Sampled Sites
 ```{r results='hide', message=FALSE, warning=FALSE, echo=FALSE}
 
 
@@ -80,8 +100,13 @@ ggmap(actonSat) +
   ggtitle("Acton Lake Sample Sites")
 ```
 
-# 3.  3D scatterplot of 1) total CH4 emissions, 2) chl a, and 3) DO
-```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=9}
+We sampled Acton Lake on May 31^st^ of 2016. The sites were designated via statistical software (the generalized random tesselation stratified design, or "GRTS"), an approach we chose because it reduced bias while maintaining spatial coverage. We used a GPS and GIS software to ensure we were within 30 meters of the designated site.  
+
+\newpage
+
+
+# 3.  Within-lake values of total CH4 emissions and chl a
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=9}
 
 actonEqArea <- readOGR(dsn = paste(globalWd, "acton", sep=""), # get polygon
                            layer = "actonEqArea")  # shapefile name
@@ -107,20 +132,25 @@ with(actonSitesPlot@data, {
                                    lwd=2.0,                                       # line width of lake outline
                                    type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
                                    angle=40,                                      # angle aspect of plot (-40)
-                                 scale.y=0.1,  
-                                 #scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
+                                   
+                                 scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
                                    #main="Volumetric Gas Emissions at Harsha Lake",      # main plot title
                                    xlab="",                                       # x-axis label (left blank here to reposition later)
                                    ylab="",                                       # y-axis label
-                                   cex.axis = 1.3,
-                                   cex.lab = 2,
+                                    cex.axis = 0.7, 
+                                 # cex.axis = 1.3,
+                                   cex.lab = 1.1,
+                                 #cex.lab = 2,
                                    mar = c(5,6,4,2)+0.1,
-                                   zlab=expression(Volumetric~Ebullition~(mL~ m^{-2}~ day^{-1})),                      # z-axis label
+                                   zlab=expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1})),                      # z-axis label
                                    zlim=range(0,15),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
-                                   
-                                  grid=c('xy','xz','yz'),                        # which grids to show - added to edited version of scatterplot3d fx
+                                   tick.marks = TRUE,
+                                  label.tick.marks = TRUE,   #whether or not to include tick mark labels for all three axes
+                                 x.ticklabs=NULL,
+                                 y.ticklabs=NULL,
+                                 grid=c('xy','xz','yz'),                        # which grids to show - added to edited version of scatterplot3d fx
                                    lty.grid.xy = 1,                               # grid line type  
                                    lty.grid.xz = 3,
                                    lty.grid.yz = 3,
@@ -128,7 +158,8 @@ with(actonSitesPlot@data, {
                                    lwd.grid.xz = 1,
                                    lwd.grid.yz = 1,
                                    box=FALSE                                      # get rid of the box around the plot
-  )
+                                    
+                                 )
   
 
   # add the lollipop points
@@ -143,51 +174,10 @@ with(actonSitesPlot@data, {
 })
 ```
 
-```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=9}
-
-##########################################################################
-### DO plot
-with(actonSitesPlot@data, {
-  do_plot <- scatterplot3d_edit(x=coords$long, y=coords$lat, z=rep(0,length(coords$long)),   # x y and z data, respectively
-                                   color="#282830",                               # color of lake outline
-                                   lwd=2.0,                                       # line width of lake outline
-                                   type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
-                                   angle=40,                                      # angle aspect of plot (-40)
-                                   scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
-                                   #main="Volumetric Gas Emissions at Harsha Lake",      # main plot title
-                                   xlab="",                                       # x-axis label (left blank here to reposition later)
-                                   ylab="",                                       # y-axis label
-                                   cex.axis = 1.3,
-                                   cex.lab = 2,
-                                   mar = c(5,6,4,2)+0.1,
-                                   zlab=expression(DO~(mg~ L^{-1})),                      # z-axis label
-                                   zlim=range(0,20),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
-                                   lty.axis=1,                                    # the line type of the axes
-                                   axis=TRUE,                                     # wheather to include axes
-                                   grid=c('xy','xz','yz'),                        # which grids to show - added to edited version of scatterplot3d fx
-                                   lty.grid.xy = 1,                               # grid line type  
-                                   lty.grid.xz = 3,
-                                   lty.grid.yz = 3,
-                                   lwd.grid.xy = 1,                               # line width of grid 
-                                   lwd.grid.xz = 1,
-                                   lwd.grid.yz = 1,
-                                   box=FALSE                                      # get rid of the box around the plot
-  )
-  
-
-  # add the lollipop points
-  do_plot$points3d(x=xcoord, y=ycoord, z=as.numeric(as.character(DO__L_S)), # x y and z data
-                      col="#282830",                      # color of lines connecting points to lake outline
-                      lwd=1.5,                            # line width of lines connecting points to lake outline
-                      pch=21,                             # type of point to plot
-                      bg="#FF0000",                       # fill color of points
-                      type="h",                           # plot type = lines to the horizontal plane
-                      cex=2 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
-  )
-})
 
 
 
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=9}
 ##########################################################################
 ### chlorophyll plot
 with(actonSitesPlot@data, {
@@ -203,7 +193,7 @@ with(actonSitesPlot@data, {
                                    cex.axis = 1.3,
                                    cex.lab = 2,
                                    mar = c(5,6,4,2)+0.1,
-                                   zlab=expression(DO~(mg~ L^{-1})),                      # z-axis label
+                                   zlab=expression(Chlorophyll~a~(ug~ L^{-1})),                      # z-axis label
                                    zlim=range(0, 45),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
@@ -231,14 +221,14 @@ with(actonSitesPlot@data, {
 ```
 
 
-## 4. DOT PLOTS
+## 4. Comparative plots
 
-```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=3}
+```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=5}
 ####################################################################################
-### Item #4: Ordered dotplots of total CH4 emissions, TP, TN, and chla
+### Item #4: Ordered dotplots of total CH4 emissions, DO, TP, TN, and chla
 
-# Highlight Harsha Lake (lake of interest) data with color
-plotColor <- ifelse(meanVariance.c.lake.lu$Lake_Name == "William H Harsha Lake",
+# Highlight Acton Lake (lake of interest) data with color
+plotColor <- ifelse(meanVariance.c.lake.lu$Lake_Name == "Acton Lake",
                     "red", "black")
 
 # CH4 total emission rate
@@ -257,6 +247,21 @@ ggplot(meanVariance.c.lake.lu,
   ggtitle(expression(Mean~CH[4]~emission~rate~
                        paste("(", "95% CI", ")", sep = "")))
 
+# DO
+# Reset plotting order for DO
+# "orderLake" is a function defined in the masterLibrary.R script
+# meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, 
+#                                                choice1 = "DO")
+# ggplot(meanVariance.c.lake.lu,
+#        aes(do_Estimate, fLake_Name)) +
+#   geom_point(color = plotColor) +
+#   geom_errorbarh(aes(xmax = do_UCB95Pct, 
+#                      xmin = do_LCB95Pct), 
+#                  color = plotColor) +
+#   xlab(expression(DO~(mg~ L^{-1}))) +
+#   theme(axis.title.y = element_blank()) +  # Eliminate x-axis title
+#   ggtitle("DO (95% CI)")
+                       
 
 # Chlorophyll 
 meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, 
@@ -303,7 +308,11 @@ ggplot(meanVariance.c.lake.lu,
 
 ```
 
-## Table
+\newpage
+
+\blandscape
+
+## 5. Tables of measured values at each site
 
 ```{r warning=FALSE, echo=FALSE}
 ######################################################################
@@ -317,20 +326,39 @@ ggplot(meanVariance.c.lake.lu,
 # sampled sites at a given lake.
 #"select" command selects the columns we want to show. The order they are listed 
 #in the () is the order they will appear
-actonTable <- filter(eqAreaData, Lake_Name == "Acton Lake", 
-                     EvalStatus == "sampled") %>%
-  select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
-         TNH4, TNO2.3, TN, TRP, TP,   #nutrient data
-         chla_S, DO__L_S,  pH_S, SpCn__S, Tmp_C_S,  TrNTU_S) #shallow sonde
+#used info from http://j-wang.blogspot.com/2015/03/landscape-and-portrait-in-rmarkdown.html to orient table pages as landscape
+actonTableSonde <- filter(eqAreaData, Lake_Name == "Acton Lake", 
+                      EvalStatus == "sampled") %>%
+                select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
+                chla_S, DO__L_S,  pH_S, SpCn__S, Tmp_C_S,  TrNTU_S) #shallow sonde
 
-kable(actonTable,
+kable(actonTableSonde,
       align = "c",
-      digits = c(1,5,5,1,0,0,0,0,0,1,1,1,0,1,1),
+      digits = c(1,5,5,1,1,1,1,0,1,1),
       col.names = c("Site ID", "Latitude", "Longitude", "Depth (m)",
-                    "NH4 (ugN/L)", "NO2.3 (ugN/L)", "Total N (ugN/L)", "Reactive P (ug/L)",
-                    "Total P (ugP/L)", "Chl a (ug/L)", "DO (mg/L)", "pH",
+                    "Chl a (ug/L)", "DO (mg/L)", "pH",
                     "Sp. Cond", "Water Temp (C)", 
                     "Turbidity"))
+```
+
+```{r warning=FALSE, echo=FALSE} 
+actonTableChem <- filter(eqAreaData, Lake_Name == "Acton Lake",
+                      EvalStatus == "sampled")  %>%
+                  filter(!is.na(TN)) %>%
+                  select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
+                          TNH4, TNO2.3, TN, TRP, TP)  #nutrient data 
+                
+ 
+   
+                         
+kable(actonTableChem,
+      align = "c",
+      digits = c(1,5,5,1,0,0,0,0,0),  #number of digits past decimal
+      col.names = c("Site ID", "Latitude", "Longitude", "Depth (m)",
+                    "NH4 (ugN/L)", "NO2.3 (ugN/L)", "Total N (ugN/L)", "Reactive P                       (ug/L)","Total P (ugP/L)" ))                          
 
 ```
 
+\elandscape
+
+## 6.  EPA disclaimer
