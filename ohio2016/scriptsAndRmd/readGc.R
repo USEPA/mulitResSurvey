@@ -23,15 +23,25 @@ gas.7 <- read.xls(paste(rootDir, "Ebullition_16_10_12_STD_UNK.xlsx", sep=""),
                   as.is=TRUE, skip=46)
 gas.8 <- read.xls(paste(rootDir, "Ebul_Trap_6ml_16_10_20_UNK_STD.xlsx", sep = ""),
                   as.is = TRUE, skip = 46)
+gas.9 <- read.xls(paste(rootDir, "Chamber_17_01_19_UNK_STD.xlsx", sep = ""),
+                  as.is = TRUE, skip = 28)
 
 # Need to strip a few samples before all are merged.
-# These are floating chamber gas samples collected manually at Cowan Lake.  Were
-# run with L_N2 samples, but need to be rerun.  Strip out here so code won't break
-# when I read in spreadsheet with rerun results.
+# These are floating chamber gas samples collected manually at Cowan Lake. These
+# data need to be dealt with separately.
+# Put in df
+cowanChm <- merge(filter(gas.5, Sample %in% c(16126:16129, 16133:16136)), # Run w/cryo
+                  filter(gas.9, Sample %in% c(16101:16104, 16115:16118,  # Run w/large loop
+                                              16108:16111, 16119:16122,
+                                              16094:16097)),
+                  all=TRUE)
+# Strip from original df
 gas.5 <- filter(gas.5, !(Sample %in% c(16126:16129, 16133:16136)))
 
-# Merge gas data.
-gas.all <- Reduce(function(...) merge(..., all=T), list(gas.1, gas.2, gas.3, gas.4, gas.5, gas.6, gas.7, gas.8))  
+# Merge gas data.  Don't include gas.9, which only has floating chamber
+# samples
+gas.all <- Reduce(function(...) merge(..., all=T), 
+                  list(gas.1, gas.2, gas.3, gas.4, gas.5, gas.6, gas.7, gas.8))  
 
 # Need to make a few fixes before exetainer code is converted to integer
 # The labels were lost from several Kiser Lake samples.  These samples were
@@ -66,7 +76,22 @@ gas.all <- select(gas.all, select = -Sample.code, -Sample.abb, # Exlcude variabl
 names(gas.all) = gsub(pattern = " ", replacement = ".", x = names(gas.all))
 names(gas.all) = tolower(names(gas.all))
 
+# Format Cowan Lake floating chamber data
+cowanChm <- select(cowanChm, select = -Sample.code, -Sample.abb, # Exlcude variables
+                  -Sample.date,
+                  -Area.CO2, -Area.Methane, 
+                  -Area.N2O, 
+                  -N2O.chk, -CO2.chk, -CH4.chk,
+                  -X, -X.1, -X.2, -X.3, -X.4, -X.5, -X.6, -X.7, -X.8, -X.9)  %>%
+  filter(!(grepl("STD", cowanChm$Sample)), # remove standards
+         !(grepl("Std", cowanChm$Sample)), # remove standards
+         !(grepl("std", cowanChm$Sample)), # remove standards
+         Sample != "") %>%  # exclude blank rows
+  rename(N2O.ppm = N2O..ppm., CO2.ppm = CO2..ppm., CH4.ppm = CH4..ppm.)  %>%
+  mutate(Sample = as.integer(Sample))  # convert to integer.  consistent with Exetainer codes
 
+names(cowanChm) = gsub(pattern = " ", replacement = ".", x = names(cowanChm))
+names(cowanChm) = tolower(names(cowanChm))
 
 # Check for duplicates.  Should be none.
 # Need to follow up on 16242
