@@ -222,12 +222,41 @@ start.time;Sys.time()
 # STEP 2: USE AIC TO DETERMINE WHETHER LINEAR OR NON-LINEAR FIT IS BEST.
 #         CONFIRM CHOICE BY INSPECTING RAW DATA
 # Choose best rate.  Just use AIC
-OUT <- mutate(OUT, co2.drate.mg.h.best = ifelse(co2.lm.aic < co2.ex.aic, co2.lm.drate.mg.h, co2.ex.drate.mg.h),
-              ch4.drate.mg.h.best = ifelse(ch4.lm.aic < ch4.ex.aic, ch4.lm.drate.mg.h, ch4.ex.drate.mg.h)) 
+# Cowan lake manual syringe sample data wouldn't support ex model.
+# Include is.na(ex.aic) to accomodate this.
+OUT <- mutate(OUT, 
+              co2.best.model = ifelse(co2.lm.aic < co2.ex.aic | is.na(co2.ex.aic), 
+                                           "linear", "exponential"),
+              co2.drate.mg.h.best = ifelse(co2.best.model == "linear",
+                                           co2.lm.drate.mg.h, co2.ex.drate.mg.h),
+              ch4.best.model = ifelse(ch4.lm.aic < ch4.ex.aic | is.na(ch4.ex.aic), 
+                                      "linear", "exponential"),
+              ch4.drate.mg.h.best = ifelse(ch4.best.model == "linear",
+                                           ch4.lm.drate.mg.h, ch4.ex.drate.mg.h)) 
 # Inspect r2.
-plot(with(OUT,ifelse(co2.lm.aic < co2.ex.aic, co2.lm.r2, co2.ex.r2)))  # CO2: some low ones to investigate
-plot(with(OUT,ifelse(ch4.lm.aic < ch4.ex.aic, ch4.lm.r2, ch4.ex.r2)))  # CH4:  some low ones to investigate
+plot(with(OUT,ifelse(co2.best.model == "linear", co2.lm.r2, co2.ex.r2)))  # CO2: some low ones to investigate
+plot(with(OUT,ifelse(ch4.best.model == "linear", ch4.lm.r2, ch4.ex.r2)))  # CH4:  some low ones to investigate
 
+# If r2 of best model < 0.9, then set to NA
+OUT <- mutate(OUT, 
+              co2.drate.mg.h.best = ifelse((co2.lm.aic < co2.ex.aic | is.na(co2.ex.aic)) & co2.lm.r2 < 0.9, # if ex is best, but r2<0.9
+                                                NA, # then NA
+                                           ifelse((co2.ex.aic < co2.lm.aic) & co2.ex.r2 < 0.9, # if lm is best, but r2<0.9
+                                                  NA, # the NA
+                                                  co2.drate.mg.h.best)), # otherwise assume value defined above
+                                                  
+              ch4.drate.mg.h.best = ifelse((ch4.lm.aic < ch4.ex.aic | is.na(ch4.ex.aic)) & ch4.lm.r2 < 0.9, # if ex is best, but r2<0.9
+                                           NA, # then NA
+                                           ifelse((ch4.ex.aic < ch4.lm.aic) & ch4.ex.r2 < 0.9, # if lm is best, but r2<0.9
+                                                  NA, # the NA
+                                                  ch4.drate.mg.h.best))) # otherwise assume value defined above
+
+# Inspect r2 after scrubbing r2<0.9
+plot(with(OUT[!is.na(OUT$co2.drate.mg.h.best),], 
+          ifelse(co2.best.model == "linear", co2.lm.r2, co2.ex.r2)))  # CO2: all > 0.9
+
+plot(with(OUT[!is.na(OUT$ch4.drate.mg.h.best),], 
+          ifelse(ch4.best.model == "linear", ch4.lm.r2, ch4.ex.r2)))  # CH4: all > 0.9
 
 # STEP 3: MERGE DIFFUSION RATES WITH eqAreaData
 # First, strip NA from OUT
@@ -237,8 +266,13 @@ eqAreaData <- merge(eqAreaData, OUT, by.x = c("Lake_Name", "siteID"),
 
 str(eqAreaData) # 1426 observations
 
-# Any sites not have a rate?
-filter(eqAreaData, EvalStatus == "sampled", is.na(ch4.drate.mg.h.best)) #Cowan, need to be run on Gc
+# Any sites not have a diffusive rate?
+# Only a subset of Cowan Lake sites were sampled due to water in LGR.
+# Other sites had strong ebullition in LGR profile.
+filter(eqAreaData, EvalStatus == "sampled", is.na(ch4.drate.mg.h.best)) %>%
+  select(Lake_Name, siteID, 
+         ch4.lm.drate.mg.h, ch4.ex.drate.mg.h, ch4.drate.mg.h.best,
+         co2.lm.drate.mg.h, co2.ex.drate.mg.h, co2.drate.mg.h.best)
 
 
 

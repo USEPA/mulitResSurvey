@@ -54,6 +54,57 @@ for (i in 1:length(txtFiles)) {  # loop to read and format each file
 gga <- do.call("rbind", ggaList)  # Coerces list into dataframe.
 
 
+# Merge in floating chamber data from Cowan Lake where manual samples
+# were collected because water was sucked into LGR.
+# Need to format file and add time stamp from field data sheets.
+cowanChmTimes <- c(16101, "2016-06-03 13:33:00",
+                   16102, "2016-06-03 13:36:00",
+                   16103, "2016-06-03 13:39:10",
+                   16104, "2016-06-03 13:42:26",
+                   16115, "2016-06-03 14:19:00",
+                   16116, "2016-06-03 14:22:10",
+                   16117, "2016-06-03 14:25:30",
+                   16118, "2016-06-03 14:28:00",
+                   16108, "2016-06-03 13:59:00",
+                   16109, "2016-06-03 14:02:00",
+                   16110, "2016-06-03 14:05:46",
+                   16111, "2016-06-03 14:08:00",
+                   16119, "2016-06-03 14:40:00",
+                   16120, "2016-06-03 14:43:40",
+                   16121, "2016-06-03 14:46:00",
+                   16122, "2016-06-03 14:49:11",
+                   16126, "2016-06-03 15:00:00",
+                   16127, "2016-06-03 15:03:29",
+                   16128, "2016-06-03 15:06:04",
+                   16129, "2016-06-03 15:09:08",
+                   16133, "2016-06-03 15:18:00",
+                   16134, "2016-06-03 15:21:00",
+                   16135, "2016-06-03 15:24:14",
+                   16136, "2016-06-03 15:27:01",
+                   16094, "2016-06-03 13:19:00",
+                   16095, "2016-06-03 13:23:16",
+                   16096, "2016-06-03 13:25:19",
+                   16097, "2016-06-03 13:28:10")
+
+cowanChmTimesDf <- data.frame(RDateTime = 
+                              as.POSIXct(cowanChmTimes[seq(2, length(cowanChmTimes), by = 2)],
+                                         origin = "1970-01-01 00:00:00", tz= "UTC"),
+                            sample = 
+                              cowanChmTimes[seq(1, length(cowanChmTimes), by = 2)],
+                            RDate = as.Date(
+                              substr(
+                                cowanChmTimes[seq(2, length(cowanChmTimes), by = 2)],
+                                start = 1, stop = 10)),
+                            GasT_C = 27.8) # from weatherunderground for Wilmington 
+
+# Merge times with gas concentration
+cowanChmTimesGas <- merge(cowanChm, cowanChmTimesDf) %>%
+  select(-sample, -n2o.ppm) %>%
+  rename(CH4._ppm = ch4.ppm, CO2._ppm = co2.ppm)
+
+# Merge GC chamber data from Cowan with gga data
+gga <- rbind(gga, cowanChmTimesGas) # rbind is smart enough to match col names
+
 
 
 # BASIC PLOTS-----------------
