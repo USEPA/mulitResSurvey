@@ -9,18 +9,18 @@ output:
 ---
 ## 1. Background:
 
-The US Environmental Protection Agency (USEPA) is conducting an investigation of methane (CH~4~) dynamics in reservoirs. CH~4~ is a potent greenhouse gas that is produced by microorganisms in reservoir sediments. The USEPA is supporting research to estimate the magnitude of CH~4~ emissions from reservoirs in the United States. 
+The US Environmental Protection Agency (USEPA) is conducting an investigation of methane (CH~4~) dynamics in reservoirs. CH~4~ is a potent greenhouse gas that is produced by microorganisms in reservoir sediments. The objective is to estimate the magnitude of CH~4~ emissions from reservoirs in the United States. 
 
-The USEPA measured CH~4~ emissions from 32 reservoirs in Ohio, Indiana, and Kentucky during the summer of 2016. We designated a minimum of 15 sites in each reservoir (depending on reservoir size), where we measured CH~4~ emissions and several water quality indicators. CH~4~ emissions were measured using a device which captures CH~4~-rich bubbles as they rise through the water column toward the atmosphere. A sonde was used to measure chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, and turbidity just below the water surface at each of the 15 sites. Additionally, nutrient chemistry was analyzed at one shallow and one deep site for each reservoir.  
+The USEPA measured CH~4~ emissions from 32 reservoirs in Ohio, Indiana, and Kentucky during the summer of 2016. We designated a minimum of 15 sampling sites in each reservoir (depending on reservoir size), where we measured CH~4~ emissions and several water quality indicators. CH~4~ emissions were measured using a device which captures CH~4~-rich bubbles as they rise through the water column toward the atmosphere. A sonde was used to measure chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, and turbidity just below the water surface at each of the 15 sites. Additionally, nutrient chemistry was analyzed at one shallow and one deep site for each reservoir.  
 
-This report presents results from the USEPA 2016 meausurement campaign relevant to Acton Lake. It contains:  
+This preliminary report presents results from the USEPA 2016 meausurement campaign relevant to Acton Lake. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
 
 1. This background information
 2. A map showing the location of the sampled sites
-3. 3D plots showing the results for each site within the reservoir for:
+3. A 3D map of the reservoir showing the measurement results for :
     + CH~4~ emissions
     + Chlorophyll a
-4. Figures showing how Acton Lake compared to the other 31 reservoirs in the study in terms of total-reservoir:
+4. Figures showing how Acton Lake compared to the other 31 reservoirs in the study in terms of:
     + CH~4~ emissions
     + Total phosphorus 
     + Total nitrogen
@@ -32,13 +32,10 @@ Thank you for your help in including Acton Lake in this project.
 
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
-#setwd('C:/Users/JBEAULIE/GitRepository/mulitResSurvey')
-#knitr::opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016')
-#myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey"
+myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
+#myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
+
 globalWd <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
-
-myWd <- "C:/R_Projects/mulitResSurvey"
-
 ```
 
 
@@ -56,16 +53,12 @@ library(ggmap)
 library(dplyr)
 library(knitr)
 library(rgdal)
-
-
-
-
 ```
 
 \newpage
 
 ## 2. Map of Sampled Sites    
-We sampled Acton Lake on May 31^st^ of 2016. The sites were designated via statistical software (the generalized random tesselation stratified design, or "GRTS"), an approach we chose because it reduced bias while maintaining spatial coverage. We used a GPS and geographic information system (GIS) software to ensure we were within 30 meters of each designated site.  
+We sampled Acton Lake on May 31^st^ of 2016. The sampling sites were chosen using a generalized random tesselation stratified design ("GRTS"), an approach which combines elements of systematic and random survey designs which allows for the random allocation of sampling sites with maximum  spatial coverage of the reservoir. We used a GPS and geographic information system (GIS) software to locate each sampling site (+/- 30 meters).  
   
   
 
@@ -188,9 +181,9 @@ with(actonSitesPlot@data, {
 
 \newpage
 
-Similarly, chlorophyll a concentrations in Acton Lake did not show a clear difference between upstream and downstream.  
+Similarly, chlorophyll a concentrations in Acton Lake did not show a clear difference between upstream and downstream sites.  
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Acton Lake. The height of each "lollipop" corresponds to the concnetration shown on the vertical z-axis in units of micrograms per liter of water. The x- and y-axes are oriented east-west and north-south, respectively.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Acton Lake. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water. The x- and y-axes are oriented east-west and north-south, respectively.*' }
 ##########################################################################
 ### chlorophyll plot
 with(actonSitesPlot@data, {
@@ -206,7 +199,7 @@ with(actonSitesPlot@data, {
                                    cex.axis = 0.7,
                                    cex.lab = 1.1,
                                    mar = c(5,6,4,2)+0.1,
-                                   zlab=expression(Chlorophyll~a~(ug~ L^{-1})),                      # z-axis label
+                                   zlab=(expression(chlorophyll~a~paste("(", {mu}, "g ", L^{-1}, ")", sep = ""))),                      # z-axis label
                                    zlim=range(0, 45),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
@@ -237,7 +230,7 @@ with(actonSitesPlot@data, {
 
 ## 4. Comparative plots  
 
-We used the results from the individual measurement sites to calculate mean values and a range of uncertainty for the whole reservoir. The uncertainty measure we used is the 95% confidence interval (CI), which is similar to two standard deviations (sd) from the mean in a normally distributed data set (where 2*sd = 95.45%). In the case of this study, the majority of the uncertainty is due to the spatial variability of a given parameter across the reservoir, rather than uncertainty due to analytical errors. 
+We used the results from the individual measurement sites to calculate mean values and an uncertainty range for the reservoir. The uncertainty measure we used is the 95% confidence interval (CI), which is similar to two standard deviations (sd) from the mean in a normally distributed data set (where 2*sd = 95.45%). In the case of this study, the majority of the uncertainty is due to the spatial variability of a given parameter within the reservoir, rather than uncertainty due to analytical errors. 
 
 
 
@@ -279,7 +272,7 @@ ggplot(meanVariance.c.lake.lu,
        aes(chla_Estimate, fLake_Name)) +
   geom_point(color = plotColor) +
   geom_errorbarh(aes(xmax = chla_UCB95Pct, xmin = chla_LCB95Pct), color = plotColor) +
-  xlab(expression(chl~a~paste("(", {mu}, "g ", L^{-1}, ")", sep = ""))) +
+  xlab(expression(chlorophyll~a~paste("(", {mu}, "g ", L^{-1}, ")", sep = ""))) +
   theme(axis.title.y = element_blank(), # Eliminate x-axis title
         plot.title = element_text(hjust = 0.5)) +  #plot title justify center)+
   ggtitle("Mean Chlorophyll a (95% CI)")
@@ -385,3 +378,5 @@ kable(actonTableChem,
 \elandscape
 
 ## 6.  EPA disclaimer
+
+I have a call into John Olszewski about this.
