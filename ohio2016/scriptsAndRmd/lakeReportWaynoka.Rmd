@@ -378,4 +378,4 @@ kable(waynokaTableChem,
 
 ## 6.  EPA disclaimer
 
-I have a call into John Olszewski about this.
+The U.S. Environmental Protection Agency, through its Office of Research and Development, participated in the research described herein. It has been subjected to the Agency’s administrative review and has been approved for limited external distribution. Any opinions expressed in this article are those of the authors and do not necessarily reflect the views of the Agency, therefore, no official endorsement should be inferred. Any mention of trade names or commercial products does not constitute endorsement or recommendation for use.
