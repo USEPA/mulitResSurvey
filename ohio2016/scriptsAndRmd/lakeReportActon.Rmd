@@ -327,7 +327,7 @@ ggplot(meanVariance.c.lake.lu,
 
 ## 5. Tables of measured values at each site  
 
-Table 1: Water quality parameters measured via sonde at each site
+Table 1: Surface (0.1 m) water quality parameters measured via sonde at each site
 
 ```{r warning=FALSE, echo=FALSE}
 ######################################################################
@@ -344,24 +344,24 @@ Table 1: Water quality parameters measured via sonde at each site
 #used info from http://j-wang.blogspot.com/2015/03/landscape-and-portrait-in-rmarkdown.html to orient table pages as landscape
 actonTableSonde <- filter(eqAreaData, Lake_Name == "Acton Lake", 
                       EvalStatus == "sampled") %>%
-                select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
+                select(siteID, LatSamp, LongSmp,  #site identification  
                 chla_S, DO__L_S,  pH_S, SpCn__S, Tmp_C_S,  TrNTU_S) #shallow sonde
 
 kable(actonTableSonde,
       align = "c",
-      digits = c(1,5,5,1,1,1,1,0,1,1),
-      col.names = c("Site ID", "Latitude", "Longitude", "Depth (m)",
+      digits = c(1,5,5,1,1,1,0,1,1),
+      col.names = c("Site ID", "Latitude", "Longitude",
                     "Chl a (ug/L)", "DO (mg/L)", "pH",
                     "Sp. Cond", "Water Temp (C)", 
                     "Turbidity"))
 ```
 
-Table 2: Water chemistry parameters measured at one shallow and one deep site
+Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow (U-18) and one deep (U-04) site
 ```{r warning=FALSE, echo=FALSE} 
 actonTableChem <- filter(eqAreaData, Lake_Name == "Acton Lake",
                       EvalStatus == "sampled")  %>%
                   filter(!is.na(TN)) %>%
-                  select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
+                  select(siteID, LatSamp, LongSmp,  #site identification  
                           TNH4, TNO2.3, TN, TRP, TP)  #nutrient data 
                 
  
@@ -369,8 +369,8 @@ actonTableChem <- filter(eqAreaData, Lake_Name == "Acton Lake",
                          
 kable(actonTableChem,
       align = "c",
-      digits = c(1,5,5,1,0,0,0,0,0),  #number of digits past decimal
-      col.names = c("Site ID", "Latitude", "Longitude", "Depth (m)",
+      digits = c(1,5,5,0,0,0,0,0),  #number of digits past decimal
+      col.names = c("Site ID", "Latitude", "Longitude",
                     "NH4 (ugN/L)", "NO2.3 (ugN/L)", "Total N (ugN/L)", "Reactive P                       (ug/L)","Total P (ugP/L)" ))                          
 
 ```
@@ -379,4 +379,4 @@ kable(actonTableChem,
 
 ## 6.  EPA disclaimer
 
-The U.S. Environmental Protection Agency, through its Office of Research and Development, participated in the research described herein. It has been subjected to the Agency’s administrative review and has been approved for limited external distribution. Any opinions expressed in this article are those of the authors and do not necessarily reflect the views of the Agency, therefore, no official endorsement should be inferred. Any mention of trade names or commercial products does not constitute endorsement or recommendation for use.
+The U.S. Environmental Protection Agency, through its Office of Research and Development, participated in the research described herein. It has been subjected to the Agency's administrative review and has been approved for limited external distribution. Any opinions expressed in this article are those of the authors and do not necessarily reflect the views of the Agency, therefore, no official endorsement should be inferred. Any mention of trade names or commercial products does not constitute endorsement or recommendation for use.

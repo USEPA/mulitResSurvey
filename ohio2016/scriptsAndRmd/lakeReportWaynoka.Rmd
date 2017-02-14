@@ -326,7 +326,7 @@ ggplot(meanVariance.c.lake.lu,
 
 ## 5. Tables of measured values at each site  
 
-Table 1: Water quality parameters measured via sonde at each site
+Table 1: Surface (0.1 m) water quality parameters measured via sonde at each site. "Site Depth" is the measure of how deep the lake was at each site. 
 
 ```{r warning=FALSE, echo=FALSE}
 ######################################################################
@@ -349,13 +349,13 @@ waynokaTableSonde <- filter(eqAreaData, Lake_Name == "Lake Waynoka",
 kable(waynokaTableSonde,
       align = "c",
       digits = c(1,5,5,1,1,1,1,0,1,1),
-      col.names = c("Site ID", "Latitude", "Longitude", "Depth (m)",
+      col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",
                     "Chl a (ug/L)", "DO (mg/L)", "pH",
                     "Sp. Cond", "Water Temp (C)", 
                     "Turbidity"))
 ```
 
-Table 2: Water chemistry parameters measured at one shallow and one deep site
+Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow and one deep site. "Site Depth" is the measure of how deep the lake was at each site. 
 ```{r warning=FALSE, echo=FALSE} 
 waynokaTableChem <- filter(eqAreaData, Lake_Name == "Lake Waynoka",
                       EvalStatus == "sampled")  %>%
@@ -369,7 +369,7 @@ waynokaTableChem <- filter(eqAreaData, Lake_Name == "Lake Waynoka",
 kable(waynokaTableChem,
       align = "c",
       digits = c(1,5,5,1,0,0,0,0,0),  #number of digits past decimal
-      col.names = c("Site ID", "Latitude", "Longitude", "Depth (m)",
+      col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",
                     "NH4 (ugN/L)", "NO2.3 (ugN/L)", "Total N (ugN/L)", "Reactive P                       (ug/L)","Total P (ugP/L)" ))                          
 
 ```
