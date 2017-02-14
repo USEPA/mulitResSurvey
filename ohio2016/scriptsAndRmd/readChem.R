@@ -4,7 +4,7 @@
 
 # READ AND FORMAT WATER CHEM---------------
 # Data retrieved from L drive on 11/09/2016
-chem <- read_excel("ohio2016/inputData/2016_ESF-EFWS_NutrientData_Updated11072016_SS.xlsx", 
+chem <- read_excel("ohio2016/inputData/2016_ESF-EFWS_NutrientData_Updated01242017_SS.xlsx", 
                    sheet = "2016DATA", skip = 1)
 
 # Replace spaces and unusual characters in column names with ".".
@@ -22,6 +22,7 @@ chem <- rename(chem, rdate = cdate.yymmdd10.,
 
 # Check units
 distinct(chem, UNIT) # all ug, except mg C/L for TOC
+                     # a few samples from 2016-07-07 with "." for units. doesn't affect me.
 
 #############################################
 # Pull out data from multi res survey 2016
@@ -53,27 +54,31 @@ matchPattern <- paste(translationKeydf$site, # 3 letter code in "or" statement
                       collapse = "|")
 fChem <- filter(chem, grepl(pattern = matchPattern, x = site))
 
+
 # The correct TP value is in "tp", not in "finalConc"
 # Repace "finalConc" value with "tp" value for analyte == TP
 fChem <- mutate(fChem, finalConc = ifelse(analyte == "TP",
                                           tp,
                                           finalConc))
+# Change "UKN" to "UNK"
+fChem <- mutate(fChem, TYPE = ifelse(grepl("UNK", TYPE), "UKN", TYPE))
 
 #############################################
 # Add unique identifiers and fix issues with fChem
 fChem <- mutate(fChem, siteAbb = substr(site, 1, 3))
-length(unique(fChem$siteAbb))  # 31, missing data from 1 lake. see issues.R
+length(unique(fChem$siteAbb))  # 32.  All lakes accounted for
 
 # Which lakes missing?
-filter(translationKeydf, !(site %in% fChem$siteAbb)) # Loramie, see issues.R
+filter(translationKeydf, !(site %in% fChem$siteAbb)) # All accounted for
 
-# Merge in Lake_Name
-fChem <- merge(fChem, translationKeydf, by.x = "siteAbb", by.y = "site")
+# Add "Lake_Name" to fChem
+fChem <- merge(fChem, translationKeydf,
+               by.x = "siteAbb", by.y ="site", all.x = TRUE)
 
 # Extract site
-# Sometimes lake abb and site are seperated by a "_", but often the "_"
-# is missing.  Remove from all to be consistent.
-fChem <- mutate(fChem, site = gsub(pattern = "_", replacement = "", x = site))
+# Sometimes lake abb and site are seperated by a "_" or "-", but often the
+# delimiter is missing.  Remove from all to be consistent.
+fChem <- mutate(fChem, site = gsub(pattern = c("_|-"), replacement = "", x = site))
 
 # nchar for site ranges from 3 (S04) to 4 (SU31)
 # Define indicator for site nchar
@@ -123,7 +128,7 @@ fChem <- mutate(fChem, siteID = ifelse(siteID == "U1-62",
 # Kiser Lake siteID is stratified in fChem (S-02, S-12),
 # but should be unstratified (U-02, U-12)
 fChem <- mutate(fChem, 
-                siteID = ifelse(Lake_Name == "Kiser Lake", 
+                siteID = ifelse(siteAbb == "KIS", 
                                 gsub("S", "U", siteID), # replace S with U
                                 siteID))
 
@@ -131,9 +136,9 @@ fChem <- mutate(fChem,
 # Verify all Lake_Name x siteID combinations are in eqAreaData
 # Don't inlcude blanks because they don't all have a siteID.
 # sum = 0, therefore all match
-sum(!(with(filter(fChem, TYPE != "BLANK"), # fChem, no blanks 
+sum(!with(filter(fChem, TYPE != "BLANK"), # fChem, no blanks 
            paste(Lake_Name, siteID)) %in% # paste Lake_Name and siteID
-  with(eqAreaData, paste(Lake_Name, siteID)))) # compare to lake x site in eqArea
+  with(eqAreaData, paste(Lake_Name, siteID))) # compare to lake x site in eqArea
 
 # Nitrite is listed as NO2 and TNO2.  Should all be TNO2
 fChem <- mutate(fChem, analyte = ifelse(analyte == "NO2",
@@ -152,12 +157,15 @@ fChem <-  filter(fChem, TYPE != "BLANK") %>%
 
 
 # Take a quick peak for obvious problems
-# Look fine
+# As of 2/14/17, still missing TOC.  Waiting for Deborah to enter.
 ggplot(fChem, aes(Lake_Name, finalConc)) + 
   geom_point(aes(color = TYPE)) + 
   facet_wrap(~analyte, scales = "free_y") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
+# Tappan Lake SU-28 UNK is too high 17.7
+fChem <- mutate(fChem, finalConc = ifelse(analyte == "TOC" & finalConc == 17.7,
+                                          NA, finalConc))
 
 # Aggregate by Lake_Name x site x variable for merging with eqAreaData
 # Remove TYPE column
@@ -165,7 +173,7 @@ fChem <- select(fChem, -TYPE)
 
 # Aggregate with ddply
 fChemAgBySite <- ddply(.data = fChem, .(Lake_Name, siteID, analyte), summarize, 
-      finalConc = mean(finalConc))
+      finalConc = mean(finalConc, na.rm = TRUE))
 
 # Cast to wide for merge with eqAreaData
 fChemAgBySiteW <- dcast(fChemAgBySite, Lake_Name + siteID ~ analyte, 
