@@ -1,30 +1,9 @@
 # EXPLORATORY PLOTS
 
-# Merge meanVariance.c with landuse data.
-# Need to adopt lake names consistent with meanVariance.c
-survRes$Lake_Name <- ifelse(survRes$lake.name == "BVR",
-                            "brookville lake",
-                            ifelse(survRes$lake.name == "BHR",
-                                   "buckhorn lake",
-                                   ifelse(survRes$lake.name == "ceaser creek lake",
-                                          "caesar creek lake",
-                                          ifelse(survRes$lake.name == "CFK",
-                                                 "carr fork lake",
-                                                 ifelse(survRes$lake.name == "CRR",
-                                                        "cave run lake",
-                                                        survRes$lake.name)))))
-
-# Lake_Name in meanVariance.c.lu must be lowercase
-# Extract data by lake
+# Merge meanVariance.c with landuse and morphology data for descRes script.
 meanVariance.c.lake.lu <- merge(filter(meanVariance.c,
-                                       Subpopulation == "lake") %>%
-                                       mutate(lLake_Name = tolower(Lake_Name)),
-                           survRes, 
-                           by.x = "lLake_Name",
-                           by.y = "Lake_Name",
-                           all.x = TRUE) %>%
-  mutate(rda = watershed.area.m2 / reservoir.area.m2,
-         si = res.perimeter.m / reservoir.area.m2)
+                                       Subpopulation == "lake"),
+                           descRes)
 
 # GRTS ESTIMATES---------------
 # Initial looks at emission rates
