@@ -18,5 +18,5 @@ source("ohio2016/scriptsAndRmd/grtsWgtAdj.R") # Merges with eqAreaData, 2s
 source("ohio2016/scriptsAndRmd/grtsMeanVariance.R") # 20s
 
 # Data analysis
-source("ohio2016/scriptsAndRmd/survRes.R")
+source("ohio2016/scriptsAndRmd/descRes.R")
 source("ohio2016/scriptsAndRmd/exploratoryPlots.R")

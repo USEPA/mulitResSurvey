@@ -166,8 +166,13 @@ descRes[descRes$Lake_Name == "Cave Run Lake", "max.depth.ft"] = 70
 
 
 # Calculate Derived Quantities
-descRes$residence.time.yr <- with(descRes, (reservoir.volume.m3 * 35.3147)  # convert to ft3
-                                / (outflow.cfs*60*60*24*365))  # convert ot ft3 per year
+descRes <- mutate(descRes, 
+                  residence.time.yr = (reservoir.volume.m3 * 35.3147)  # convert to ft3
+                                / (outflow.cfs*60*60*24*365),
+                  rda = watershed.area.m2 / reservoir.area.m2,
+                  si = res.perimeter.m / reservoir.area.m2,
+                  percent.agg.ag = percent.pasture.hay + 
+                    percent.cultivated.crops)
 
 
 
