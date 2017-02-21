@@ -21,3 +21,12 @@
 
 # survRes.R
 # Incorporate Platz's morphology data into this object
+
+
+# statModel.R
+# How should the summary tool be used for model selection?  Remove all non-significant
+# variables from full model?  Remove highest order interactions first?
+
+# Need assistance in evaluating residual pattern in lme model.  Good enough?  What else can we try?
+
+# How to asses overall p-value for lme model?
