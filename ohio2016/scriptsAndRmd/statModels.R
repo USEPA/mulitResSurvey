@@ -3,26 +3,25 @@
 cor(select(meanVariance.c.lake.lu, 
            ebMlHrM2_Estimate,
            ch4.trate.mg.h_Estimate,
-           chla_Estimate, #0.19
-           tp_Estimate,
-           tn_Estimate,
+           chla_Estimate, #ebMl 0.30. Trate 0.18. TP 0.75
+           tp_Estimate, #ebMl 0.33. Trate 0.23.
+           tn_Estimate, #ebMl 0.45. Trate 0.16.
            max.depth.ft,
-           res.perimeter.m,
-           res.fetch.m, #-0.13
-           reservoir.area.m2, #-0.19
-           watershed.area.m2,#0.39
-           percent.agg.ag, #Ag and TN are 0.8!
-           rda, #0.56 
-           si), # 0.22
+           mean.depth.m.morpho, #ebMl -0.11. Trate -0.15.
+           res.perimeter.m, #ebMl -0.03. Trate -0.02.
+           res.fetch.m, #ebMl 0.08. Trate -0.14.
+           reservoir.area.m2, #ebMl -0.10. Trate -0.18.
+           watershed.area.m2, #ebMl 0.29. Trate 0.39.
+           percent.agg.ag, #ebMl -0.52. Trate 0.24. Ag and TN are 0.8!
+           rda, #ebMl 0.44. Trate 0.57. 
+           si), #ebMl 0.07. Trate 0.21.
     use = "pairwise.complete.obs")
-
-# Lots of correlations with volumetric, few with mass flux rate
 
 
 # TOTAL AND VOLUMETRIC EMISSIONS BY LANDSCAPE AND MORPHOMETRIC MODELS----------
 # First will work with model containing only morphometric and 
 # and watershed indices.
-# %ag, depth, reservoir size, watershed size, perimeter, rda, si, fetch
+# %ag, mean depth, reservoir size, watershed size, perimeter, rda, si, fetch
 # Lots of collinearity, select non correlated variables based
 # on variance inflation factors.
 
@@ -32,13 +31,11 @@ cor(select(meanVariance.c.lake.lu,
 # Assume a cutoff of 5
 # Iteratively remove variable with highest VIF, 
 # then recalculate until all VIF < 5
-# All uncommented variables have a VIF < 2.12, but corvif gives
+# All uncommented variables have a VIF < 1.56, but corvif gives
 # a warning message, results reliable?
-corvif(cbind(meanVariance.c.lake.lu$max.depth.ft,
-             meanVariance.c.lake.lu$res.perimeter.m,
-             meanVariance.c.lake.lu$res.fetch.m,
-            # meanVariance.c.lake.lu$reservoir.area.m2, # remove first
-            # meanVariance.c.lake.lu$watershed.area.m2, # remove second
+corvif(cbind(meanVariance.c.lake.lu$mean.depth.m.morpho,
+             meanVariance.c.lake.lu$reservoir.area.m2,  
+           # meanVariance.c.lake.lu$watershed.area.m2, # remove first
              meanVariance.c.lake.lu$percent.agg.ag,
              meanVariance.c.lake.lu$rda,
              meanVariance.c.lake.lu$si))
@@ -48,19 +45,25 @@ corvif(cbind(meanVariance.c.lake.lu$max.depth.ft,
 # wrapper for fmsb::VIF
 # Gives same results as above, with no warning message
 vif_func(in_frame = select(meanVariance.c.lake.lu,
-                           max.depth.ft, res.perimeter.m,
-                           res.fetch.m, reservoir.area.m2,
-                           watershed.area.m2, percent.agg.ag, 
-                           rda, si),
+                           mean.depth.m.morpho, 
+                           reservoir.area.m2,
+                           watershed.area.m2,
+                           percent.agg.ag, 
+                           rda, 
+                           si),
          thresh = 5, trace = TRUE)
+
+# This is a bit tricky because watershed area is removed.  Might be OK
+# because rda was retained.
 
 #################################################################
 # Set up TOTAL EMISSION RATE model with non correlated variables
-m1.T <- lm(ch4.trate.mg.h_Estimate ~ (max.depth.ft + res.perimeter.m +
-           res.fetch.m + percent.agg.ag + rda + si)^2, # include 2-way interactions
+m1.T <- lm(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + reservoir.area.m2 +
+           percent.agg.ag + rda + si)^2, # include 2-way interactions
+           weights = 1/ch4.trate.mg.h_StdError^2, #inverse of variance
          data = meanVariance.c.lake.lu)
 summary(m1.T);anova(m1.T)  # a few things going
-plot(m1.T) # not too bad!
+plot(m1.T) # yikes!
 
 # assess Multi-collinearity of model
 sqrt(car::vif(m1.T)) # car, vif>2 indicates problems? (http://www.statmethods.net/stats/rdiagnostics.html)
@@ -72,11 +75,91 @@ fmsb::VIF(m1.T) # fmsb, vif < 10, all good here.
 # be considered in vif_func above.
 
 # Move forward with stepwise model selection
-m.T.null <- lm(ch4.trate.mg.h_Estimate ~ 1, data = meanVariance.c.lake.lu)
+m.T.null <- lm(ch4.trate.mg.h_Estimate ~ 1, 
+               weights = 1/ch4.trate.mg.h_StdError^2, #inverse of variance
+               data = meanVariance.c.lake.lu)
 m.T.step <- step(m.T.null, # model to start with
                    scope = list(lower = m.T.null, upper = m1.T), # range to fit
                    direction ="both")
-anova(m.T.step);summary(m.T.step) # positive rda coefficient, p=0.001, r2=0.31
+anova(m.T.step);summary(m.T.step) # positive rda and percent ag coefficient, p=0.006, adj r2=0.24
+
+# Diagnostics
+plot(m.T.step) # Positively skewed residuals.
+hist(residuals(m.T.step))
+plot(fitted(m.T.step), residuals(m.T.step), xlab="Fitted", ylab="Residuals")
+abline(h=0, col="red") 
+
+# Observed vs fitted
+m.T.stepDf <- data.frame(mPred = fitted(m.T.step),
+                         observed =meanVariance.c.lake.lu$ch4.trate.mg.h_Estimate)
+
+# Model consistently underpredicts, hence skewed residuals
+ggplot(m.T.stepDf, aes(observed, mPred)) + 
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  ylab("Predicted")
+
+# CONSIDER LOG TRANSFORMING VARIABLE
+m2.T <- lm(log10(ch4.trate.mg.h_Estimate) ~ (mean.depth.m.morpho + reservoir.area.m2 +
+                                        percent.agg.ag + rda + si)^2, # include 2-way interactions
+           weights = 1/ch4.trate.mg.h_StdError^2, inverse of variance
+           data = meanVariance.c.lake.lu)
+summary(m2.T);anova(m2.T)  # a few things going
+plot(m2.T) # two outliers, but better than before
+
+# Move forward with stepwise model selection
+m2.T.null <- lm(log10(ch4.trate.mg.h_Estimate) ~ 1, 
+               weights = 1/ch4.trate.mg.h_StdError^2, inverse of variance
+               data = meanVariance.c.lake.lu)
+m2.T.step <- step(m2.T.null, # model to start with
+                 scope = list(lower = m2.T.null, upper = m2.T), # range to fit
+                 direction ="both")
+anova(m2.T.step);summary(m2.T.step) # positive rda and percent ag coefficient, p=0.01, adj r2=0.22
+
+# Diagnostics
+hist(residuals(m2.T.step)) # looks ok
+plot(fitted(m2.T.step), residuals(m2.T.step), # a little better, not much 
+     xlab="Fitted", ylab="Residuals")
+abline(h=0, col="red") 
+
+# Observed vs fitted
+m2.T.stepDf <- data.frame(mPred = fitted(m2.T.step),
+                         observed = log10(meanVariance.c.lake.lu$ch4.trate.mg.h_Estimate))
+
+# Really not much better
+ggplot(m.T.stepDf, aes(observed, mPred)) + 
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  ylab("Predicted")
+
+# MOVE TO gls MODEL
+# Define weights as inverse of variance
+# Trick for weighting (https://www.r-bloggers.com/a-quick-note-in-weighting-with-nlme/)
+wts <- 1/meanVariance.c.lake.lu$ch4.trate.mg.h_StdError^2
+m3.T <- gls(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + reservoir.area.m2 +
+                                         percent.agg.ag + rda + si)^2, # include 2-way interactions
+            weights = ~wts,
+            data = meanVariance.c.lake.lu)
+
+# Diagnostics
+E.m3.T <- resid(m3.T, type = "normalized")
+E.m3.fitted <- fitted(m3.T)
+plot(E.m3.T ~ E.m3.fitted) # hmm, a bit better than lm
+plot(E.m3.T ~ meanVariance.c.lake.lu$mean.depth.m.morpho) # Only positive residuals in deep lakes
+plot(E.m3.T ~ meanVariance.c.lake.lu$reservoir.area.m2) # only 3 large lakes
+plot(E.m3.T ~ meanVariance.c.lake.lu$percent.agg.ag) # no pattern
+plot(E.m3.T ~ meanVariance.c.lake.lu$rda) # less variance at higher rda
+plot(E.m3.T ~ meanVariance.c.lake.lu$si) # only 3 large lakes w/large si
+
+# Add mean.depth.m.morpho as variance covariate
+
+
+
+
+
+
+
+
 
 
 

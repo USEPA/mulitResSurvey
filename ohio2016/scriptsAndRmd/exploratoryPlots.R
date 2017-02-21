@@ -199,10 +199,10 @@ ggsave('ohio2016/output/figures/ch4TotByLU.tiff',  # export as .tif
 
 # CH4 total vs depth
 ggplot(meanVariance.c.lake.lu,
-       aes(max.depth.ft, ch4.trate.mg.h_Estimate)) +
+       aes(mean.depth.m.morpho, ch4.trate.mg.h_Estimate)) +
   geom_point() +
-  ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
-  xlab("maximum depth (ft)")
+  ylab(expression(Total~CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
+  xlab("mean depth (m)")
 
 ggsave('ohio2016/output/figures/ch4TotbyDepth.tiff',  # export as .tif
        units="in",  # specify units for dimensions
@@ -236,7 +236,9 @@ ggplot(meanVariance.c.lake.lu,
        aes(tp_Estimate, ch4.trate.mg.h_Estimate)) +
   geom_point() +
   ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
-  xlab("TP (ug/L")
+  xlab("TP (ug/L") 
+  #coord_trans(x="log", y="log")
+
 
 
 

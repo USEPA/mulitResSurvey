@@ -146,7 +146,7 @@ morphoHydro <- rename(morphoHydro, Lake_Name = lake_name)
 
 # Simplify df and create lLower_Lake for merging with above
 morphoHydro <- select(morphoHydro, Lake_Name, outflow.cfs, reservoir.volume.m3,
-                      reservoir.area.m2.morpho, reservoir.mean.depth.m.morpho,
+                      reservoir.area.m2.morpho, mean.depth.m.morpho,
                       anoxicfrac) %>%
   mutate(lLake_Name = tolower(Lake_Name))
 
@@ -170,7 +170,7 @@ descRes <- mutate(descRes,
                   residence.time.yr = (reservoir.volume.m3 * 35.3147)  # convert to ft3
                                 / (outflow.cfs*60*60*24*365),
                   rda = watershed.area.m2 / reservoir.area.m2,
-                  si = res.perimeter.m / reservoir.area.m2,
+                  si = res.perimeter.m / (2*sqrt(pi*reservoir.area.m2)),
                   percent.agg.ag = percent.pasture.hay + 
                     percent.cultivated.crops)
 

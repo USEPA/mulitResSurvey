@@ -26,6 +26,7 @@ library(plot3Drgl)
 library(car) # vif function
 library(fmsb) # variance inflation factor 'VIF' function
 library(relaimpo)  # dependent on MASS, which masks dplyr select
+library(nlme) # for gls function
 
 # Always load dplyr after plyr and relaimpo!  These packages mask
 # dplyr functions.
