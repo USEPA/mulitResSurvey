@@ -136,13 +136,14 @@ charIds <- data.frame(Lake = charIds[seq(1, length(charIds), 2)], # extract lake
                           "S-09",
                   ifelse(siteID == "SU7", # BVR site not entered right
                           "SU-07",
-                  ifelse(siteID == "U14",
-                         "SU-14",
                   ifelse(!grepl("-", siteID) & nchar(siteID) == 4, # add "-"
                          paste(substr(siteID, 1,2), "-", substr(siteID,3,4), sep = ""),
                   ifelse(!grepl("-", siteID) & nchar(siteID) == 3, # add "-"
                         paste(substr(siteID, 1, 1), "-", substr(siteID,2, 3), sep = ""),
-                        siteID)))))),
+                        siteID))))),
+         Lake = ifelse(Lake == "BVR" & siteID == "U-14", # This is labeled BVR, but should be WGF
+                       "WGF",
+                       Lake),
          # Bring in true lake name.  key is derived from masterLibrary
          Lake_Name = translationKeydf[match(Lake, translationKeydf$site), "Lake_Name"])
 

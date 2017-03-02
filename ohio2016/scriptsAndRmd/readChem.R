@@ -4,8 +4,13 @@
 
 # READ AND FORMAT WATER CHEM---------------
 # Data retrieved from L drive on 11/09/2016
-chem <- read_excel("ohio2016/inputData/2016_ESF-EFWS_NutrientData_Updated01242017_SS.xlsx", 
+chem16 <- read_excel("ohio2016/inputData/2016_ESF-EFWS_NutrientData_Updated01242017_SS.xlsx", 
                    sheet = "2016DATA", skip = 1)
+
+chem17 <- read_excel("ohio2016/inputData/2017_ESF-EFWS_NutrientData_Updated02282017_SS.xlsx", 
+                     sheet = "2017DATA", skip = 1)
+
+chem <- merge(chem16, chem17, all = TRUE)
 
 # Replace spaces and unusual characters in column names with ".".
 # Note that "(" is a special character in R.  Must precdede with \\ for
@@ -29,6 +34,7 @@ distinct(chem, UNIT) # all ug, except mg C/L for TOC
 # Hocking Lake was coded in chem samples as HOC, but should be HOK.
 # Senecaville Lake (SNC, 2016-09-13), entered as SEN in chem file
 # Acton Lake (ACN, 2016-05-31), site ids U04 and U18 in chem file for this
+# Brookeville SU-35 is coded as SU35_2.
 chem <- mutate(chem, site = 
                  # fix Hocking
                  ifelse(grepl(pattern = "HOC", x = site),
@@ -45,7 +51,11 @@ chem <- mutate(chem, site =
                  # Fix Acton
                  ifelse(site %in% c("U04", "U18"),
                         paste("ACN", site, sep = ""),
-                              site))))
+                              
+                 # Fix Brookeville
+                 ifelse(site == "SU35_2",
+                        "BVRSU35",
+                        site)))))
 
 
 # Pull out site values that contain the 3 letter code for each reservoir.
@@ -157,15 +167,16 @@ fChem <-  filter(fChem, TYPE != "BLANK") %>%
 
 
 # Take a quick peak for obvious problems
-# As of 2/14/17, still missing TOC.  Waiting for Deborah to enter.
+# As of 3/02/17, still missing TOC from several lake.  Waiting for Deborah to enter.
 ggplot(fChem, aes(Lake_Name, finalConc)) + 
   geom_point(aes(color = TYPE)) + 
   facet_wrap(~analyte, scales = "free_y") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
-# Tappan Lake SU-28 UNK is too high 17.7
+# Tappan Lake SU-28 UNK-TOC is too high 17.7
 fChem <- mutate(fChem, finalConc = ifelse(analyte == "TOC" & finalConc == 17.7,
                                           NA, finalConc))
+
 
 # Aggregate by Lake_Name x site x variable for merging with eqAreaData
 # Remove TYPE column
@@ -183,6 +194,17 @@ fChemAgBySiteW <- dcast(fChemAgBySite, Lake_Name + siteID ~ analyte,
 names(fChemAgBySiteW) = gsub(pattern = c("\\(| |#|)|/|-"), 
                              replacement = ".", 
                              x = names(fChemAgBySiteW))
+
+
+# Missing TP from BVR SU-35 (tube cracked).  Estimate from TRP
+tpModel <- lm(TP ~ TRP, data = fChemAgBySiteW)
+newdata = data.frame(TRP = fChemAgBySiteW[with(fChemAgBySiteW, siteID == "SU-35" & 
+                                                 Lake_Name == "Brookville Lake"),
+                                          "TRP"])
+tpPredict <- predict(tpModel, newdata = newdata)
+fChemAgBySiteW[with(fChemAgBySiteW, siteID == "SU-35" & 
+                      Lake_Name == "Brookville Lake"),
+               "TP"] = tpPredict
 
 # Merge with eqAreaData
 str(eqAreaData) #1426 observations
