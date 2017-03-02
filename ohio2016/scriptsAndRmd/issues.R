@@ -9,7 +9,8 @@
 
 # Brookeville
 # One of the SU-35 dups was lost.  Also, the TP vial from the remaining SU-35
-# site broke in the freezer or during the autoclave.  No TP from this site.
+# site broke in the freezer or during the autoclave.  No TP measured from this site,
+# so I estimated from an overall TP ~ TRP model.
 
 # As of 2/14/17, still waiting on TOC data from Aug and Sept samples.
 
