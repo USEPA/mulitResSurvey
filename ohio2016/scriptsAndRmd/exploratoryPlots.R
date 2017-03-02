@@ -137,6 +137,7 @@ ggsave('ohio2016/output/figures/chlaDotPlot.tiff',  # export as .tif
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")
 
+
 # CORRELATIONS----------------------------
 # Volumetric emissions by land use
 m <- lm(ebMlHrM2_Estimate ~ percent.agg.ag, # univariate model
@@ -196,6 +197,40 @@ ggsave('ohio2016/output/figures/ch4TotByLU.tiff',  # export as .tif
        compression = "lzw")
 
 
+######Chla vs land use
+ggplot(meanVariance.c.lake.lu,
+       aes(percent.agg.ag, chla_Estimate)) +
+  geom_point()
+
+#Chla vs land use with linear regression
+m <- lm(chla_Estimate ~ percent.agg.ag, # univariate model
+        data = meanVariance.c.lake.lu)
+# Set up 
+eq <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2, 
+                 list(a = format(coef(m)[1], digits = 4), 
+                      b = format(coef(m)[2], digits = 4), 
+                      r2 = format(summary(m)$r.squared, digits = 3)))
+
+dftext <- data.frame(percent.agg.ag = 30, 
+                     chla_Estimate = 60, 
+                     eq = as.character(as.expression(eq)))
+
+ggplot(meanVariance.c.lake.lu,
+       aes(percent.agg.ag, chla_Estimate)) +
+  geom_point() +
+  # geom_errorbar(aes(ymax = ebMlHrM2_UCB95Pct,  
+  #                   ymin = ebMlHrM2_LCB95Pct)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  #geom_text(aes(label = eq), data = dftext, parse = TRUE) +
+  ylab(expression(chl~a~{mu}*g~L^{-1})) +
+  xlab("% agricultural land use in watershed")
+
+ggsave('ohio2016/output/figures/chlaByLU.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=5,   # 1 column
+       height=5, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
 
 # CH4 total vs depth
 ggplot(meanVariance.c.lake.lu,
@@ -212,6 +247,29 @@ ggsave('ohio2016/output/figures/ch4TotbyDepth.tiff',  # export as .tif
        compression = "lzw")
 
 
+####### CH4 total vs depth with linear model output
+m <- lm(ch4.trate.mg.h_Estimate ~ mean.depth.m.morpho, # univariate model
+        data = meanVariance.c.lake.lu)
+# Set up 
+eq <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2, 
+                 list(a = format(coef(m)[1], digits = 4), 
+                      b = format(coef(m)[2], digits = 4), 
+                      r2 = format(summary(m)$r.squared, digits = 3)))
+
+dftext <- data.frame(mean.depth.m.morpho = 30, 
+                     ch4.trate.mg.h_Estimate = 60, 
+                     eq = as.character(as.expression(eq)))
+
+ggplot(meanVariance.c.lake.lu,
+       aes(mean.depth.m.morpho, ch4.trate.mg.h_Estimate)) +
+  geom_point() +
+  # geom_errorbar(aes(ymax = ebMlHrM2_UCB95Pct,  
+  #                   ymin = ebMlHrM2_LCB95Pct)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  #geom_text(aes(label = eq), data = dftext, parse = TRUE) +
+  ylab(expression(Total~CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
+  xlab("mean depth (m)")
+  
 
 # CH4 total vs watershed:reservoir
 ggplot(meanVariance.c.lake.lu,
@@ -322,3 +380,35 @@ ggplot(filter(eqAreaData,
 ggplot(meanVariance.c.lake.lu, aes(tp_Estimate, chla_Estimate)) +
   geom_point() +
   ylab(expression(chl~a~{mu}*g~L^{-1}))
+
+
+###### Plots of site values
+
+### CH4 ebullition by site and site depth
+
+ggplot(eqAreaData, aes(wtrDpth, ch4.erate.mg.h ))+
+         geom_point()+
+         ylab(expression(CH[4]~ebullition~(mg/h)))+
+         xlab("water depth (m)")
+
+?ggplot
+?aes
+# trying to bin this:
+
+depth.class <- cut(eqAreaData$wtrDpth, c(2, 3, 4, 5, 7, 10, 15, 30), include.lowest = TRUE)
+mean.eb <- tapply(eqAreaData$ch4.erate.mg.h, depth.class, mean, na.rm=TRUE)
+plot(mean.eb, type = "p", xlab = "depth class")
+summary(mean.eb)
+list(mean.eb)
+?plot
+
+### site CH4 diffusion vs ebullition
+
+ggplot(eqAreaData, aes(ch4.erate.mg.h, ch4.drate.mg.h))+
+  geom_point() +
+  ylab(expression(CH[4]~diffusion~(mg/h)))+
+  xlab(expression(CH[4]~ebullition~(mg/h)))
+
+
+
+
