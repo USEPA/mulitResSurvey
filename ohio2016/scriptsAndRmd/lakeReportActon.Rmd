@@ -361,13 +361,15 @@ Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow (U-1
 actonTableChem <- filter(eqAreaData, Lake_Name == "Acton Lake",
                       EvalStatus == "sampled")  %>%
                   filter(!is.na(TN)) %>%
-                  select(siteID, LatSamp, LongSmp,  #site identification  
+                  select(siteID, LatSamp, LongSmp,  #site identification, no site depths recorded at Acton  
                           TNH4, TNO2.3, TN, TRP, TP)  #nutrient data 
-                
- 
+
+#tried this first, but couldn't get the inverse ("-") to work
+#actonTableChemOrder <- actonTableChem[ order(-actonTableChem$siteID),]                 
+actonTableChemOrder <- plyr::arrange(actonTableChem, siteID, decreasing=TRUE)
    
                          
-kable(actonTableChem,
+kable(actonTableChemOrder,
       align = "c",
       digits = c(1,5,5,0,0,0,0,0),  #number of digits past decimal
       col.names = c("Site ID", "Latitude", "Longitude",

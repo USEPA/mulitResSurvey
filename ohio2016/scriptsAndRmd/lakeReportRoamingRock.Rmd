@@ -108,7 +108,7 @@ ggmap(roamingRockSat) +
 
 ## 3.  Within-lake values of methane emissions and chlorophyll a concentrations  
 
-Previous studies have found a general pattern of higher CH~4~ emissions in the river-reservoir transition (tributary) area, and lower emissions in the deeper downstream waters. Lake Roaming Rock dispalyed this pattern: the highest emissions were observed in the south tributary and near the northeast tributary inflow. 
+Previous studies have found a general pattern of higher CH~4~ emissions in the river-reservoir transition (tributary) area, and lower emissions in the deeper downstream waters. Lake Roaming Rock displayed this pattern: the highest emissions were observed in the south tributary and near the northeast tributary inflow. 
 
 ```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Lake Roaming Rock. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
 
@@ -366,10 +366,11 @@ roamingRockTableChem <- filter(eqAreaData, Lake_Name == "Lake Roaming Rock",
                   select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
                           TNH4, TNO2.3, TN, TRP, TP)  #nutrient data 
                 
- 
+#order by site water depth
+roamingRockTableChemOrder <- plyr::arrange(roamingRockTableChem, wtrDpth)
    
                          
-kable(roamingRockTableChem,
+kable(roamingRockTableChemOrder,
       align = "c",
       digits = c(1,5,5,1,0,0,0,0,0),  #number of digits past decimal
       col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",
