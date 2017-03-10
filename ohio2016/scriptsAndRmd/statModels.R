@@ -427,7 +427,7 @@ m.tot1 <- lm(ebMlHrM2_Estimate ~ (chla_Estimate +
                                      reservoir.area.m2 +
                                      #percent.agg.ag +
                                      rda +
-                                     si)^2, # include 2-way interactions
+                                     si), # no 2-way interactions
               data = meanVariance.c.lake.lu)
 summary(m.tot1) # std error, t-value, Pr values all NA
                 # after removing percent ag (VIF was 4.24), values are populated
@@ -438,7 +438,7 @@ plot(m.tot1) # before removing percent ag:Error in qqnorm.default(rs, main = mai
 
 # Move forward with stepwise model selection
 m.step.tot <- step(m.tot1,  direction ="both")
-anova(m.step.tot)
+anova(m.step.tot)  #don't trust the p-values
 summary(m.step.tot) # several variables with low p-values, r2 = 0.86
 
 ## remove variable with highest p-val: tp (p = 0.37)
@@ -486,7 +486,7 @@ plot(m.tot3) # normality looks bad
 m.step.tot3 <- step(m.tot3, # model to start with
                direction ="both",  na.action = na.omit)
 anova(m.step.tot3);summary(m.step.tot3) # no variables retained
-##########################################################33
+##########################################################
 ##GLS model
 
 
