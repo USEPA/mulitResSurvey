@@ -32,8 +32,8 @@ Thank you for your help in including Lake Mohawk in this project.
 
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
-#myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
-myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
+myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
+#myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
 
 globalWd <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
 ```
