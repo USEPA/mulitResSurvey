@@ -363,10 +363,12 @@ appleValleyTableChem <- filter(eqAreaData, Lake_Name == "Apple Valley Lake",
                   select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
                           TNH4, TNO2.3, TN, TRP, TP)  #nutrient data 
                 
- 
+#order by site water depth
+appleValleyTableChemOrder <- plyr::arrange(
+                             appleValleyTableChem, wtrDpth) 
    
                          
-kable(appleValleyTableChem,
+kable(appleValleyTableChemOrder,
       align = "c",
       digits = c(1,5,5,1,0,0,0,0,0),  #number of digits past decimal
       col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",

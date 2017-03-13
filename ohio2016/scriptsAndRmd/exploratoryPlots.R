@@ -387,9 +387,17 @@ ggplot(meanVariance.c.lake.lu, aes(tp_Estimate, chla_Estimate)) +
 ### CH4 ebullition by site and site depth
 
 ggplot(eqAreaData, aes(wtrDpth, ch4.erate.mg.h ))+
-         geom_point()+
+         geom_point(color = alpha("black", 1/8))+
          ylab(expression(CH[4]~ebullition~(mg/h)))+
          xlab("water depth (m)")
+
+#binning
+ebVsDepth <- ggplot(eqAreaData, aes(wtrDpth, ch4.erate.mg.h )) + 
+  ylab(expression(CH[4]~ebullition~(mg/h)))+
+  xlab("water depth (m)")
+ebVsDepth
+ebVsDepth + stat_bin2d()
+ebVsDepth + stat_bin2d(bins = 10)
 
 ?ggplot
 ?aes
@@ -402,13 +410,88 @@ summary(mean.eb)
 list(mean.eb)
 ?plot
 
-### site CH4 diffusion vs ebullition
+### site CH4 diffusion vs ebullition 
+### Sarah worked on this 3/9
 
-ggplot(eqAreaData, aes(ch4.erate.mg.h, ch4.drate.mg.h))+
+ggplot(eqAreaData, aes(ch4.erate.mg.h, ch4.drate.mg.h.best))+
   geom_point() +
   ylab(expression(CH[4]~diffusion~(mg/h)))+
   xlab(expression(CH[4]~ebullition~(mg/h)))
 
+ggplot(eqAreaData, aes(log10(ch4.erate.mg.h), Lake_Name))+
+  geom_jitter()
 
+ggplot(eqAreaData, aes(siteID, ch4.erate.mg.h))+
+geom_bar(stat="identity", 
+         position = "stack",
+         data=filter(eqAreaData, Lake_Name == "Acton Lake", EvalStatus == "sampled")) #only main sites
+           
+ggplot(eqAreaData, aes(siteID, ch4.drate.mg.h.best))+
+  geom_bar(stat="identity", 
+           position = "stack",
+           data=filter(eqAreaData, Lake_Name == "Acton Lake", EvalStatus == "sampled")) #only main sites
 
+ebVsDiffP <- ggplot(eqAreaData, aes(siteID, ch4.erate.mg.h)) +
+            geom_point(data=filter(eqAreaData, Lake_Name == "Acton Lake", EvalStatus == "sampled"))
+ebVsDiffP
 
+ebVsDiffP + geom_point(data = filter(eqAreaData, Lake_Name == "Acton Lake", EvalStatus == "sampled"),
+                      aes(siteID, ch4.drate.mg.h.best),
+                      color = "red")
+
+ebVsDiffB <- ggplot(eqAreaData, aes(siteID, ch4.trate.mg.h)) +
+              geom_bar(stat = "identity",
+                       position = "stack",
+                       data=filter(eqAreaData, 
+                                   Lake_Name == "Acton Lake", 
+                                   EvalStatus == "sampled"))
+ebVsDiffB
+
+ebVsDiffB + geom_point(data = filter(eqAreaData, 
+                                     Lake_Name == "Acton Lake", 
+                                     EvalStatus == "sampled"),
+                       aes(siteID, ch4.drate.mg.h.best),
+                       color = "red",
+                       shape = "-",
+                       size = 20)
+
+eqAreaDataActon <- filter(eqAreaData, 
+                          Lake_Name == "Acton Lake",
+                          EvalStatus == "sampled")
+str(eqAreaDataActon)
+#15 obs of 121 variables
+names(eqAreaDataActon)
+#make a vector with info on relative location (marina, center, dam)
+eqAreaDataActon$siteID
+eqAreaDataActon$actonLocation <- c("center", "dam", "center", "marina", "center", 
+                   "dam", "marina", "dam", "dam", "center", "marina",
+                   "dam", "center", "marina", "center")
+#make a vector with estimated lake depth at each site
+eqAreaDataActon$siteDpthEstFt<- c(16, 27, 12, 6, 3, 25, 3, 6, 25, 16, 6, 20, 15, 12, 18)
+names(eqAreaDataActon)
+
+eqAreaDataActonOrder <- plyr::arrange(eqAreaDataActon, 
+                                      actonLocation, 
+                                      ch4.trate.mg.h)
+
+ebVsDiffB <- ggplot(eqAreaDataActonOrder, aes(siteID, co2.trate.mg.h)) +
+  geom_bar(stat = "identity",
+           position = "stack",
+           aes(fill = (siteDpthEstFt)))
+ebVsDiffB
+
+ebVsDiffB + geom_point(data = filter(eqAreaDataActonOrder),
+                       aes(siteID, co2.drate.mg.h.best),
+                       color = "grey",
+                       shape = "-",
+                       size = 20)
+ggsave('ohio2016/output/figures/ch4ebAndDiffBySite.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=5,   # 1 column
+       height=5, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
+
+ggplot(data = eqAreaDataActon, aes(siteID, co2.trate.mg.h))+
+  geom_bar(stat = "identity",
+           aes(fill = factor(actonLocation)))

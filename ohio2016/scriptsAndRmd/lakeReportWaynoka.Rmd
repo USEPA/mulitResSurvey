@@ -363,10 +363,10 @@ waynokaTableChem <- filter(eqAreaData, Lake_Name == "Lake Waynoka",
                   select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
                           TNH4, TNO2.3, TN, TRP, TP)  #nutrient data 
                 
- 
-   
-                         
-kable(waynokaTableChem,
+#order by water depth at site 
+waynokaTableChemOrder <- plyr::arrange(waynokaTableChem, wtrDpth)
+
+kable(waynokaTableChemOrder,
       align = "c",
       digits = c(1,5,5,1,0,0,0,0,0),  #number of digits past decimal
       col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",

@@ -364,9 +364,9 @@ mohawkTableChem <- filter(eqAreaData, Lake_Name == "Lake Mohawk",
                           TNH4, TNO2.3, TN, TRP, TP)  #nutrient data 
                 
  
-   
+mohawkTableChemOrder <-plyr::arrange(mohawkTableChem, wtrDpth)   
                          
-kable(mohawkTableChem,
+kable(mohawkTableChemOrder,
       align = "c",
       digits = c(1,5,5,1,0,0,0,0,0),  #number of digits past decimal
       col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",
