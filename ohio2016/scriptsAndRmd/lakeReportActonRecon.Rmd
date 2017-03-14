@@ -117,7 +117,7 @@ with(actonSitesPlot@data, {
                                    color="#282830",                               # color of lake outline
                                    lwd=2.0,                                       # line width of lake outline
                                    type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
-                                   angle=40,                                      # angle aspect of plot (-40)
+                                   angle=80,                                      # angle aspect of plot (-40)
                                    
                                  scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
                                    #main="Volumetric Gas Emissions at Harsha Lake",      # main plot title
@@ -156,7 +156,7 @@ with(actonSitesPlot@data, {
                       pch=21,                             # type of point to plot
                       bg="#FF0000",                       # fill color of points
                       type="h",                           # plot type = lines to the horizontal plane
-                      cex=2 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
+                      cex=(ch4.drate.mg.h.best/2) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
   )
 })
 
@@ -196,7 +196,7 @@ with(actonSitesPlot@data, {
                                    color="#282830",                               # color of lake outline
                                    lwd=2.0,                                       # line width of lake outline
                                    type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
-                                   angle=40,                                      # angle aspect of plot (-40)
+                                   angle=80,                                      # angle aspect of plot (-40)
                                    
                                  scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
                                    #main="Volumetric Gas Emissions at Harsha Lake",      # main plot title
@@ -235,7 +235,7 @@ with(actonSitesPlot@data, {
                       pch=21,                             # type of point to plot
                       bg="#FF0000",                       # fill color of points
                       type="h",                           # plot type = lines to the horizontal plane
-                      cex=2 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
+                      cex=((-co2.drate.mg.h.best)/50) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
   )
 })
 
@@ -275,7 +275,7 @@ with(actonSitesPlot@data, {
                                    color="#282830",                               # color of lake outline
                                    lwd=2.0,                                       # line width of lake outline
                                    type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
-                                   angle=40,                                      # angle aspect of plot (-40)
+                                   angle=80,                                      # angle aspect of plot (-40)
                                    
                                  scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
                                    #main="Volumetric Gas Emissions at Harsha Lake",      # main plot title
@@ -314,7 +314,7 @@ with(actonSitesPlot@data, {
                       pch=21,                             # type of point to plot
                       bg="#FF0000",                       # fill color of points
                       type="h",                           # plot type = lines to the horizontal plane
-                      cex=2 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
+                      cex=(ch4.erate.mg.h/2) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
   )
 })
 ```
@@ -347,7 +347,7 @@ with(actonSitesPlot@data, {
                                    color="#282830",                               # color of lake outline
                                    lwd=2.0,                                       # line width of lake outline
                                    type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
-                                   angle=40,                                      # angle aspect of plot (-40)
+                                   angle=80,                                      # angle aspect of plot (-40)
                                    
                                  scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
                                    #main="Volumetric Gas Emissions at Harsha Lake",      # main plot title
@@ -386,7 +386,7 @@ with(actonSitesPlot@data, {
                       pch=21,                             # type of point to plot
                       bg="#FF0000",                       # fill color of points
                       type="h",                           # plot type = lines to the horizontal plane
-                      cex=2 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
+                      cex=(co2.erate.mg.h*10) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
   )
 })
 
@@ -426,7 +426,7 @@ with(actonSitesPlot@data, {
                                    color="#282830",                               # color of lake outline
                                    lwd=2.0,                                       # line width of lake outline
                                    type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
-                                   angle=40,                                      # angle aspect of plot (-40)
+                                   angle=80,                                      # angle aspect of plot (-40)
                                    
                                  scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
                                    #main="Volumetric Gas Emissions at Harsha Lake",      # main plot title
@@ -465,7 +465,7 @@ with(actonSitesPlot@data, {
                       pch=21,                             # type of point to plot
                       bg="#FF0000",                       # fill color of points
                       type="h",                           # plot type = lines to the horizontal plane
-                      cex=2 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
+                      cex=(ebMlHrM2/50) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
   )
 })
 
