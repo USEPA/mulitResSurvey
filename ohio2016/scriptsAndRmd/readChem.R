@@ -35,6 +35,7 @@ distinct(chem, UNIT) # all ug, except mg C/L for TOC
 # Senecaville Lake (SNC, 2016-09-13), entered as SEN in chem file
 # Acton Lake (ACN, 2016-05-31), site ids U04 and U18 in chem file for this
 # Brookeville SU-35 is coded as SU35_2.
+# Cave Run SU4 should be SU46
 chem <- mutate(chem, site = 
                  # fix Hocking
                  ifelse(grepl(pattern = "HOC", x = site),
@@ -55,7 +56,11 @@ chem <- mutate(chem, site =
                  # Fix Brookeville
                  ifelse(site == "SU35_2",
                         "BVRSU35",
-                        site)))))
+                        
+                # Fix Cave Run
+                ifelse(site == "CRRSU4",
+                       "CRRSU46",
+                        site))))))
 
 
 # Pull out site values that contain the 3 letter code for each reservoir.

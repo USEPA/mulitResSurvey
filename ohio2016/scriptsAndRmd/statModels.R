@@ -409,7 +409,7 @@ vif_func(in_frame = select(meanVariance.c.lake.lu,
                            tn_Estimate,
                            mean.depth.m.morpho,
                            reservoir.area.m2,  
-                         #  watershed.area.m2, # remove first
+                           watershed.area.m2, # remove first
                            percent.agg.ag,
                            rda,
                            si),
@@ -467,8 +467,8 @@ summary(m.step.tot2)
 # Missing TN values is screwing things up, remove NAs before analysis
 data.trate.chem <- select(meanVariance.c.lake.lu, ch4.trate.mg.h_Estimate, ch4.trate.mg.h_StdError,
                           chla_Estimate, tp_Estimate, tn_Estimate, Lake_Name,
-                          mean.depth.m.morpho, reservoir.area.m2, percent.agg.ag, rda, si) %>%
-  na.omit()
+                          mean.depth.m.morpho, reservoir.area.m2, percent.agg.ag, rda, si) 
+
 m.tot3 <- lm(ch4.trate.mg.h_Estimate ~ (chla_Estimate + 
                                            tp_Estimate +
                                            tn_Estimate +
@@ -476,7 +476,7 @@ m.tot3 <- lm(ch4.trate.mg.h_Estimate ~ (chla_Estimate +
                                           reservoir.area.m2 +
                                           #percent.agg.ag +
                                           rda +
-                                          si)^2, # include 2-way interactions
+                                          si), # no 2-way interactions
               data = data.trate.chem)
 summary(m.tot3)
 anova(m.tot3)  # only rda
@@ -484,7 +484,7 @@ plot(m.tot3) # normality looks bad
 
 # Move forward with stepwise model selection
 m.step.tot3 <- step(m.tot3, # model to start with
-               direction ="both",  na.action = na.omit)
+               direction ="both")
 anova(m.step.tot3);summary(m.step.tot3) # no variables retained
 ##########################################################
 ##GLS model

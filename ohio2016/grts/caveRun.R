@@ -239,7 +239,7 @@ ggmap(caveRunSat) +
             aes(label=siteID, x=long, y=lat),
             hjust=1.2, vjust=0, size=2, color = "#00BFC4") +
   coord_equal() +
-  ggtitle("Oversample locations for alum Creek Lake")
+  ggtitle("Oversample locations for Cave Run Lake")
 
 ggsave(filename=paste(rootDir, "caveRun/caveRunOversampleSites.tiff", sep=""),
        width=8,height=5.5, units="in",
@@ -249,9 +249,8 @@ ggsave(filename=paste(rootDir, "caveRun/caveRunOversampleSites.tiff", sep=""),
 ggmap(caveRunSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
-  geom_polygon(data=caveRunEqArea84.f, aes(long, lat, group=group, fill=section)) +
-  scale_fill_manual(values = c("#000066", "#333399", "#006666")) + # colors from http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
-  geom_point(data=caveRunSites84@data, 
+  geom_polygon(data=caveRunEqArea84.f, aes(long, lat, group=group)) +
+geom_point(data=caveRunSites84@data, 
              aes(x=long, y=lat, color = panel),
              size = 2) +
   geom_text(data=caveRunSites84@data,
@@ -261,7 +260,7 @@ ggmap(caveRunSat) +
   scale_color_discrete(name = "Sites",
                        labels = c("Main", "Oversample")) +
   coord_equal() +
-  ggtitle("All Measurement locations for alum Creek Lake")
+  ggtitle("All Measurement locations for Cave Run Lake")
 
 ggsave(filename=paste(rootDir, "caveRun/caveRunAllSites.tiff", sep=""),
        width=8,height=5.5, units="in",

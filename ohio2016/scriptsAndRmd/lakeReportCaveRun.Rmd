@@ -1,7 +1,7 @@
 ---
-title: "Water Quality and Methane Emissions at Lake Mohawk"
+title: "Water Quality and Methane Emissions at Cave Run Lake"
 author: "J. Beaulieu and S. Waldo"
-date: "January 27, 2017"
+date: "March 13, 2017"
 output: 
   pdf_document:
     includes: 
@@ -13,21 +13,21 @@ The US Environmental Protection Agency (USEPA) is conducting an investigation of
 
 The USEPA measured CH~4~ emissions from 32 reservoirs in Ohio, Indiana, and Kentucky during the summer of 2016. We designated a minimum of 15 sampling sites in each reservoir (depending on reservoir size), where we measured CH~4~ emissions and several water quality indicators. CH~4~ emissions were measured using a device which captures CH~4~-rich bubbles as they rise through the water column toward the atmosphere. A sonde was used to measure chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, and turbidity just below the water surface at each of the 15 sites. Additionally, nutrient chemistry was analyzed at one shallow and one deep site for each reservoir.  
 
-This preliminary report presents results from the USEPA 2016 meausurement campaign relevant to Lake Mohawk. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
+This preliminary report presents results from the USEPA 2016 meausurement campaign relevant to Cave Run Lake. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
 
 1. This background information
 2. A map showing the location of the sampled sites
 3. A 3D map of the reservoir showing the measurement results for :
     + CH~4~ emissions
     + Chlorophyll a
-4. Figures showing how Lake Mohawk compared to the other 31 reservoirs in the study in terms of:
+4. Figures showing how Cave Run Lake compared to the other 31 reservoirs in the study in terms of:
     + CH~4~ emissions
     + Total phosphorus 
     + Total nitrogen
     + Chlorophyll a
-5. Tables summarizing the other measured water quality values at each site within Lake Mohawk    
+5. Tables summarizing the other measured water quality values at each site within Cave Run Lake   
  
-Thank you for your help in including Lake Mohawk in this project. 
+Thank you for your help in including Cave Run Lake in this project. 
 
 
 
@@ -58,83 +58,87 @@ library(rgdal)
 \newpage
 
 
+
 ## 2. Map of Sampled Sites    
-We sampled Lake Mohawk on August 29^th^ - 30^th^ of 2016. The sampling sites were chosen using a generalized random tesselation stratified design ("GRTS"), an approach which combines elements of systematic and random survey designs which allows for the random allocation of sampling sites with maximum  spatial coverage of the reservoir. We used a GPS and geographic information system (GIS) software to locate each sampling site (+/- 30 meters).  
+We sampled Cave Run Lake on August 8^th^ - 9^th^ of 2016. The sampling sites were chosen using a generalized random tesselation stratified design ("GRTS"), an approach which combines elements of systematic and random survey designs which allows for the random allocation of sampling sites with maximum  spatial coverage of the reservoir. We used a GPS and geographic information system (GIS) software to locate each sampling site (+/- 30 meters).  
   
   
 
-```{r results='hide', message=FALSE, warning=FALSE, echo=FALSE, fig.width=7, fig.height=7, fig.cap='*Location of the fifteen sample sites within Lake Mohawk. Satellite image from Google Maps.*'}
+```{r results='hide', message=FALSE, warning=FALSE, echo=FALSE, fig.width=7, fig.height=7, fig.cap='*Location of the fifteen sample sites within Cave Run Lake. Satellite image from Google Maps.*'}
 
 
 # Read and project spatial points dataframe for plotting
-mohawkSitesPlot <- readOGR(dsn = paste(globalWd, "mohawk", sep=""), 
-                          layer = "mohawkSitesEqAreaData")  # shapefile with data
+caveRunSitesPlot <- readOGR(dsn = paste(globalWd, "caveRun", sep=""), 
+                          layer = "caveRunSitesEqAreaData")  # shapefile with data
 
-mohawkSites84 <- spTransform(x = mohawkSitesPlot, #reproject
+caveRunSites84 <- spTransform(x = caveRunSitesPlot, #reproject
                             CRS("+proj=longlat +datum=WGS84")) # projection for google maps
 
-mohawkSites84@data <- mutate(mohawkSites84@data, 
-                            long=coordinates(mohawkSites84)[,1], # add long to @data slot
-                            lat=coordinates(mohawkSites84)[,2]) # add lat to @data slot
+caveRunSites84@data <- mutate(caveRunSites84@data, 
+                            long=coordinates(caveRunSites84)[,1], # add long to @data slot
+                            lat=coordinates(caveRunSites84)[,2]) # add lat to @data slot
 
 # Get ggmap
-bbox <- make_bbox(data=mohawkSites84@data, #defines map extent based on sample site lat/lon
+bbox <- make_bbox(data=caveRunSites84@data, #defines map extent based on sample site lat/lon
                   long, lat, f = 1) # f is zoom.  Large #, less zoom. tweak for each lake.  
-mohawkSat <- get_map(location = bbox,
+caveRunSat <- get_map(location = bbox,
                     color = "color",
                     source = "google",
                     maptype = "satellite")
 
-ggmap(mohawkSat) +
+ggmap(caveRunSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
-  geom_point(data=filter(mohawkSites84@data, EvalStatus == "sampled"), #only main sites
+  geom_point(data=filter(caveRunSites84@data, EvalStatus == "sampled"), #only main sites
              aes(x=long, y=lat),
              size = 2, color = "#00BFC4") + # specify color to be consistent across maps
   theme(axis.title.y = element_blank(), # Eliminate x-axis title
         plot.title = element_text(hjust = 0.5)) +  #plot title justify center
-  geom_text(data=filter(mohawkSites84@data, EvalStatus == "sampled"), #only main sites
+  geom_text(data=filter(caveRunSites84@data, EvalStatus == "sampled"), #only main sites
             aes(label=siteID, x=long, y=lat),
             hjust=1.2, vjust=0, size=3, color = "#00BFC4") +      #alternate color: "#F8766D"
   coord_equal() +
-  ggtitle("Lake Mohawk Sample Sites")
+  ggtitle("Cave Run Lake Sample Sites")
 ```
+
+
 
 \newpage
 
 
 ## 3.  Within-lake values of methane emissions and chlorophyll a concentrations  
 
-Previous studies have found a general pattern of higher CH~4~ emissions in the river-reservoir transition (tributary) area, and lower emissions in the deeper downstream waters. The two highest rates of CH~4~ emissions were observed near the southern tributary, but overall there was not a strong spatial pattern. 
+Previous studies have found a general pattern of higher CH~4~ emissions in the river-reservoir transition (tributary) area, and lower emissions in the deeper downstream waters. Cave Run Lake displayed this pattern: the highest emissions were observed in the upper half of the reservoir nearest the inflow.
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=6, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Lake Mohawk. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Cave Run Lake. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
 
 
-mohawkEqArea <- readOGR(dsn = paste(globalWd, "mohawk", sep=""), # get polygon
-                           layer = "mohawkEqArea",  # shapefile name
+caveRunEqArea <- readOGR(dsn = paste(globalWd, "caveRun", sep=""), # get polygon
+                           layer = "caveRunEqArea",  # shapefile name
                             verbose = FALSE)  #keep from reporting progress
 
-mohawkSitesPlot@data <- merge(mohawkSitesPlot@data, # add emission to point shp
-                             filter(eqAreaData, Lake_Name == "Lake Mohawk") %>%
+caveRunSitesPlot@data <- merge(caveRunSitesPlot@data, # add emission to point shp
+                             filter(eqAreaData, Lake_Name == "Cave Run Lake") %>%
                                select(ch4.trate.mg.h, siteID))
+
 
 # load external script (this is the scatterplot3d function, but changed a bit with to add more user control over style)
 source(paste(myWd, "/ohio2016/scriptsAndRmd/scatterplot3d_edit.R", sep = ""))
 
 # grab coordinates from polygon (in order to plot as a line on the xy plane of 3D plot)
-coords = fortify(mohawkEqArea)
+coords = fortify(caveRunEqArea)
 coords <- subset(coords, !hole)
 
 
 
 ##########################################################################
 ### Total CH4 emission rate
-with(mohawkSitesPlot@data, {
+with(caveRunSitesPlot@data, {
   ch4_plot <- scatterplot3d_edit(x=coords$long, y=coords$lat, z=rep(0,length(coords$long)),   # x y and z data, respectively
                                    color="#282830",                               # color of lake outline
                                    lwd=2.0,                                       # line width of lake outline
                                    type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
-                                   angle=70,                                      # angle aspect of plot (-40)
+                                   angle=80,                                      # angle aspect of plot (-40)
                                    
                                  scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
                                    #main="Volumetric Gas Emissions at Harsha Lake",      # main plot title
@@ -146,7 +150,7 @@ with(mohawkSitesPlot@data, {
                                  #cex.lab = 2,
                                    mar = c(5,6,4,2)+0.1,
                                    zlab=expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1})),                      # z-axis label
-                                   zlim=range(0,30),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
+                                   zlim=range(0,50),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
                                    tick.marks = TRUE,
@@ -180,12 +184,12 @@ with(mohawkSitesPlot@data, {
 
 \newpage
 
-Measured chlorophyll a concentrations in Lake Mohawk display a spatial pattern with higher levels to the east and south.  
+Chlorophyll a concentrations showed a similar trend of decreading values with increasing distance from the inflow.  This is likely because the inflow is the primary nutrient source to the epilimnion during the summer (Figure 5).  
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=6, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Lake Mohawk. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Cave Run Lake. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
 ##########################################################################
 ### chlorophyll plot
-with(mohawkSitesPlot@data, {
+with(caveRunSitesPlot@data, {
   chl_plot <- scatterplot3d_edit(x=coords$long, y=coords$lat, z=rep(0,length(coords$long)),   # x y and z data, respectively
                                    color="#282830",                               # color of lake outline
                                    lwd=2.0,                                       # line width of lake outline
@@ -199,7 +203,7 @@ with(mohawkSitesPlot@data, {
                                    cex.lab = 1.1,
                                    mar = c(5,6,4,2)+0.1,
                                    zlab=(expression(chlorophyll~a~paste("(", {mu}, "g ", L^{-1}, ")", sep = ""))),                      # z-axis label
-                                   zlim=range(0, 25),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
+                                   zlim=range(0, 15),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
                                    grid=c('xy','xz','yz'),                        # which grids to show - added to edited version of scatterplot3d fx
@@ -237,8 +241,8 @@ We used the results from the individual measurement sites to calculate mean valu
 ####################################################################################
 ### Item #4: Ordered dotplots of total CH4 emissions, DO, TP, TN, and chla
 
-# Highlight Lake Mohawk (lake of interest) data with color
-plotColor <- ifelse(meanVariance.c.lake.lu$Lake_Name == "Lake Mohawk",
+# Highlight Cave Run Lake (lake of interest) data with color
+plotColor <- ifelse(meanVariance.c.lake.lu$Lake_Name == "Cave Run Lake",
                     "red", "black")
 
 # CH4 total emission rate
@@ -341,12 +345,12 @@ Table 1: Surface (0.1 m) water quality parameters measured via sonde at each sit
 #"select" command selects the columns we want to show. The order they are listed 
 #in the () is the order they will appear
 #used info from http://j-wang.blogspot.com/2015/03/landscape-and-portrait-in-rmarkdown.html to orient table pages as landscape
-mohawkTableSonde <- filter(eqAreaData, Lake_Name == "Lake Mohawk", 
+caveRunTableSonde <- filter(eqAreaData, Lake_Name == "Cave Run Lake", 
                       EvalStatus == "sampled") %>%
                 select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
                 chla_S, DO__L_S,  pH_S, SpCn__S, Tmp_C_S,  TrNTU_S) #shallow sonde
 
-kable(mohawkTableSonde,
+kable(caveRunTableSonde,
       align = "c",
       digits = c(1,5,5,1,1,1,1,0,1,1),
       col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",
@@ -357,16 +361,17 @@ kable(mohawkTableSonde,
 
 Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow and one deep site. "Site Depth" is the measure of how deep the lake was at each site. 
 ```{r warning=FALSE, echo=FALSE} 
-mohawkTableChem <- filter(eqAreaData, Lake_Name == "Lake Mohawk",
+caveRunTableChem <- filter(eqAreaData, Lake_Name == "Cave Run Lake",
                       EvalStatus == "sampled")  %>%
                   filter(!is.na(TN)) %>%
                   select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
                           TNH4, TNO2.3, TN, TRP, TP)  #nutrient data 
                 
- 
-mohawkTableChemOrder <-plyr::arrange(mohawkTableChem, wtrDpth)   
+#order by site water depth
+caveRunTableChemOrder <- plyr::arrange(caveRunTableChem, wtrDpth)
+   
                          
-kable(mohawkTableChemOrder,
+kable(caveRunTableChemOrder,
       align = "c",
       digits = c(1,5,5,1,0,0,0,0,0),  #number of digits past decimal
       col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",
