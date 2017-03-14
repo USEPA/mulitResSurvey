@@ -354,7 +354,7 @@ kable(mjKirwanTableSonde,
       digits = c(1,5,5,1,1,1,1,0,1,1),
       col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",
                     "Chl a (ug/L)", "DO (mg/L)", "pH",
-                    "Sp. Cond", "Water Temp (C)", 
+                    "Sp. Cond (uS/cm)", "Water Temp (C)", 
                     "Turbidity"))
 ```
 
