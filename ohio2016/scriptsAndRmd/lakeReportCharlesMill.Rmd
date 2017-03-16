@@ -1,7 +1,7 @@
 ---
-title: "Water Quality and Methane Emissions at Lake Roaming Rock"
+title: "Water Quality and Methane Emissions at Charles Mill Lake"
 author: "J. Beaulieu and S. Waldo"
-date: "January 26, 2017"
+date: "March 13, 2017"
 output: 
   pdf_document:
     includes: 
@@ -13,21 +13,21 @@ The US Environmental Protection Agency (USEPA) is conducting an investigation of
 
 The USEPA measured CH~4~ emissions from 32 reservoirs in Ohio, Indiana, and Kentucky during the summer of 2016. We designated a minimum of 15 sampling sites in each reservoir (depending on reservoir size), where we measured CH~4~ emissions and several water quality indicators. CH~4~ emissions were measured using a device which captures CH~4~-rich bubbles as they rise through the water column toward the atmosphere. A sonde was used to measure chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, and turbidity just below the water surface at each of the 15 sites. Additionally, nutrient chemistry was analyzed at one shallow and one deep site for each reservoir.  
 
-This preliminary report presents results from the USEPA 2016 meausurement campaign relevant to Lake Roaming Rock. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
+This preliminary report presents results from the USEPA 2016 meausurement campaign relevant to Charles Mill Lake. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
 
 1. This background information
 2. A map showing the location of the sampled sites
 3. A 3D map of the reservoir showing the measurement results for :
     + CH~4~ emissions
     + Chlorophyll a
-4. Figures showing how Lake Roaming Rock compared to the other 31 reservoirs in the study in terms of:
+4. Figures showing how Charles Mill Lake compared to the other 31 reservoirs in the study in terms of:
     + CH~4~ emissions
     + Total phosphorus 
     + Total nitrogen
     + Chlorophyll a
-5. Tables summarizing the other measured water quality values at each site within Lake Roaming Rock    
+5. Tables summarizing the other measured water quality values at each site within Charles Mill Lake   
  
-Thank you for your help in including Lake Roaming Rock in this project. 
+Thank you for your help in including Charles Mill Lake in this project. 
 
 
 
@@ -53,6 +53,7 @@ library(ggmap)
 library(dplyr)
 library(knitr)
 library(rgdal)
+library(rgeos)
 ```
 
 \newpage
@@ -60,45 +61,45 @@ library(rgdal)
 
 
 ## 2. Map of Sampled Sites    
-We sampled Lake Roaming Rock on September 8^th^ - 9^th^ of 2016. The sampling sites were chosen using a generalized random tesselation stratified design ("GRTS"), an approach which combines elements of systematic and random survey designs which allows for the random allocation of sampling sites with maximum  spatial coverage of the reservoir. We used a GPS and geographic information system (GIS) software to locate each sampling site (+/- 30 meters).  
+We sampled Charles Mill Lake on July 18^th^ - 19^th^ of 2016. The sampling sites were chosen using a generalized random tesselation stratified design ("GRTS"), an approach which combines elements of systematic and random survey designs which allows for the random allocation of sampling sites with maximum  spatial coverage of the reservoir. We used a GPS and geographic information system (GIS) software to locate each sampling site (+/- 30 meters).  
   
   
 
-```{r results='hide', message=FALSE, warning=FALSE, echo=FALSE, fig.width=7, fig.height=7, fig.cap='*Location of the fifteen sample sites within Lake Roaming Rock. Satellite image from Google Maps.*'}
+```{r results='hide', message=FALSE, warning=FALSE, echo=FALSE, fig.width=7, fig.height=7, fig.cap='*Location of the fifteen sample sites within Charles Mill Lake. Satellite image from Google Maps.*'}
 
 
 # Read and project spatial points dataframe for plotting
-roamingRockSitesPlot <- readOGR(dsn = paste(globalWd, "roamingRock", sep=""), 
-                          layer = "roamingRockSitesEqAreaData")  # shapefile with data
+charlesMillSitesPlot <- readOGR(dsn = paste(globalWd, "charlesMill", sep=""), 
+                          layer = "charlesMillSitesEqAreaData")  # shapefile with data
 
-roamingRockSites84 <- spTransform(x = roamingRockSitesPlot, #reproject
+charlesMillSites84 <- spTransform(x = charlesMillSitesPlot, #reproject
                             CRS("+proj=longlat +datum=WGS84")) # projection for google maps
 
-roamingRockSites84@data <- mutate(roamingRockSites84@data, 
-                            long=coordinates(roamingRockSites84)[,1], # add long to @data slot
-                            lat=coordinates(roamingRockSites84)[,2]) # add lat to @data slot
+charlesMillSites84@data <- mutate(charlesMillSites84@data, 
+                            long=coordinates(charlesMillSites84)[,1], # add long to @data slot
+                            lat=coordinates(charlesMillSites84)[,2]) # add lat to @data slot
 
 # Get ggmap
-bbox <- make_bbox(data=roamingRockSites84@data, #defines map extent based on sample site lat/lon
-                  long, lat, f = 1.4) # f is zoom.  Large #, less zoom. tweak for each lake.  
-roamingRockSat <- get_map(location = bbox,
+bbox <- make_bbox(data=charlesMillSites84@data, #defines map extent based on sample site lat/lon
+                  long, lat, f = 0.5) # f is zoom.  Large #, less zoom. tweak for each lake.  
+charlesMillSat <- get_map(location = bbox,
                     color = "color",
                     source = "google",
                     maptype = "satellite")
 
-ggmap(roamingRockSat) +
+ggmap(charlesMillSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
-  geom_point(data=filter(roamingRockSites84@data, EvalStatus == "sampled"), #only main sites
+  geom_point(data=filter(charlesMillSites84@data, EvalStatus == "sampled"), #only main sites
              aes(x=long, y=lat),
              size = 2, color = "#00BFC4") + # specify color to be consistent across maps
   theme(axis.title.y = element_blank(), # Eliminate x-axis title
         plot.title = element_text(hjust = 0.5)) +  #plot title justify center
-  geom_text(data=filter(roamingRockSites84@data, EvalStatus == "sampled"), #only main sites
+  geom_text(data=filter(charlesMillSites84@data, EvalStatus == "sampled"), #only main sites
             aes(label=siteID, x=long, y=lat),
             hjust=1.2, vjust=0, size=3, color = "#00BFC4") +      #alternate color: "#F8766D"
   coord_equal() +
-  ggtitle("Lake Roaming Rock Sample Sites")
+  ggtitle("Charles Mill Lake Sample Sites")
 ```
 
 
@@ -108,33 +109,38 @@ ggmap(roamingRockSat) +
 
 ## 3.  Within-lake values of methane emissions and chlorophyll a concentrations  
 
-Previous studies have found a general pattern of higher CH~4~ emissions in the river-reservoir transition (tributary) area, and lower emissions in the deeper downstream waters. Lake Roaming Rock displayed this pattern: the highest emissions were observed in the south tributary and near the northeast tributary inflow. 
+All sampling locations in Charles Mill Lake were emitting CH~4~ to the atmosphere, though there was no obvious within-lake spatial pattern (Fig. 2).
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Lake Roaming Rock. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Charles Mill Lake. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
 
-
-roamingRockEqArea <- readOGR(dsn = paste(globalWd, "roamingRock", sep=""), # get polygon
-                           layer = "roamingRockEqArea",  # shapefile name
+# Get polygon
+charlesMillEqArea <- readOGR(dsn = paste(globalWd, "charlesMill", sep=""), 
+                           layer = "charlesMillEqArea",  # shapefile name
                             verbose = FALSE)  #keep from reporting progress
 
-roamingRockSitesPlot@data <- merge(roamingRockSitesPlot@data, # add emission to point shp
-                             filter(eqAreaData, Lake_Name == "Lake Roaming Rock") %>%
+# Dissolve strata from polygon
+charlesMillEqArea <- gUnaryUnion(charlesMillEqArea, id = charlesMillEqArea@data$Lake_Name)
+
+# Add emission to point shp
+charlesMillSitesPlot@data <- merge(charlesMillSitesPlot@data, 
+                             filter(eqAreaData, Lake_Name == "Charles Mill Lake") %>%
                                select(ch4.trate.mg.h, siteID))
 
 # load external script (this is the scatterplot3d function, but changed a bit with to add more user control over style)
 source(paste(myWd, "/ohio2016/scriptsAndRmd/scatterplot3d_edit.R", sep = ""))
 
 # grab coordinates from polygon (in order to plot as a line on the xy plane of 3D plot)
-coords = fortify(roamingRockEqArea)
+coords = fortify(charlesMillEqArea)
 coords <- subset(coords, !hole)
 
 
 
 ##########################################################################
 ### Total CH4 emission rate
-with(roamingRockSitesPlot@data, {
+with(charlesMillSitesPlot@data, {
   ch4_plot <- scatterplot3d_edit(x=coords$long, y=coords$lat, z=rep(0,length(coords$long)),   # x y and z data, respectively
                                    color="#282830",                               # color of lake outline
+                                   fill = "white",                                 # polygon fill color
                                    lwd=2.0,                                       # line width of lake outline
                                    type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
                                    angle=40,                                      # angle aspect of plot (-40)
@@ -149,7 +155,9 @@ with(roamingRockSitesPlot@data, {
                                  #cex.lab = 2,
                                    mar = c(5,6,4,2)+0.1,
                                    zlab=expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1})),                      # z-axis label
-                                   zlim=range(0,15),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
+                                   zlim=range(0,20),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
+                                   labs.line.z=-0.5,                              # adjustment of the z axis tick labels in margin lines
+                                  
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
                                    tick.marks = TRUE,
@@ -176,21 +184,22 @@ with(roamingRockSitesPlot@data, {
                       pch=21,                             # type of point to plot
                       bg="#FF0000",                       # fill color of points
                       type="h",                           # plot type = lines to the horizontal plane
-                      cex=2 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
+                      cex=1 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
   )
 })
 ```
 
 \newpage
 
-However, chlorophyll a concentrations in Lake Roaming Rock did not show a clear difference between upstream and downstream sites, and were relatively low overall (see Figure 5).  
+Chlorophyll a was abundant throughout the lake (Fig. 3).  Overall, Charles Mill Lake had the second highest chloropyll a abundance of the 32 lakes (Fig. 5). 
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Lake Roaming Rock. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Charles Mill Lake. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
 ##########################################################################
 ### chlorophyll plot
-with(roamingRockSitesPlot@data, {
+with(charlesMillSitesPlot@data, {
   chl_plot <- scatterplot3d_edit(x=coords$long, y=coords$lat, z=rep(0,length(coords$long)),   # x y and z data, respectively
                                    color="#282830",                               # color of lake outline
+                                   fill = "white",                                 # polygon fill color
                                    lwd=2.0,                                       # line width of lake outline
                                    type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
                                    angle=40,                                      # angle aspect of plot (-40)
@@ -201,8 +210,11 @@ with(roamingRockSitesPlot@data, {
                                    cex.axis = 0.7,
                                    cex.lab = 1.1,
                                    mar = c(5,6,4,2)+0.1,
-                                   zlab=(expression(chlorophyll~a~paste("(", {mu}, "g ", L^{-1}, ")", sep = ""))),                      # z-axis label
-                                   zlim=range(0, 15),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
+                                   zlab=(expression(chlorophyll~a~paste("(", {mu}, "g ", L^{-1}, ")", sep = ""))),                # z-axis label
+                                   zlim=range(0, 80),                            # range of z data shown
+                                   labs.line.z=-0.5,                              # adjustment of the z axis tick labels in margin lines
+                                   #labs.adj.y=0.05,                               # adjustment of the z axis tick labels (not in margin lines)
+                                   
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
                                    grid=c('xy','xz','yz'),                        # which grids to show - added to edited version of scatterplot3d fx
@@ -223,7 +235,7 @@ with(roamingRockSitesPlot@data, {
                       pch=21,                             # type of point to plot
                       bg="#FF0000",                       # fill color of points
                       type="h",                           # plot type = lines to the horizontal plane
-                      cex=2 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
+                      cex=1 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
   )
 })
 ```
@@ -240,8 +252,8 @@ We used the results from the individual measurement sites to calculate mean valu
 ####################################################################################
 ### Item #4: Ordered dotplots of total CH4 emissions, DO, TP, TN, and chla
 
-# Highlight Lake Roaming Rock (lake of interest) data with color
-plotColor <- ifelse(meanVariance.c.lake.lu$Lake_Name == "Lake Roaming Rock",
+# Highlight Charles Mill Lake (lake of interest) data with color
+plotColor <- ifelse(meanVariance.c.lake.lu$Lake_Name == "Charles Mill Lake",
                     "red", "black")
 
 # CH4 total emission rate
@@ -344,33 +356,33 @@ Table 1: Surface (0.1 m) water quality parameters measured via sonde at each sit
 #"select" command selects the columns we want to show. The order they are listed 
 #in the () is the order they will appear
 #used info from http://j-wang.blogspot.com/2015/03/landscape-and-portrait-in-rmarkdown.html to orient table pages as landscape
-roamingRockTableSonde <- filter(eqAreaData, Lake_Name == "Lake Roaming Rock", 
+charlesMillTableSonde <- filter(eqAreaData, Lake_Name == "Charles Mill Lake", 
                       EvalStatus == "sampled") %>%
                 select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
                 chla_S, DO__L_S,  pH_S, SpCn__S, Tmp_C_S,  TrNTU_S) #shallow sonde
 
-kable(roamingRockTableSonde,
+kable(charlesMillTableSonde,
       align = "c",
       digits = c(1,5,5,1,1,1,1,0,1,1),
       col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",
                     "Chl a (ug/L)", "DO (mg/L)", "pH",
-                    "Sp. Cond", "Water Temp (C)", 
+                    "Sp. Cond (uS/cm)", "Water Temp (C)", 
                     "Turbidity"))
 ```
 
 Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow and one deep site. "Site Depth" is the measure of how deep the lake was at each site. 
 ```{r warning=FALSE, echo=FALSE} 
-roamingRockTableChem <- filter(eqAreaData, Lake_Name == "Lake Roaming Rock",
+charlesMillTableChem <- filter(eqAreaData, Lake_Name == "Charles Mill Lake",
                       EvalStatus == "sampled")  %>%
                   filter(!is.na(TN)) %>%
                   select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
                           TNH4, TNO2.3, TN, TRP, TP)  #nutrient data 
                 
 #order by site water depth
-roamingRockTableChemOrder <- plyr::arrange(roamingRockTableChem, wtrDpth)
+charlesMillTableChemOrder <- plyr::arrange(charlesMillTableChem, wtrDpth)
    
                          
-kable(roamingRockTableChemOrder,
+kable(charlesMillTableChemOrder,
       align = "c",
       digits = c(1,5,5,1,0,0,0,0,0),  #number of digits past decimal
       col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",

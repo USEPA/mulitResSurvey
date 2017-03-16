@@ -11,7 +11,7 @@ output:
 
 The US Environmental Protection Agency (USEPA) is conducting an investigation of methane (CH~4~) dynamics in reservoirs. CH~4~ is a potent greenhouse gas that is produced by microorganisms in reservoir sediments. The objective is to estimate the magnitude of CH~4~ emissions from reservoirs in the United States. 
 
-The USEPA measured CH~4~ emissions from 32 reservoirs in Ohio, Indiana, and Kentucky during the summer of 2016. We designated a minimum of 15 sampling sites in each reservoir (depending on reservoir size), where we measured CH~4~ emissions and several water quality indicators. CH~4~ emissions were measured using a device which captures CH~4~-rich bubbles as they rise through the water column toward the atmosphere. A sonde was used to measure chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, and turbidity just below the water surface at each of the 15 sites. Additionally, nutrient chemistry was analyzed at one shallow and one deep site for each reservoir.  
+The USEPA measured CH~4~ emissions from 32 reservoirs in Ohio, Indiana, and Kentucky during the summer of 2016. We designated a minimum of 15 sampling sites in each reservoir (depending on reservoir size), where we measured CH~4~ emissions and several water quality indicators. CH~4~ emissions were measured using a device which captures CH~4~-rich bubbles as they rise through the water column toward the atmosphere. A sonde was used to measure chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, and turbidity just below the water surface at each site. Additionally, nutrient chemistry was analyzed at one shallow and one deep site for each reservoir.  
 
 This preliminary report presents results from the USEPA 2016 meausurement campaign relevant to Cave Run Lake. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
 
@@ -53,6 +53,7 @@ library(ggmap)
 library(dplyr)
 library(knitr)
 library(rgdal)
+library(rgeos)
 ```
 
 \newpage
@@ -64,7 +65,7 @@ We sampled Cave Run Lake on August 8^th^ - 9^th^ of 2016. The sampling sites wer
   
   
 
-```{r results='hide', message=FALSE, warning=FALSE, echo=FALSE, fig.width=7, fig.height=7, fig.cap='*Location of the fifteen sample sites within Cave Run Lake. Satellite image from Google Maps.*'}
+```{r results='hide', message=FALSE, warning=FALSE, echo=FALSE, fig.width=7, fig.height=7, fig.cap='*Location of the 30 sample sites within Cave Run Lake. Satellite image from Google Maps.*'}
 
 
 # Read and project spatial points dataframe for plotting
@@ -110,12 +111,15 @@ ggmap(caveRunSat) +
 
 Previous studies have found a general pattern of higher CH~4~ emissions in the river-reservoir transition (tributary) area, and lower emissions in the deeper downstream waters. Cave Run Lake displayed this pattern: the highest emissions were observed in the upper half of the reservoir nearest the inflow.
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Cave Run Lake. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 30 sample sites within Cave Run Lake. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
 
 
 caveRunEqArea <- readOGR(dsn = paste(globalWd, "caveRun", sep=""), # get polygon
                            layer = "caveRunEqArea",  # shapefile name
                             verbose = FALSE)  #keep from reporting progress
+
+# Dissolve strata from polygon
+caveRunEqArea <- gUnaryUnion(caveRunEqArea, id = caveRunEqArea@data$Lake_Name)
 
 caveRunSitesPlot@data <- merge(caveRunSitesPlot@data, # add emission to point shp
                              filter(eqAreaData, Lake_Name == "Cave Run Lake") %>%
@@ -138,6 +142,7 @@ with(caveRunSitesPlot@data, {
                                    color="#282830",                               # color of lake outline
                                    lwd=2.0,                                       # line width of lake outline
                                    type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
+                                   fill = "white",
                                    angle=80,                                      # angle aspect of plot (-40)
                                    
                                  scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
@@ -150,7 +155,8 @@ with(caveRunSitesPlot@data, {
                                  #cex.lab = 2,
                                    mar = c(5,6,4,2)+0.1,
                                    zlab=expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1})),                      # z-axis label
-                                   zlim=range(0,50),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
+                                   zlim=range(0,50),                            # range of z data shown
+                                   labs.line.z=-0.5,                              # adjustment of the z axis tick labels in margin lines
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
                                    tick.marks = TRUE,
@@ -177,7 +183,7 @@ with(caveRunSitesPlot@data, {
                       pch=21,                             # type of point to plot
                       bg="#FF0000",                       # fill color of points
                       type="h",                           # plot type = lines to the horizontal plane
-                      cex=2 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
+                      cex=1 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
   )
 })
 ```
@@ -186,7 +192,7 @@ with(caveRunSitesPlot@data, {
 
 Chlorophyll a concentrations showed a similar trend of decreading values with increasing distance from the inflow.  This is likely because the inflow is the primary nutrient source to the epilimnion during the summer (Figure 5).  
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Cave Run Lake. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 30 sample sites within Cave Run Lake. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
 ##########################################################################
 ### chlorophyll plot
 with(caveRunSitesPlot@data, {
@@ -203,7 +209,8 @@ with(caveRunSitesPlot@data, {
                                    cex.lab = 1.1,
                                    mar = c(5,6,4,2)+0.1,
                                    zlab=(expression(chlorophyll~a~paste("(", {mu}, "g ", L^{-1}, ")", sep = ""))),                      # z-axis label
-                                   zlim=range(0, 15),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
+                                   zlim=range(0, 15),                            # range of z data shown
+                                   labs.line.z=-0.5,                              # adjustment of the z axis tick labels in margin lines
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
                                    grid=c('xy','xz','yz'),                        # which grids to show - added to edited version of scatterplot3d fx
@@ -224,7 +231,7 @@ with(caveRunSitesPlot@data, {
                       pch=21,                             # type of point to plot
                       bg="#FF0000",                       # fill color of points
                       type="h",                           # plot type = lines to the horizontal plane
-                      cex=2 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
+                      cex=1 #(vRateBest/500) + 0.5          # scaling of point sizes - this will need to be adjusted for each variable
   )
 })
 ```
@@ -346,7 +353,8 @@ Table 1: Surface (0.1 m) water quality parameters measured via sonde at each sit
 #in the () is the order they will appear
 #used info from http://j-wang.blogspot.com/2015/03/landscape-and-portrait-in-rmarkdown.html to orient table pages as landscape
 caveRunTableSonde <- filter(eqAreaData, Lake_Name == "Cave Run Lake", 
-                      EvalStatus == "sampled") %>%
+                      EvalStatus == "sampled",
+                      siteID != "SU-04") %>%  # no sonde data from this site
                 select(siteID, LatSamp, LongSmp, wtrDpth,  #site identification  
                 chla_S, DO__L_S,  pH_S, SpCn__S, Tmp_C_S,  TrNTU_S) #shallow sonde
 
@@ -355,7 +363,7 @@ kable(caveRunTableSonde,
       digits = c(1,5,5,1,1,1,1,0,1,1),
       col.names = c("Site ID", "Latitude", "Longitude", "Site Depth (m)",
                     "Chl a (ug/L)", "DO (mg/L)", "pH",
-                    "Sp. Cond", "Water Temp (C)", 
+                    "Sp. Cond (uS/cm)", "Water Temp (C)", 
                     "Turbidity"))
 ```
 
