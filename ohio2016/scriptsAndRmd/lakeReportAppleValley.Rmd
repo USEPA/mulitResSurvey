@@ -13,7 +13,7 @@ The US Environmental Protection Agency (USEPA) is conducting an investigation of
 
 The USEPA measured CH~4~ emissions from 32 reservoirs in Ohio, Indiana, and Kentucky during the summer of 2016. We designated a minimum of 15 sampling sites in each reservoir (depending on reservoir size), where we measured CH~4~ emissions and several water quality indicators. CH~4~ emissions were measured using a device which captures CH~4~-rich bubbles as they rise through the water column toward the atmosphere. A sonde was used to measure chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, and turbidity just below the water surface at each of the 15 sites. Additionally, nutrient chemistry was analyzed at one shallow and one deep site for each reservoir.  
 
-This preliminary report presents results from the USEPA 2016 meausurement campaign relevant to Apple Valley Lake. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
+This preliminary report presents results from the USEPA 2016 measurement campaign relevant to Apple Valley Lake. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
 
 1. This background information
 2. A map showing the location of the sampled sites
@@ -32,8 +32,8 @@ Thank you for your help in including Apple Valley Lake in this project.
 
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
-#myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
-myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
+myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
+#myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
 
 globalWd <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
 ```
@@ -59,7 +59,7 @@ library(rgdal)
 
 
 ## 2. Map of Sampled Sites    
-We sampled Apple Valley Lake on July 20^th^ - 21^st^ of 2016. The sampling sites were chosen using a generalized random tesselation stratified design ("GRTS"), an approach which combines elements of systematic and random survey designs which allows for the random allocation of sampling sites with maximum  spatial coverage of the reservoir. We used a GPS and geographic information system (GIS) software to locate each sampling site (+/- 30 meters).  
+We sampled Apple Valley Lake on July 20^th^ - 21^st^ of 2016. The sampling sites were chosen using a generalized random tessellation stratified design ("GRTS"), an approach which combines elements of systematic and random survey designs which allows for the random allocation of sampling sites with maximum  spatial coverage of the reservoir. We used a GPS and geographic information system (GIS) software to locate each sampling site (+/- 30 meters).  
   
   
 
@@ -233,7 +233,7 @@ We used the results from the individual measurement sites to calculate mean valu
 
 
 
-```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*Mean and 95% confidence interval (CI) of the CH~4~ emission rate for each reservoir in this study, calculated from the vaules measured at >=15 sites within each reservoir.*'  }
+```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*Mean and 95% confidence interval (CI) of the CH~4~ emission rate for each reservoir in this study, calculated from the values measured at >=15 sites within each reservoir.*'  }
 ####################################################################################
 ### Item #4: Ordered dotplots of total CH4 emissions, DO, TP, TN, and chla
 
@@ -262,7 +262,7 @@ ggplot(meanVariance.c.lake.lu,
 
 \newpage
 
-```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*Mean and 95% confidence interval (CI) of the chlorophyll a concentration for each reservoir in this study, calculated from the vaules measured at >=15 sites within each reservoir.*'  }
+```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*Mean and 95% confidence interval (CI) of the chlorophyll a concentration for each reservoir in this study, calculated from the values measured at >=15 sites within each reservoir.*'  }
 
 # Chlorophyll 
 meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, 
@@ -279,7 +279,7 @@ ggplot(meanVariance.c.lake.lu,
 
 \newpage
 
-```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*Mean and 95% confidence interval (CI) of the total phosphorus (TP) concentration for each reservoir in this study, calculated from the vaules measured at >=15 sites within each reservoir.*'  }
+```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*Mean and 95% confidence interval (CI) of the total phosphorus (TP) concentration for each reservoir in this study, calculated from the values measured at >=15 sites within each reservoir.*'  }
 
 # TP 
 # Reset plotting order to rank by TP
@@ -298,7 +298,7 @@ ggplot(meanVariance.c.lake.lu,
 
 \newpage
 
-```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*Mean and 95% confidence interval (CI) of the total nitrogen (TN) concentration for each reservoir in this study, calculated from the vaules measured at >=15 sites within each reservoir.*'  }
+```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*Mean and 95% confidence interval (CI) of the total nitrogen (TN) concentration for each reservoir in this study, calculated from the values measured at >=15 sites within each reservoir.*'  }
 
 
 # TN 

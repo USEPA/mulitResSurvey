@@ -13,7 +13,7 @@ The US Environmental Protection Agency (USEPA) is conducting an investigation of
 
 The USEPA measured CH~4~ emissions from 32 reservoirs in Ohio, Indiana, and Kentucky during the summer of 2016. We designated a minimum of 15 sampling sites in each reservoir (depending on reservoir size), where we measured CH~4~ emissions and several water quality indicators. CH~4~ emissions were measured using a device which captures CH~4~-rich bubbles as they rise through the water column toward the atmosphere. A sonde was used to measure chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, and turbidity just below the water surface at each of the 15 sites. Additionally, nutrient chemistry was analyzed at one shallow and one deep site for each reservoir.  
 
-This preliminary report presents results from the USEPA 2016 measurement  campaign relevant to Seneca Lake. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
+This preliminary report presents results from the USEPA 2016 measurement campaign relevant to Seneca Lake. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
 
 1. This background information
 2. A map showing the location of the sampled sites
@@ -32,8 +32,8 @@ Thank you for your help in including Seneca Lake in this project.
 
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
-#myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
-myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
+myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
+#myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
 
 globalWd <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
 ```
