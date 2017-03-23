@@ -1,5 +1,5 @@
 ---
-title: "Water Quality and Methane Emissions at Pleasant Hill Lake"
+title: "Water Quality and Methane Emissions at Pleasant Hill Lake, Ohio"
 author: "J. Beaulieu and S. Waldo"
 date: "March 13, 2017"
 output: 
@@ -13,7 +13,7 @@ The US Environmental Protection Agency (USEPA) is conducting an investigation of
 
 The USEPA measured CH~4~ emissions from 32 reservoirs in Ohio, Indiana, and Kentucky during the summer of 2016. We designated a minimum of 15 sampling sites in each reservoir (depending on reservoir size), where we measured CH~4~ emissions and several water quality indicators. CH~4~ emissions were measured using a device which captures CH~4~-rich bubbles as they rise through the water column toward the atmosphere. A sonde was used to measure chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, and turbidity just below the water surface at each of the 15 sites. Additionally, nutrient chemistry was analyzed at one shallow and one deep site for each reservoir.  
 
-This preliminary report presents results from the USEPA 2016 measurement campaign relevant to Pleasant Hill Lake. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
+This preliminary report presents results from the USEPA 2016 measurement campaign relevant to Pleasant Hill Lake which is located in north-central Ohio and managed by the Muskingum Watershed Conservancy District. These data will be included in a formal peer-reviewed publication to be submitted for publication in early 2018.  This preliminary report includes:  
 
 1. This background information
 2. A map showing the location of the sampled sites
@@ -50,6 +50,7 @@ load(paste(myWd, "/.RData", sep = ""))
 
 library(ggplot2)
 library(ggmap)
+library(ggrepel)
 library(dplyr)
 library(knitr)
 library(rgdal)
@@ -61,11 +62,11 @@ library(rgeos)
 
 
 ## 2. Map of Sampled Sites    
-We sampled Pleasant Hill Lake on July 19^th^ - 20^th^ of 2016. The sampling sites were chosen using a generalized random tessellation stratified design ("GRTS"), an approach which combines elements of systematic and random survey designs which allows for the random allocation of sampling sites with maximum  spatial coverage of the reservoir. We used a GPS and geographic information system (GIS) software to locate each sampling site (+/- 30 meters).  
+Pleasant Hill Lake, located in north-central Ohio, is one of 16 reservoirs in the Muskingum Watershed Conservancy District. We sampled Pleasant Hill Lake on July 19^th^ - 20^th^ of 2016. The sampling sites were chosen using a generalized random tessellation stratified design ("GRTS"), an approach which combines elements of systematic and random survey designs which allows for the random allocation of sampling sites with maximum  spatial coverage of the reservoir. We used a GPS and geographic information system (GIS) software to locate each sampling site (+/- 30 meters).  Chlorophyll a, dissolved oxygen, pH, specific conductivity, water temperature, turbidity, and CH~4~ emissions were measured at all sampling sites. Nutrient concentrations were measured at one deep site near the dam and one shallow site near the inflow. 
   
   
 
-```{r results='hide', message=FALSE, warning=FALSE, echo=FALSE, fig.width=7, fig.height=7, fig.cap='*Location of the fifteen sample sites within Pleasant Hill Lake. Satellite image from Google Maps.*'}
+```{r results='hide', message=FALSE, warning=FALSE, echo=FALSE, fig.width=7, fig.height=6.0, fig.cap='*Location of the fifteen sample sites within Pleasant Hill Lake, located in north-central Ohio. Water samples for nutrient analysis were collected from one deep and one shallow site. Satellite image from Google Maps.*'}
 
 
 # Read and project spatial points dataframe for plotting
@@ -79,6 +80,12 @@ pleasantHillSites84@data <- mutate(pleasantHillSites84@data,
                             long=coordinates(pleasantHillSites84)[,1], # add long to @data slot
                             lat=coordinates(pleasantHillSites84)[,2]) # add lat to @data slot
 
+# Specify chemistry sampling sites
+pleasantHillSites84@data <- mutate(pleasantHillSites84@data,
+                              chem = ifelse(siteID %in% c("S-07", "S-34"), 
+                                  "chem",
+                                  "no_chem"))
+
 # Get ggmap
 bbox <- make_bbox(data=pleasantHillSites84@data, #defines map extent based on sample site lat/lon
                   long, lat, f = 0.5) # f is zoom.  Large #, less zoom. tweak for each lake.  
@@ -91,13 +98,16 @@ ggmap(pleasantHillSat) +
   ylab("Latitude") +
   xlab ("Longitude") +
   geom_point(data=filter(pleasantHillSites84@data, EvalStatus == "sampled"), #only main sites
-             aes(x=long, y=lat),
-             size = 2, color = "#00BFC4") + # specify color to be consistent across maps
-  theme(axis.title.y = element_blank(), # Eliminate x-axis title
-        plot.title = element_text(hjust = 0.5)) +  #plot title justify center
-  geom_text(data=filter(pleasantHillSites84@data, EvalStatus == "sampled"), #only main sites
-            aes(label=siteID, x=long, y=lat),
-            hjust=1.2, vjust=0, size=3, color = "#00BFC4") +      #alternate color: "#F8766D"
+             aes(x=long, y=lat, color = chem),
+             size = 2) + 
+  theme(plot.title = element_text(hjust = 0.5)) +  #plot title justify center
+  geom_text_repel(data=filter(pleasantHillSites84@data, EvalStatus == "sampled"), #only main sites
+            aes(label=siteID, x=long, y=lat, color = chem),
+           size=3) +      #alternate color: "#F8766D"
+  scale_color_manual(values = c("yellow", "white"), #alternate color: "#F8766D" "#00BFC4"
+                     labels = c("Nutrient sample",
+                                "No nutrient sample")) +
+  guides(color = guide_legend(title = NULL)) +
   coord_equal() +
   ggtitle("Pleasant Hill Lake Sample Sites")
 ```
@@ -111,18 +121,18 @@ ggmap(pleasantHillSat) +
 
 Previous studies have found a general pattern of higher CH~4~ emissions in the river-reservoir transition (tributary) area, and lower emissions in the deeper downstream waters. There were no strong spatial patterns in CH~4~ emission rates in Pleasant Hill Lake.
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Pleasant Hill Lake. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Pleasant Hill Lake, located in north-central Ohio. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
 
 # Get polygon
-pleasantHillEqArea <- readOGR(dsn = paste(globalWd, "pleasantHill", sep=""), 
-                           layer = "pleasantHillEqArea",  # shapefile name
+pleasantHillEqArea84 <- readOGR(dsn = paste(globalWd, "pleasantHill", sep=""), 
+                           layer = "pleasantHillEqArea84",  # shapefile name
                             verbose = FALSE)  #keep from reporting progress
 
 # Dissolve strata from polygon
-pleasantHillEqArea <- gUnaryUnion(pleasantHillEqArea, id = pleasantHillEqArea@data$Lake_Name)
+pleasantHillEqArea84 <- gUnaryUnion(pleasantHillEqArea84, id = pleasantHillEqArea84@data$GNIS_Name)
 
 # Add emission to point shp
-pleasantHillSitesPlot@data <- merge(pleasantHillSitesPlot@data, 
+pleasantHillSites84@data <- merge(pleasantHillSites84@data, 
                              filter(eqAreaData, Lake_Name == "Pleasant Hill Lake") %>%
                                select(ch4.trate.mg.h, siteID))
 
@@ -130,40 +140,40 @@ pleasantHillSitesPlot@data <- merge(pleasantHillSitesPlot@data,
 source(paste(myWd, "/ohio2016/scriptsAndRmd/scatterplot3d_edit.R", sep = ""))
 
 # grab coordinates from polygon (in order to plot as a line on the xy plane of 3D plot)
-coords = fortify(pleasantHillEqArea)
+coords = fortify(pleasantHillEqArea84)
 coords <- subset(coords, !hole)
 
 
 
 ##########################################################################
 ### Total CH4 emission rate
-with(pleasantHillSitesPlot@data, {
+with(pleasantHillSites84@data, {
   ch4_plot <- scatterplot3d_edit(x=coords$long, y=coords$lat, z=rep(0,length(coords$long)),   # x y and z data, respectively
                                    color="#282830",                               # color of lake outline
                                    fill = "white",                                 # polygon fill color
                                    lwd=2.0,                                       # line width of lake outline
-                                   type="l",                                      # plot type - "l" = line, "h" = the lollipop style with a line  connecting to the horizontal plane 
+                                   type="l",                                      # plot type "l" = line, "h" = lollipop with line connecting to horizontal plane 
                                    angle=40,                                      # angle aspect of plot (-40)
                                    
-                                 scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
-                                   #main="Volumetric Gas Emissions at Harsha Lake",      # main plot title
-                                   xlab="",                                       # x-axis label (left blank here to reposition later)
+                                   scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
+                                   xlab="Latitude",                                       # x-axis label (left blank here to reposition later)
                                    ylab="",                                       # y-axis label
-                                    cex.axis = 0.7, 
-                                 # cex.axis = 1.3,
+                                   y.margin.add = 0.5,
+                                   cex.axis = 0.7, 
                                    cex.lab = 1.1,
-                                 #cex.lab = 2,
                                    mar = c(5,6,4,2)+0.1,
                                    zlab=expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1})),                      # z-axis label
                                    zlim=range(0,50),                            # range of z data shown - I grabbed the max from previously plotting the methane data here. Set so when I add the points, the z-axis fits that data. 
-                                   labs.line.z=-0.5,                              # adjustment of the z axis tick labels in margin lines
-                                  
+                                   labs.line.z=-0.3,                              # adjustment of the z axis tick labels in margin lines
+                                   n.breaks.x=7,                                  # Number of breaks for the axis. If x.pretty = TRUE, this is just a suggestion. It may do more or less. If left blank, defaults to par("lab")[1] value
+                                   x.pretty=FALSE,                                # Whether or not to let the function create pretty breaks (default to TRUE if unspecified)
+                                   x.sig=4,                                       # When x.pretty=FALSE, can use this to set the sig. digits displayed for x axis tick labels
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
                                    tick.marks = TRUE,
-                                  label.tick.marks = TRUE,   #whether or not to include tick mark labels for all three axes
-                                 x.ticklabs=NULL,
-                                 y.ticklabs=NULL,
+                                   label.tick.marks = TRUE,   #whether or not to include tick mark labels for all three axes
+                                   x.ticklabs=NULL,
+                                   y.ticklabs=NULL,
                                  
                                  grid=c('xy','xz','yz'),                        # which grids to show - added to edited version of scatterplot3d fx
                                    lty.grid.xy = 1,                               # grid line type  
@@ -176,9 +186,27 @@ with(pleasantHillSitesPlot@data, {
                                     
                                  )
   
-
+  
+  # reposition & add y-axis label
+  dims <- par("usr")                        # format of 'dims' is vector of: [xmin,xmax,ymin,ymax]
+  x <- dims[2] - 0.1*diff(dims[1:2])       # define x position of label
+  y <- dims[3] + 0.1*diff(dims[3:4])       # define y position of label
+  text(x,y,"Longitude", srt=55)             # add label.  srt sets angle
+  
+    # add inflow label
+  dims <- par("usr")                        # format of 'dims' is vector of: [xmin,xmax,ymin,ymax]
+  x.d <- dims[1] + 0.15*diff(dims[1:2])       # define x position of label
+  y.d <- dims[3] + 0.14*diff(dims[3:4])        # define y position of label
+  text(x.d, y.d, "Inflow")             # add label.  srt sets angle
+  
+  # add dam label
+  dims <- par("usr")                        # format of 'dims' is vector of: [xmin,xmax,ymin,ymax]
+  x.i <- dims[1] + 0.59*diff(dims[1:2])       # define x position of label
+  y.i <- dims[3] + 0.08*diff(dims[3:4])        # define y position of label
+  text(x.i, y.i, "Dam")   
+  
   # add the lollipop points
-  ch4_plot$points3d(x=xcoord, y=ycoord, z=as.numeric(as.character(ch4.trate.mg.h)), # x y and z data
+  ch4_plot$points3d(x=long, y=lat, z=as.numeric(as.character(ch4.trate.mg.h)), # x y and z data
                       col="#282830",                      # color of lines connecting points to lake outline
                       lwd=1.5,                            # line width of lines connecting points to lake outline
                       pch=21,                             # type of point to plot
@@ -193,10 +221,10 @@ with(pleasantHillSitesPlot@data, {
 
 The lowest Chlorophyll a concentrations occurred immediately above the dam.  Chlorophyll concentrations were relatively uniform across the rest of the reservoir (Figure 3).  
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Pleasant Hill Lake. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Pleasant Hill Lake, located in north-central Ohio. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
 ##########################################################################
 ### chlorophyll plot
-with(pleasantHillSitesPlot@data, {
+with(pleasantHillSites84@data, {
   chl_plot <- scatterplot3d_edit(x=coords$long, y=coords$lat, z=rep(0,length(coords$long)),   # x y and z data, respectively
                                    color="#282830",                               # color of lake outline
                                    fill = "white",                                 # polygon fill color
@@ -205,16 +233,18 @@ with(pleasantHillSitesPlot@data, {
                                    angle=40,                                      # angle aspect of plot (-40)
                                    scale.y=0.5,                                   # scale y axis (increase by 175% (1.75))
                                    #main="Volumetric Gas Emissions at Harsha Lake",      # main plot title
-                                   xlab="",                                       # x-axis label (left blank here to reposition later)
-                                   ylab="",                                       # y-axis label
+                                   xlab="Latitude",                                       # x-axis label (left blank here to reposition later)
+                                   ylab="",     
+                                   y.margin.add = 0.5,
                                    cex.axis = 0.7,
                                    cex.lab = 1.1,
                                    mar = c(5,6,4,2)+0.1,
                                    zlab=(expression(chlorophyll~a~paste("(", {mu}, "g ", L^{-1}, ")", sep = ""))),                # z-axis label
                                    zlim=range(0, 25),                            # range of z data shown
-                                   labs.line.z=-0.5,                              # adjustment of the z axis tick labels in margin lines
-                                   #labs.adj.y=0.05,                               # adjustment of the z axis tick labels (not in margin lines)
-                                   
+                                   labs.line.z=-0.3,                              # adjustment of the z axis tick labels in margin lines
+                                   n.breaks.x=7,                                  # Number of breaks for the axis. If x.pretty = TRUE, this is just a suggestion. It may do more or less. If left blank, defaults to par("lab")[1] value
+                                   x.pretty=FALSE,                                # Whether or not to let the function create pretty breaks (default to TRUE if unspecified)
+                                   x.sig=4,                                       # When x.pretty=FALSE, can use this to set the sig. digits displayed for x axis tick labels
                                    lty.axis=1,                                    # the line type of the axes
                                    axis=TRUE,                                     # wheather to include axes
                                    grid=c('xy','xz','yz'),                        # which grids to show - added to edited version of scatterplot3d fx
@@ -227,9 +257,26 @@ with(pleasantHillSitesPlot@data, {
                                    box=FALSE                                      # get rid of the box around the plot
   )
   
+    # reposition & add y-axis label
+  dims <- par("usr")                        # format of 'dims' is vector of: [xmin,xmax,ymin,ymax]
+  x <- dims[2] - 0.1*diff(dims[1:2])       # define x position of label
+  y <- dims[3] + 0.1*diff(dims[3:4])       # define y position of label
+  text(x,y,"Longitude", srt=55)             # add label.  srt sets angle
+  
+    # add inflow label
+  dims <- par("usr")                        # format of 'dims' is vector of: [xmin,xmax,ymin,ymax]
+  x.d <- dims[1] + 0.15*diff(dims[1:2])       # define x position of label
+  y.d <- dims[3] + 0.14*diff(dims[3:4])        # define y position of label
+  text(x.d, y.d, "Inflow")             # add label.  srt sets angle
+  
+  # add dam label
+  dims <- par("usr")                        # format of 'dims' is vector of: [xmin,xmax,ymin,ymax]
+  x.i <- dims[1] + 0.59*diff(dims[1:2])       # define x position of label
+  y.i <- dims[3] + 0.08*diff(dims[3:4])        # define y position of label
+  text(x.i, y.i, "Dam")  
 
   # add the lollipop points
-  chl_plot$points3d(x=xcoord, y=ycoord, z=as.numeric(as.character(chla_S)), # x y and z data
+  chl_plot$points3d(x=long, y=lat, z=as.numeric(as.character(chla_S)), # x y and z data
                       col="#282830",                      # color of lines connecting points to lake outline
                       lwd=1.5,                            # line width of lines connecting points to lake outline
                       pch=21,                             # type of point to plot
@@ -244,7 +291,7 @@ with(pleasantHillSitesPlot@data, {
 
 ## 4. Comparative plots  
 
-We used the results from the individual measurement sites to calculate mean values and an uncertainty range for the reservoir. The uncertainty measure we used is the 95% confidence interval (CI), which is similar to two standard deviations (sd) from the mean in a normally distributed data set (where 2*sd = 95.45%). In the case of this study, the majority of the uncertainty is due to the spatial variability of a given parameter within the reservoir, rather than uncertainty due to analytical errors. 
+Chlorophyll a concentration and CH~4~ emission rate was measured at all sampling sites.  We used the measurements to calculate mean values and an uncertainty range for the reservoir. The uncertainty measure we used is the 95% confidence interval (CI), which is similar to two standard deviations (sd) from the mean in a normally distributed data set (where 2*sd = 95.45%). In the case of this study, the majority of the uncertainty is due to the spatial variability of a given parameter within the reservoir, rather than uncertainty due to analytical errors. 
 
 
 
@@ -269,7 +316,10 @@ ggplot(meanVariance.c.lake.lu,
                  color = plotColor) +
   xlab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
   theme(axis.title.y = element_blank(), # Eliminate x-axis title
-        plot.title = element_text(hjust = 0.5)) +  #plot title justify center
+        plot.title = element_text(hjust = 0.5),  #plot title justify center
+        axis.text.y = element_text(color = c(rep("black", 22), "red", rep("black", 9)),
+        face = c(rep("plain", 22), "bold", rep("plain", 9)))
+        ) +
   ggtitle(expression(Mean~CH[4]~emission~rate~
                        paste("(", "95% CI", ")", sep = "")))
 ```
@@ -288,49 +338,88 @@ ggplot(meanVariance.c.lake.lu,
   geom_errorbarh(aes(xmax = chla_UCB95Pct, xmin = chla_LCB95Pct), color = plotColor) +
   xlab(expression(chlorophyll~a~paste("(", {mu}, "g ", L^{-1}, ")", sep = ""))) +
   theme(axis.title.y = element_blank(), # Eliminate x-axis title
-        plot.title = element_text(hjust = 0.5)) +  #plot title justify center)+
+        plot.title = element_text(hjust = 0.5),  #plot title justify center
+        axis.text.y = element_text(color = c(rep("black", 20), "red", rep("black", 11)),
+        face = c(rep("plain", 20), "bold", rep("plain", 11)))
+        ) +
   ggtitle("Mean Chlorophyll a (95% CI)")
 ```
 
 \newpage
 
-```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*Mean and 95% confidence interval (CI) of the total phosphorus (TP) concentration for each reservoir in this study, calculated from the values measured at one shallow and one deep site within each reservoir.*'  }
+Water samples for total phosphorus (TP) and total nitrogen (TN) were collected from just below the water surface at a shallow site near the inflow and a deep site near the dam.  The concentrations at both sites are shown below.
+
+```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*TP concentrations at a deep and shallow site in each reservoir included in the study.  Pleasant Hill Lake is highlighted in red.  See Fig. 1 for sample site locations.*'  }
 
 # TP 
-# Reset plotting order to rank by TP
-meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "TP")
-ggplot(meanVariance.c.lake.lu,
-       aes(tp_Estimate, fLake_Name)) +
-  geom_point(color = plotColor) +
-  geom_errorbarh(aes(xmax = tp_UCB95Pct, 
-                     xmin = tp_LCB95Pct), 
-                 color = plotColor) +
+# Extract TP and TN data
+tp.tn <- filter(eqAreaData, !is.na(TN)|!is.na(TP)) %>%
+                  select(Lake_Name, siteID, TP, TN, wtrDpth, stratum)
+
+# Create vector for deep or shallow site
+tp.tn <- mutate(tp.tn, 
+                d_s = ifelse(stratum == "trib",
+                             "shallow",
+                      ifelse(stratum == "open_water",
+                                    "deep",
+                      ifelse(stratum == "None" & Lake_Name == "Wingfoot Lake" & siteID == "U-16",
+                                           "deep",
+                      ifelse(stratum == "None" & Lake_Name == "Kiser Lake" & siteID == "U-12",
+                                                  "deep",
+                      ifelse(stratum == "None" & Lake_Name == "Hocking County Lake" & siteID == "US-15",
+                                                         "deep",
+                      ifelse(stratum == "None" & Lake_Name == "Charles Mill Lake" & siteID == "US-16",
+                                                                "deep",
+                      ifelse(stratum == "None" & Lake_Name == "Acton Lake" & siteID == "U-04",
+                                                                       "deep",
+                                                                       "shallow"))))))))
+
+# Order Lake_Name to plot in ~ order of increasing TP
+orderList <- order(tp.tn[, "TP"])
+lakeLevels <- tp.tn[orderList, "Lake_Name"]
+tp.tn$fLake_Name <- factor(tp.tn$Lake_Name, levels = lakeLevels)
+
+# Highlight Pleasant Hill Lake (lake of interest) data with color
+plotColor <- ifelse(tp.tn$fLake_Name == "Pleasant Hill Lake",
+                    "red", "black")
+
+ggplot(tp.tn,
+       aes(TP, fLake_Name, color = plotColor)) +
+  geom_point(aes(shape = d_s)) +
   xlab(expression(Total~Phosphorus~paste("(", {mu}, "g P ", L^{-1}, ")", sep = ""))) +  
   theme(axis.title.y = element_blank(), # Eliminate x-axis title
         plot.title = element_text(hjust = 0.5)) +  #plot title justify center
-  ggtitle("Mean TP (95% CI)")
+  ggtitle("Total Phosphorus") +
+  theme(axis.text.y = element_text(color = c(rep("black", 23), "red", rep("black", 8)),
+        face = c(rep("plain", 23), "bold", rep("plain", 8)))) +
+  scale_color_manual(values = c("black", "red")) +
+  guides(color=FALSE) +
+  theme(legend.title = element_blank())
 ```
 
 \newpage
 
-```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*Mean and 95% confidence interval (CI) of the total nitrogen (TN) concentration for each reservoir in this study, calculated from the values measured at one shallow and one deep site within each reservoir.*'  }
+```{r echo=FALSE, warning=FALSE, fig.width=7, fig.height=7, fig.cap='*TN concentrations at a deep and shallow site in each reservoir included in the study.  Pleasant Hill Lake is highlighted in red.  See Fig. 1 for sample site locations.*'  }
 
 
 # TN 
-# Reset plotting order to rank by TN
-meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "TN")
-ggplot(meanVariance.c.lake.lu,
-       aes(tn_Estimate, fLake_Name)) +
-  geom_point(color = plotColor) +
-  geom_errorbarh(aes(xmax = tn_UCB95Pct, 
-                     xmin = tn_LCB95Pct), 
-                 color = plotColor) +
+# Order Lake_Name to plot in ~ order of increasing TN
+orderList <- order(tp.tn[, "TN"])
+lakeLevels <- tp.tn[orderList, "Lake_Name"]
+tp.tn$fLake_Name <- factor(tp.tn$Lake_Name, levels = lakeLevels)
+
+ggplot(tp.tn,
+       aes(TN, fLake_Name, color = plotColor)) +
+  geom_point(aes(shape = d_s)) +
   xlab(expression(Total~Nitrogen~paste("(", {mu}, "g N ", L^{-1}, ")", sep = ""))) +   
   theme(axis.title.y = element_blank(), # Eliminate x-axis title
         plot.title = element_text(hjust = 0.5)) +  #plot title justify center
-  ggtitle("Mean TN (95% CI)")
-
-
+  ggtitle("Total Nitrogen") +
+      theme(axis.text.y = element_text(color = c(rep("black", 11), "red", rep("black", 20)),
+        face = c(rep("plain", 11), "bold", rep("plain", 20)))) +
+  scale_color_manual(values = c("black", "red")) +
+  guides(color=FALSE) +
+  theme(legend.title = element_blank())
 
 
 ```
