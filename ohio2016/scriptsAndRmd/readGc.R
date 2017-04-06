@@ -25,6 +25,8 @@ gas.8 <- read.xls(paste(rootDir, "Ebul_Trap_6ml_16_10_20_UNK_STD.xlsx", sep = ""
                   as.is = TRUE, skip = 46)
 gas.9 <- read.xls(paste(rootDir, "Chamber_17_01_19_UNK_STD.xlsx", sep = ""),
                   as.is = TRUE, skip = 28)
+gas.10 <- read.xls(paste(rootDir, "Ebul_DgasAir_16_10_05_UNK_STD.xlsx", sep = ""),
+                   as.is = TRUE, skip = 33)
 
 # Need to strip a few samples before all are merged.
 # These are floating chamber gas samples collected manually at Cowan Lake. These
@@ -41,7 +43,7 @@ gas.5 <- filter(gas.5, !(Sample %in% c(16126:16129, 16133:16136)))
 # Merge gas data.  Don't include gas.9, which only has floating chamber
 # samples
 gas.all <- Reduce(function(...) merge(..., all=T), 
-                  list(gas.1, gas.2, gas.3, gas.4, gas.5, gas.6, gas.7, gas.8))  
+                  list(gas.1, gas.2, gas.3, gas.4, gas.5, gas.6, gas.7, gas.8, gas.10))  
 
 # Need to make a few fixes before exetainer code is converted to integer
 # The labels were lost from several Kiser Lake samples.  These samples were
@@ -144,8 +146,8 @@ xtrCodes.m <- filter(xtrCodes.m, !logicalIndicator)
 xtrCodes.gas <- merge(xtrCodes.m, gas.all, by.x = "value", by.y = "sample", all = TRUE)
 
 str(xtrCodes.m)  #980 observations
-str(gas.all) # 901 observations
-str(xtrCodes.gas) # 1003 observations
+str(gas.all) # 1004 observations
+str(xtrCodes.gas) # 1008 observations
 
 # Specific fixes
 # Still need to add codes for MIT trap redeployment
@@ -155,6 +157,7 @@ omitCodes <- c(16170, # run on GC, but field notes indicate is bad and not enter
                16199, 16200, # contaminated, per field sheets
                16206, # bad, per field data sheets
                16023, # chromatogram overwritten due to sequence problem
+               16475, # chromatogram overwritten due to sequence problem
                16298, 16299, # contaminated, omit, per field sheets.
                161235, 161281, 161257, 161262, 161266, 161258, # Cowan Lake cntl traps
                161237, 16151, 161265, 16165, 161279, 16158, # Cowan Lake cntl traps
@@ -163,6 +166,7 @@ omitCodes <- c(16170, # run on GC, but field notes indicate is bad and not enter
                16576,  # Empty short tube run on GC
                16603, # trap sample, but no record in field sheets.
                16825, # no record in field sheets
+               16614:16617, # no record in field sheets
                16070) # Karen noted loose cap. Came from trap, but looks like air.
                
 
@@ -172,11 +176,40 @@ xtrCodes.gas <- filter(xtrCodes.gas, !(value %in% omitCodes))
 
                        
 # Sample run on GC, but not in data sheets
-filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value)  # 0
+filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value)  # none
 
+# Samples in data sheets, but GC data not yet read into R.  
+filter(xtrCodes.gas, is.na(xtrCodes.gas$co2.ppm)) %>% arrange(variable, value)
+# 16312. No record of this sample being run.  Have reps
 
-# Samples in data sheets, but GC data not yet read into R
-filter(xtrCodes.gas, is.na(xtrCodes.gas$co2.ppm)) %>% arrange(variable, value)  # Many, but still analyzing GC samples
+# Take a look at values
+ggplot(filter(xtrCodes.gas, variable == "tp.xtr"), aes(Lake_Name, n2o.ppm)) + 
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(filter(xtrCodes.gas, variable == "tp.xtr"), aes(Lake_Name, ch4.ppm/10000)) + 
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(filter(xtrCodes.gas, variable == "tp.xtr"), aes(Lake_Name, co2.ppm/10000)) + 
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(filter(xtrCodes.gas, variable == "tp.xtr"), aes(Lake_Name, o2)) + 
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(filter(xtrCodes.gas, variable == "tp.xtr"), aes(Lake_Name, ar)) + 
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(filter(xtrCodes.gas, variable == "tp.xtr"), aes(Lake_Name, n2)) +  
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(filter(xtrCodes.gas, variable == "tp.xtr"), aes(Lake_Name, total)) + 
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
 
 
 # QA/QC GC REPS--------------
@@ -293,4 +326,5 @@ xtrCodes.gas.agg.c <- dcast(filter(xtrCodes.gas.agg.m, type != "dg.xtr"), # cast
 
 # Merge
 eqAreaData <- merge(xtrCodes.gas.agg.c, eqAreaData, all = TRUE)
+
 
