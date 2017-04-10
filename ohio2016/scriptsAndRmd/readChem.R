@@ -4,13 +4,14 @@
 
 # READ AND FORMAT WATER CHEM---------------
 # Data retrieved from L drive on 11/09/2016
-chem16 <- read_excel("ohio2016/inputData/2016_ESF-EFWS_NutrientData_Updated01242017_SS.xlsx", 
+chem16 <- read_excel("ohio2016/inputData/2016_ESF-EFWS_NutrientData_Updated04072017_SS.xlsx", 
                    sheet = "2016DATA", skip = 1)
 
-chem17 <- read_excel("ohio2016/inputData/2017_ESF-EFWS_NutrientData_Updated02282017_SS.xlsx", 
+chem17 <- read_excel("ohio2016/inputData/2017_ESF-EFWS_NutrientData_Updated03312017_SS.xlsx", 
                      sheet = "2017DATA", skip = 1)
 
 chem <- merge(chem16, chem17, all = TRUE)
+
 
 # Replace spaces and unusual characters in column names with ".".
 # Note that "(" is a special character in R.  Must precdede with \\ for
@@ -165,23 +166,44 @@ fChem <- mutate(fChem, analyte = ifelse(analyte == "NO2",
 #    chem data in one place.  Push these data through grtsMeanVariance to get
 #    lake-wide mean.
 
-# Strip Blanks
-fChem <-  filter(fChem, TYPE != "BLANK") %>%
-# Exclude unnecessary columns
-  select(Lake_Name, siteID, TYPE, analyte, finalConc)
-
-
 # Take a quick peak for obvious problems
-# As of 3/02/17, still missing TOC from several lake.  Waiting for Deborah to enter.
 ggplot(fChem, aes(Lake_Name, finalConc)) + 
   geom_point(aes(color = TYPE)) + 
   facet_wrap(~analyte, scales = "free_y") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
-# Tappan Lake SU-28 UNK-TOC is too high 17.7
-fChem <- mutate(fChem, finalConc = ifelse(analyte == "TOC" & finalConc == 17.7,
-                                          NA, finalConc))
 
+fChem <- mutate(fChem,      # blank and unknown switched at CMLSU01  
+                finalConc = ifelse(analyte == "TOC" & site == "CMLUS01",
+                                          3.34,
+                            ifelse(analyte == "TOC" & site == "CMLUS01BLK",
+                                          0.28,
+                                   
+                            # Looks like sample contained blank water       
+                            ifelse(analyte == "TOC" & site == "MILSU01D",
+                                          NA,
+                                   
+                            # blank and unknown switched at MJKS23        
+                            ifelse(analyte == "TOC" & site == "MJKS23",
+                                   5.06,
+                            ifelse(analyte == "TOC" & site == "MJKS23BLK",
+                                   0.29,
+                                   
+                            # Looks like sample contained blank water         
+                            ifelse(analyte == "TOC" & site == "TPNSU07D",
+                                   NA,
+                                   
+                            # Tappan Lake SU-28 UNK-TOC is too high 17.7
+                            ifelse(analyte == "TOC" & site == "TPNSU28D",
+                                   NA,
+                                   finalConc)
+                )))))))
+
+
+# Strip Blanks
+fChem <-  filter(fChem, TYPE != "BLANK") %>%
+  # Exclude unnecessary columns
+  select(Lake_Name, siteID, TYPE, analyte, finalConc)
 
 # Aggregate by Lake_Name x site x variable for merging with eqAreaData
 # Remove TYPE column
@@ -216,5 +238,15 @@ str(eqAreaData) #1426 observations
 eqAreaData <- merge(fChemAgBySiteW, eqAreaData, all = TRUE)
 str(eqAreaData) # Still 1426, merged as expected
 
+# Look for missing data
+# See issues.R
+select(eqAreaData, Lake_Name, siteID, TN, TNH4, TNO2, TNO2.3, TOC, TP, TRP) %>%
+  filter(!is.na(TP))
 
-
+# Knox Lake chem data
+# From Sam on 4/7/2017
+# site ID: KNX_S01, KNXS01D.  I checked the KNX_S01 and KNXS01D samples and there 
+# are notes in column AA that we had a lot of troubleshooting that day and there 
+# was no volume left to rerun after it was resolved.  This affected TNO2-3 on 
+# both samples and TRP also on KNXS01D.  Sorry, Jake – we do everything we can to
+# prevent data loss.  

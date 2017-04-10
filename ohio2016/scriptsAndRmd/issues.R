@@ -4,15 +4,12 @@
 
 
 
-# Missing chem data from:
-# Lake Loramie (LOR, 2016-08-03).  Found samples in lab. Waiting for TOC. 
-
-# Brookeville
-# One of the SU-35 dups was lost.  Also, the TP vial from the remaining SU-35
-# site broke in the freezer or during the autoclave.  No TP measured from this site,
-# so I estimated from an overall TP ~ TRP model.
-
-# As of 2/14/17, still waiting on TOC data from Aug and Sept samples.
+# Brookeville chem data:
+# Sample from SU-35 is included in 2017_ESF_EFWS_NutrientData.... and is recorded
+# with site ID SU-35_2.  One of the SU-35 dups was lost.  Also, the TP vial from
+# the remaining SU-35 site broke in the freezer or during the autoclave.  No TP 
+# measured from this site, so I estimated from an overall TP ~ TRP model.  No TOC
+# data from this sample.  I think Karen spilled sample.  Please confirm (4/7/17).
 
 
 # exploratoryPlots.R

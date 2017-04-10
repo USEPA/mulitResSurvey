@@ -140,9 +140,18 @@ filter(sedListVolSubChl, !is.na(useXtr1) | !is.na(useXtr2) | !is.na(useXtr3)) %>
 # Total number of samples
 sum(is.na(sedListVolSubChl[, c("useXtr1", "useXtr2", "useXtr3")])) # 31 samples
 
-write.table(filter(sedListVolSubChl, !is.na(useXtr1) | !is.na(useXtr2) | !is.na(useXtr3)) %>%
-              select(reservoir, site, useSite, 
-                   useXtr1, useXtr2, useXtr3),
+# Add gas composition data
+# Simplify and melt
+isoSamplComp <- select(sedListVolSubChl, reservoir, site, 
+                           useSite, useXtr1, useXtr2, useXtr3) %>%
+  melt() %>% rename(sample.code = value) %>%
+  filter(!is.na(sample.code)) %>%
+  left_join(., gas.all, by = c("sample.code" = "sample")) %>%
+  select(reservoir, site, useSite, sample.code, n2o.ppm,
+         co2.ppm, ch4.ppm)
+ 
+
+write.table(isoSamplComp,
             "ohio2016/output/trap13ch4SamplesMegan.txt", 
             row.names = FALSE, sep = "\t")
 
@@ -162,5 +171,4 @@ ggsave("ohio2016/output/figures/trapCh4IsotopeLakesForMegan.tiff",
        height=6, # Whatever works
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")
-
 
