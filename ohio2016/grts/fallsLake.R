@@ -1,28 +1,27 @@
 # FALLs LAKE DESIGN
-# 7 APRIL 2017, Sarah Waldo
+# 10 APRIL 2017, Sarah Waldo
 
 # CURRENT DESIGN IS FOR STRATIFIED UNEQUAL-PROBABILITY
 # Falls lake is similar to Cave Run: area of 48 km2 vs. 31 km2 at Cave Run,
 # perimeter of 280 km at Falls Lake vs. 245 km at Cave Run.
 # This first "Straw Design" is in prep for the 4/10/17 call with 
 # John Walker's group. I'll use a stratified, unequal probability design,
-# 28 sample sites broken into 10 tributary (9.8 km2, or 20% of surface area)
-# and 18 open water (38.3 km2, or 80% of surface area). 
+# 28 sample sites broken into 12 tributary (12 km2, or 25% of surface area)
+# and 16 open water (36.2 km2, or 75% of surface area). 
 
 
 ## WHEN MODIFIYING FOR ANOTHER LAKE MAKE THE FOLLOWING CHANGES: 
 ##  MODIFY THE GRTS DESIGN LIST FOR THE NUMBER OF MAIN AND OVERSAMPLE SITES WANTED 
 ##  FOR EACH STRATA AND EACH SECTION, FOR Falls Lake:
-##    OPEN WATER MAINSITES = 18
-##            SECTION A (NORTH_WEST, 13.4 km2) = 5 
-##            SECTION B (MIDDLE, 11.9 km2) = 5
+##    OPEN WATER MAINSITES = 16
+##            SECTION A (NORTH_WEST, 13 km2) = 4 
+##            SECTION B (MIDDLE, 10 km2) = 4
 ##            SECTION C (UPPER_DAM 6.2 km2) = 4
 ##            SECTION D (LOWER_DAM 6.9 km2) = 4
-##    OPEN WATER OVER SAMPLE = 20
-##    TRIBUTARY MAIN SITES = 10
-##            SECTION A (MAIN, 5.9 km2) = 6
-##            SECTION B (SECONDARY, 3.9 km2) = 4
-##    TRIBUTARY OVER SAMPLE = 10
+##    OPEN WATER OVER SAMPLE = 24
+##    TRIBUTARY MAIN SITES = 12
+##            
+##    TRIBUTARY OVER SAMPLE = 18
 ##  CHANGE THE ZOOM FACTOR ON LINE 179
 ##  FIND AND REPLACE ALL INSTANCES OF THE LAKE NAME
 
@@ -50,18 +49,17 @@ set.seed(4447864)
 # Create the design list
 ### We decided to set the number of main sites in the tributary area to 5, since it is a relatively small area (0.4 sq km)
 ### the unequal probability splits the open water part of the lake into two sections of almost equal area
-fallsLakeDsgn <- list("open_water" = list(panel=c(mainSites=18),
+fallsLakeDsgn <- list("open_water" = list(panel=c(mainSites=16),
                                           seltype="Unequal",
                                           caty.n=c("lower_dam" = 4,
                                                    "upper_dam" = 4,
-                                                   "middle" = 5,
-                                                   "north_west" = 5),
-                                          over=20),
-                      "trib"=list(panel=c(mainSites=10),
+                                                   "middle" = 4,
+                                                   "north_west" = 4),
+                                          over=24),
+                      "trib"=list(panel=c(mainSites=12),
                                   seltype="Unequal",
-                                  caty.n=c("main" = 6,
-                                           "secondary" = 4),
-                                  over=10))
+                                  caty.n=c("trib" = 12),
+                                  over=18))
 
 fallsLakeSitesEqArea <- grts(design=fallsLakeDsgn,
                              DesignID="SU", # SU for stratified, unequal
