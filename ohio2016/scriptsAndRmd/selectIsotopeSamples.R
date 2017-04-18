@@ -138,7 +138,7 @@ filter(sedListVolSubChl, !is.na(useXtr1) | !is.na(useXtr2) | !is.na(useXtr3)) %>
             num_sites = length(site))  # Samples from 14 reservoirs
 
 # Total number of samples
-sum(is.na(sedListVolSubChl[, c("useXtr1", "useXtr2", "useXtr3")])) # 31 samples
+sum(!is.na(sedListVolSubChl[, c("useXtr1", "useXtr2", "useXtr3")])) # 50 samples
 
 # Add gas composition data
 # Simplify and melt
