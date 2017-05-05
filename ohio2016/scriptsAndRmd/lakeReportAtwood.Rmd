@@ -1,7 +1,7 @@
 ---
 title: "Water Quality and Methane Emissions at Atwood Lake, Ohio"
 author: "J. Beaulieu and S. Waldo"
-date: "March 13, 2017"
+date: "May 5, 2017"
 output: 
   pdf_document:
     includes: 
@@ -32,8 +32,8 @@ Thank you for your help in including Atwood Lake in this project.
 
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
-myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
-#myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
+#myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
+myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
 
 globalWd <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
 ```
@@ -120,7 +120,7 @@ ggmap(atwoodSat) +
 
 Previous studies have found a general pattern of higher CH~4~ emissions in the river-reservoir transition (tributary) area, and lower emissions in the deeper downstream waters. This pattern was observed at Atwood Lake, with higher emissions in the eastern tributary region and lower emissions in the deeper waters to the west. Overall, Atwood Lake had low CH~4~ emissions compared to other reservoirs in this survey (see Figure 4).
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Atwood Lake, Ohio. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Atwood Lake, Ohio over June 29^th^ - 30^th^, 2016. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
 
 # Get polygon
 atwoodEqArea84 <- readOGR(dsn = paste(globalWd, "atwood", sep=""), 
@@ -219,7 +219,7 @@ with(atwoodSites84@data, {
 
 The chlorophyll a levels in Atwood Lake displayed a clear gradient, decreasing at a consistent rate from the eastern inflow area to the western/downstream extent. 
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Atwood Lake, Ohio. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Atwood Lake, Ohio on June 29^th^, 2016. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
 ##########################################################################
 ### chlorophyll plot
 with(atwoodSites84@data, {
@@ -422,7 +422,7 @@ ggplot(tp.tn,
 
 ## 5. Tables of measured values at each site  
 
-Table 1: Surface (0.1 m) water quality parameters measured via sonde at each site. "Site Depth" is the measure of how deep the lake was at each site. 
+Table 1: Surface (0.1 m) water quality parameters measured via sonde at each site on June 29^th^, 2016. "Site Depth" is the measure of how deep the lake was at each site. 
 
 ```{r warning=FALSE, echo=FALSE}
 ######################################################################
@@ -451,7 +451,7 @@ kable(atwoodTableSonde,
                     "Turbidity"))
 ```
 
-Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow and one deep site. "Site Depth" is the measure of how deep the lake was at each site. 
+Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow and one deep site on June 29^th^, 2016. "Site Depth" is the measure of how deep the lake was at each site. 
 ```{r warning=FALSE, echo=FALSE} 
 atwoodTableChem <- filter(eqAreaData, Lake_Name == "Atwood Lake",
                       EvalStatus == "sampled")  %>%
