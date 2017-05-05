@@ -1,7 +1,7 @@
 ---
 title: "Water Quality and Methane Emissions at Charles Mill Lake, Ohio"
 author: "J. Beaulieu and S. Waldo"
-date: "March 13, 2017"
+date: "May 5, 2017"
 output: 
   pdf_document:
     includes: 
@@ -32,8 +32,8 @@ Thank you for your help in including Charles Mill Lake in this project.
 
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
-myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
-#myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
+#myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
+myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
 
 globalWd <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
 ```
@@ -118,9 +118,9 @@ ggmap(charlesMillSat) +
 
 ## 3.  Within-lake values of methane emissions and chlorophyll a concentrations  
 
-All sampling locations in Charles Mill Lake were emitting CH~4~ to the atmosphere, though there was no obvious within-lake spatial pattern (Fig. 2).
+All sampling locations in Charles Mill Lake, located in north-central Ohio, were emitting CH~4~ to the atmosphere. However, there is not a clear within-lake spatial pattern (Fig. 2).
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Charles Mill Lake, located in north-central Ohio. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within Charles Mill Lake from July 18^th^ to 19^th^, 2016. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
 
 # Get polygon
 charlesMillEqArea84 <- readOGR(dsn = paste(globalWd, "charlesMill", sep=""), 
@@ -217,9 +217,9 @@ with(charlesMillSites84@data, {
 
 \newpage
 
-Chlorophyll a was abundant throughout the lake (Fig. 3).  Overall, Charles Mill Lake had the second highest chloropyll a abundance of the 32 lakes (Fig. 5). 
+Chlorophyll a was abundant throughout the lake (Fig. 3).  Overall, Charles Mill Lake, located in north-central Ohio, had the second highest chloropyll a abundance of the 32 lakes (Fig. 5). 
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Charles Mill Lake, located in north-central Ohio. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within Charles Mill Lake on July 18^th^, 2016. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
 ##########################################################################
 ### chlorophyll plot
 with(charlesMillSites84@data, {
@@ -422,7 +422,7 @@ ggplot(tp.tn,
 
 ## 5. Tables of measured values at each site  
 
-Table 1: Surface (0.1 m) water quality parameters measured via sonde at each site. "Site Depth" is the measure of how deep the lake was at each site. 
+Table 1: Surface (0.1 m) water quality parameters measured via sonde at each site on July 18^th^, 2016. "Site Depth" is the measure of how deep the lake was at each site. 
 
 ```{r warning=FALSE, echo=FALSE}
 ######################################################################
@@ -451,7 +451,7 @@ kable(charlesMillTableSonde,
                     "Turbidity"))
 ```
 
-Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow and one deep site. "Site Depth" is the measure of how deep the lake was at each site. 
+Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow and one deep site on July 18^th^, 2016. "Site Depth" is the measure of how deep the lake was at each site. 
 ```{r warning=FALSE, echo=FALSE} 
 charlesMillTableChem <- filter(eqAreaData, Lake_Name == "Charles Mill Lake",
                       EvalStatus == "sampled")  %>%
