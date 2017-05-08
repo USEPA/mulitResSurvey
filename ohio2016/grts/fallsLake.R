@@ -19,8 +19,8 @@
 ##            SECTION C (UPPER_DAM 6.2 km2) = 4
 ##            SECTION D (LOWER_DAM 6.9 km2) = 4
 ##    OPEN WATER OVER SAMPLE = 24
-##    TRIBUTARY MAIN SITES = 12
-##            
+
+##    TRIBUTARY MAIN SITES = 14
 ##    TRIBUTARY OVER SAMPLE = 18
 ##  CHANGE THE ZOOM FACTOR ON LINE 179
 ##  FIND AND REPLACE ALL INSTANCES OF THE LAKE NAME
@@ -56,9 +56,10 @@ fallsLakeDsgn <- list("open_water" = list(panel=c(mainSites=16),
                                                    "middle" = 4,
                                                    "north_west" = 4),
                                           over=24),
-                      "trib"=list(panel=c(mainSites=12),
+                      "trib"=list(panel=c(mainSites=14), #updated to 14 on 5/4/17 so that the ratio of the sample density in the tributary 
+                                                         #and the open water matches that of Cave run. See excel spreadsheet "fallsLakeVsCaveRun"
                                   seltype="Unequal",
-                                  caty.n=c("trib" = 12),
+                                  caty.n=c("trib" = 14),
                                   over=18))
 
 fallsLakeSitesEqArea <- grts(design=fallsLakeDsgn,

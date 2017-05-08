@@ -1,7 +1,7 @@
 ---
 title: "Water Quality and Methane Emissions at M.J. Kirwan Reservoir, Ohio"
 author: "J. Beaulieu and S. Waldo"
-date: "March 13, 2017"
+date: "May 5, 2017"
 output: 
   pdf_document:
     includes: 
@@ -32,8 +32,8 @@ Thank you for your help in including MJ Kirwan reservoir in this project.
 
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
-myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
-#myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
+#myWd <- "C:/Users/JBEAULIE/GitRepository/mulitResSurvey" # for Jake
+myWd <- "C:/R_Projects/mulitResSurvey" # for Sarah
 
 globalWd <- "L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/grtsDesign/"
 ```
@@ -117,9 +117,9 @@ ggmap(mjKirwanSat) +
 
 ## 3.  Within-lake values of methane emissions and chlorophyll a concentrations  
 
-Previous studies have found a general pattern of higher CH~4~ emissions in the river-reservoir transition (tributary) area, and lower emissions in the deeper downstream waters. MJ Kirwan reservoir displayed this pattern: the highest emissions were observed in the upper half of the reservoir nearest the inflow.
+Previous studies have found a general pattern of higher CH~4~ emissions in the river-reservoir transition (tributary) area, and lower emissions in the deeper downstream waters. The MJ Kirwan reservoir in eastern Ohio displayed this pattern: the highest emissions were observed in the upper half of the reservoir nearest the inflow.
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within MJ Kirwan reservoir in eastern Ohio. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Methane emissions measured at the 15 sample sites within MJ Kirwan reservoir from September 6^th^ to 7^th^, 2016. The height of each "lollipop" corresponds to the emission rate shown on the vertical z-axis in units of milligrams CH~4~ per square meter of lake surface per hour.*' }
 
 
 mjKirwanEqArea84 <- readOGR(dsn = paste(globalWd, "mjKirwan", sep=""), # get polygon
@@ -217,7 +217,7 @@ with(mjKirwanSites84@data, {
 
 Chlorophyll a concentrations showed a similar trend of decreading values with increasing distance from the inflow.  This is likely because the inflow is the primary nutrient source to the epilimnion during the summer (Figure 5).  
 
-```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within MJ Kirwan reservoir in eastern Ohio. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
+```{r echo=FALSE, warning=F, message=F, error=F, fig.width=7, fig.height=7, fig.cap='*Chlorophyll a concentrations measured at the 15 sample sites within MJ Kirwan reservoir on September 6^th^, 2016. The height of each "lollipop" corresponds to the concentration shown on the vertical z-axis in units of micrograms per liter of water.*' }
 ##########################################################################
 ### chlorophyll plot
 with(mjKirwanSites84@data, {
@@ -424,7 +424,7 @@ ggplot(tp.tn,
 
 ## 5. Tables of measured values at each site  
 
-Table 1: Surface (0.1 m) water quality parameters measured via sonde at each site. "Site Depth" is the measure of how deep the lake was at each site. 
+Table 1: Surface (0.1 m) water quality parameters measured via sonde at each site on September 6^th^, 2016. "Site Depth" is the measure of how deep the lake was at each site. 
 
 ```{r warning=FALSE, echo=FALSE}
 ######################################################################
@@ -453,7 +453,7 @@ kable(mjKirwanTableSonde,
                     "Turbidity"))
 ```
 
-Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow and one deep site. "Site Depth" is the measure of how deep the lake was at each site. 
+Table 2: Surface (0.1 m) water chemistry parameters measured at one shallow and one deep site on September 6^th^, 2016. "Site Depth" is the measure of how deep the lake was at each site. 
 ```{r warning=FALSE, echo=FALSE} 
 mjKirwanTableChem <- filter(eqAreaData, Lake_Name == "Michael J Kirwan Reservoir",
                       EvalStatus == "sampled")  %>%
