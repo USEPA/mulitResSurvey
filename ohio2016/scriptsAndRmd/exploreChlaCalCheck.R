@@ -1,8 +1,9 @@
 # PLOT SONDE BASED CHL A MEASUREMENTS WITH LAB CHECKS
 # FROM MULTI RES SURVEY
 
-ggplot(eqAreaData, aes(chla.sample, chla_S)) +
-  geom_point() +
+ggplot(filter(eqAreaData, !is.na(chla.sample)),
+              aes(chla.sample, chla_S)) +
+  geom_point(aes(color = Lake_Name)) +
   geom_abline(intercept = 0, slope = 1) +
   xlab("Lab based chl a (ug/L") +
   ylab("Sonde based chl a (ug/L")
