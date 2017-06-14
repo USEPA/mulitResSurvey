@@ -16,6 +16,7 @@ temp <- rep(NA, n)
 
 # Dataframe to hold results
 OUT <- data.frame(site = temp, Lake_Name = temp,
+                  ch4.diff.max=temp, #Sarah added on 6/14/17; making histogram of max ch4 levels measured by LGR
                   ch4.lm.slope = temp, ch4.lm.drate.mg.h = temp, ch4.lm.aic = temp, ch4.lm.r2 = temp, ch4.lm.pval = temp,
                   ch4.ex.aic = temp, ch4.ex.r2 = temp, ch4.ex.slope = temp, ch4.ex.drate.mg.h = temp, ch4.ex.k=temp, 
                   co2.lm.slope = temp, co2.lm.drate.mg.h = temp, co2.lm.aic = temp, co2.lm.r2 = temp, co2.lm.pval = temp,
@@ -47,6 +48,8 @@ for (i in 1:length(unique(paste(gga.model$Lake_Name, gga.model$siteID)))) {  # F
     mutate(elapTime = RDateTime - RDateTime[1], # Calculate elapsed time (seconds). 
            chmVol.L = chmVol.L.i[1,1]) %>%  # subscripting needed to remove name
     select(Lake_Name, siteID, CH4._ppm, elapTime, GasT_C, chmVol.L)  # Pull out data of interest
+  
+  OUT[i, "ch4.diff.max"]<-max(data.i.ch4$CH4._ppm, na.rm=TRUE) #maximum CH4 mixing ratio measured during the chamber deployment time
   
   data.i.co2 <- filter(gga.model,  # extract data
                        RDateTime >= co2DeplyDtTm, # based on diff start time
@@ -218,6 +221,13 @@ for (i in 1:length(unique(paste(gga.model$Lake_Name, gga.model$siteID)))) {  # F
 }  
 dev.off()
 start.time;Sys.time() 
+
+ggplot(OUT, aes(ch4.diff.max))+
+  geom_histogram(binwidth = 0.5)
+  
+ggsave(filename="ohio2016/output/figures/ch4maxHistogram.tiff",
+       width=8,height=5.5, units="in",
+       dpi=800,compression="lzw")
 
 # STEP 2: USE AIC TO DETERMINE WHETHER LINEAR OR NON-LINEAR FIT IS BEST.
 #         CONFIRM CHOICE BY INSPECTING RAW DATA
