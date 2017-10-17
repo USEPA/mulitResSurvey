@@ -147,7 +147,7 @@ xtrCodes.gas <- merge(xtrCodes.m, gas.all, by.x = "value", by.y = "sample", all 
 
 str(xtrCodes.m)  #980 observations
 str(gas.all) # 1004 observations
-str(xtrCodes.gas) # 1008 observations
+str(xtrCodes.gas) # 1007 observations
 
 # Specific fixes
 # Still need to add codes for MIT trap redeployment
@@ -305,8 +305,7 @@ ggplot(xtrCodes.gas.agg, aes(siteID, ch4.ppm)) + # Everything appears to have ag
   facet_grid(~variable, scales="free_y")   # lot of low CH4 trap values to look into
 
 # MERGE RAW GC DATA WITH eqAreaData---------------
-# Only merge air and trap data now.  Need to push dg through
-# headspace equilibration calcs before using.
+# Merge all gas samples.  Will calculate dissolved concentrations downstream.
 # 1) Need to melt, which requires a data.frame, not a dplyr tbl_df.
 # 2) melt creates a 'variable' column, already have 'variable' column
 # in xtrCodes.gas.agg. Must rename first.
@@ -317,12 +316,16 @@ id.vars = c("Lake_Name", "siteID", "type")) # specify id variable
 
 xtrCodes.gas.agg.m <- mutate(xtrCodes.gas.agg.m, type =  # adopt more intuitive names
                              ifelse(type == "tp.xtr", "trap",
-                                    ifelse(type == "ar.xtr", "air", type)))
+                                    ifelse(type == "ar.xtr", "air", 
+                                           ifelse(type == "dg.xtr", "dissolved",
+                                                  type))))
   
-xtrCodes.gas.agg.c <- dcast(filter(xtrCodes.gas.agg.m, type != "dg.xtr"), # cast
+xtrCodes.gas.agg.c <- dcast(xtrCodes.gas.agg.m,  # cast
                             Lake_Name + siteID ~ type + variable) %>%
   select(-air_o2.sd, -air_o2, -air_o2.cv, -air_ar.sd, -air_ar, -air_ar.cv, -air_n2.sd,
-         -air_n2, -air_n2.cv, -air_total)
+         -air_n2, -air_n2.cv, -air_total,
+         -dissolved_o2.sd, -dissolved_o2, -dissolved_o2.cv, -dissolved_ar.sd, -dissolved_ar, 
+         -dissolved_ar.cv, -dissolved_n2.sd, -dissolved_n2, -dissolved_n2.cv, -dissolved_total)
 
 # Merge
 eqAreaData <- merge(xtrCodes.gas.agg.c, eqAreaData, all = TRUE)

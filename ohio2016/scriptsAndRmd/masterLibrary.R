@@ -34,6 +34,10 @@ library(piecewiseSEM) # for rsquared of lme model
 library(plyr)  # for 'join' in ggplot plotting of shapefile
 library(dplyr)   # For data manipulation
 
+# Dissolved gas calculation function.  Loading from local repo.
+# May be able to load package in future.
+source("C:/Users/JBEAULIE/GitRepository/NEON-dissolved-gas/neonDissGas/R/def.calc.sdg.R")
+
 
 # TRIM FUNCTION--------------------------
 # returns string w/o leading or trailing whitespace
@@ -104,6 +108,12 @@ grtsMeanVariance <- function(x) {
                           tno2 = x$TNO2,
                           trap_ch4.ppm = x$trap_ch4.ppm,
                           #tno2-3 = x$TNO-3, # this breaks code.  need to remove dash
+                          dissolved.ch4 = x$dissolved.ch4,
+                          ch4.sat.ratio = x$ch4.sat.ratio,
+                          dissolved.co2 = x$dissolved.co2,
+                          co2.sat.ratio = x$co2.sat.ratio,
+                          dissolved.n2o = x$dissolved.n2o,
+                          n2o.sat.ratio = x$n2o.sat.ratio,
                           ch4.drate.mg.m2.h = x$ch4.drate.mg.h.best,
                           co2.drate.mg.m2.h = x$co2.drate.mg.h.best,
                           ch4.erate.mg.h = x$ch4.erate.mg.h,

@@ -97,6 +97,60 @@ mylist4 <- lapply(mylist3, function(x) {
                                     NA, 
                                     eqAreaData[, "DG_Extn"])
  
+ # BAROMETRIC PRESSURE----------------
+ # Assign barometric pressure to dissolved gas sampling site where BP
+ # was not recorded.  All lakes have at least one measurement, so assign
+ # recorded value to missing sites.
+ eqAreaData <- group_by(eqAreaData, Lake_Name) %>% 
+   mutate(BrPrssr = 
+            # Select observation where dissolved gas was collected (i.e. anywhere a
+            # deep sonde measurement was made), but BP wasn't recorded
+            ifelse(!is.na(smDpthD) & is.na(BrPrssr),
+                   # Set BP equal to any other BP measured at the lake
+                   subset(BrPrssr, !is.na(BrPrssr)),
+                   BrPrssr)) # else return BP
+
+ 
+ # HEADSPACE GAS AND WATER VOLUMES----------------
+ # Water and gas volumes were not always recorded.  When they were,
+ # they weren't associated with a single sample. Assign mean values by lake.  If
+ # no data reported for lake, assume he=20ml and water =120ml. Data is recorded
+ # as character values.
+ 
+ # Function for executing above
+volEst <- function(x, choice1) {
+  if (choice1 == "He") {
+    # Calculate mean He volume.  deal w/character values
+    vol <- strsplit(x, split = ",") %>% unlist() %>% as.numeric() %>% mean(na.rm = TRUE)
+    vol <- ifelse(is.nan(vol), 20, vol) # if not reported, assume 20mL
+  }
+  if (choice1 == "water") {
+    # Calculate mean water volume.  deal w/character values
+    vol <- strsplit(x, split = ",") %>% unlist() %>% as.numeric() %>% mean(na.rm = TRUE)
+    vol <- ifelse(is.nan(vol) | vol >= 140, # if not reported, or erroneous (cant be 140)
+                  120, vol) # assume 120mL
+  }
+  vol # return volume estimate
+}
+ 
+ eqAreaData <- mutate(eqAreaData,
+                      HeVol = 
+                        # Select observation where dissolved gas was collected
+                        ifelse(!is.na(DG_Extn),
+                               # Set He volume equal to mean for lake
+                               volEst(HeVol, "He"),
+                               HeVol), # else return He
+                      H2O_vol = 
+                        # Select observation where dissolved gas was collected
+                        ifelse(!is.na(DG_Extn),
+                               # Set Water volume equal to mean for lake
+                               volEst(H2O_vol, "water"),
+                               H2O_vol)) %>% # else return H2O_vol
+   ungroup() %>% # remove grouping
+   as.data.frame() %>% # remove tbl_df class
+   mutate(HeVol = as.numeric(HeVol),
+          H2O_vol = as.numeric(H2O_vol))
+ 
  # CHAMBER VOLUME
  # Calculate chamber volume based on relationship between water level
  # and volume.  See chamberDesign.xlsx in East Fork folder.

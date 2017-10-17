@@ -12,6 +12,7 @@ source("ohio2016/scriptsAndRmd/readChl.R") # Merges with eqAreaData
 # Calculate derived quantities
 source("ohio2016/scriptsAndRmd/plotCleanLgr.R") # Merges chamber time with eqAreaData, 10min
 source("ohio2016/scriptsAndRmd/calculateEmissions.R") # Merges with eqAreaData, 3min
+source("ohio2016/scriptsAndRmd/calculateDissGas.R")
 
 # grts calculations
 source("ohio2016/scriptsAndRmd/grtsWgtAdj.R") # Merges with eqAreaData, 2s

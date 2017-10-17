@@ -88,7 +88,16 @@ height=6, # Whatever works
 dpi=600,   # ES&T. 300-600 at PLOS One,
 compression = "lzw")
 
-
+# CH4 dissolved
+ggplot(meanVariance.c.lake.lu,
+       aes(dissolved.ch4_Estimate, fLake_Name)) +
+  geom_point(color = plotColor) +
+  geom_errorbarh(aes(xmax = dissolved.ch4_UCB95Pct, 
+                     xmin = dissolved.ch4_LCB95Pct), 
+                 color = plotColor) +
+  xlab(expression(dissolved~CH[4]~(mu*moles~L^{-1}))) +
+  theme(axis.title.y = element_blank()) +  # Eliminate x-axis title
+  ggtitle("Mean (95% CI) from grts function")
 ##---------------------------------------------------------------------------##
 # CO2 rates
 
@@ -119,6 +128,16 @@ ggplot(meanVariance.c.lake.lu,
   geom_point(color = plotColor) +
   geom_errorbarh(aes(xmax = co2.trate.mg.h_UCB95Pct, xmin = co2.trate.mg.h_LCB95Pct), color = plotColor)
 
+# CO2 dissolved
+ggplot(meanVariance.c.lake.lu,
+       aes(co2.sat.ratio_Estimate, fLake_Name)) +
+  geom_point(color = plotColor) +
+  geom_errorbarh(aes(xmax = co2.sat.ratio_UCB95Pct, 
+                     xmin = co2.sat.ratio_LCB95Pct), 
+                 color = plotColor) +
+  xlab(expression(dissolved~CO[2]~(sat~ratio))) +
+  theme(axis.title.y = element_blank()) +  # Eliminate x-axis title
+  ggtitle("Mean (95% CI) from grts function")
 
 ##---------------------------------------------------------------------------##
 # Chlorophyll
