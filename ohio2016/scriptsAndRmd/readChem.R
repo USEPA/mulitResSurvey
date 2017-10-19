@@ -4,10 +4,10 @@
 
 # READ AND FORMAT WATER CHEM---------------
 # Data retrieved from L drive on 11/09/2016
-chem16 <- read_excel("ohio2016/inputData/2016_ESF-EFWS_NutrientData_Updated04072017_SS.xlsx", 
+chem16 <- read_excel("ohio2016/inputData/waterChemistry/2016_ESF-EFWS_NutrientData_Updated04072017_SS.xlsx", 
                    sheet = "2016DATA", skip = 1)
 
-chem17 <- read_excel("ohio2016/inputData/2017_ESF-EFWS_NutrientData_Updated03312017_SS.xlsx", 
+chem17 <- read_excel("ohio2016/inputData/waterChemistry/2017_ESF-EFWS_NutrientData_Updated03312017_SS.xlsx", 
                      sheet = "2017DATA", skip = 1)
 
 chem <- merge(chem16, chem17, all = TRUE)

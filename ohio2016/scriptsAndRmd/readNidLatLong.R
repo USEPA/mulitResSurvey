@@ -25,7 +25,7 @@ filter(survRes3latLong, is.na(latitude)) %>% select(dam, lake.name)
 
 # I got the lat and long for the LD reservoirs included in surv3 from the shapefiles for each reservoir.
 # Read in here and merge with nid.lat.long
-ldLatLong <- read_excel("ohio2016/inputData/ldLatLongForSurv3Reservoirs.xlsx")
+ldLatLong <- read_excel("ohio2016/inputData/watershedAndMorphology/ldLatLongForSurv3Reservoirs.xlsx")
 
 survRes3latLong <- merge(survRes3latLong, ldLatLong, by = c("lake.name"), all = TRUE)
 

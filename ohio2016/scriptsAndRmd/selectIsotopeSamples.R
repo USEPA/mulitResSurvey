@@ -5,7 +5,7 @@
 # COLLECTED SEDIMENT SAMPLES
 
 # Read in list of sediment samples given to Megan
-sedList <- read_excel("Copy of Multi Reservoir Sediment Sample List.xlsx", 
+sedList <- read_excel("ohio2016/inputData/sedimentData/Multi Reservoir Sediment Sample List.xlsx", 
                       skip =2)
 
 # Clean up names

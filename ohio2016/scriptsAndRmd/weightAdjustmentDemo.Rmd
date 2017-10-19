@@ -1,0 +1,153 @@
+---
+title: "Analysis of a GRTS Survey Design for an Area Resource"
+author: "J. Beaulieu"
+date: "Friday, September 16, 2016"
+output: html_document
+---
+
+# 1.  Preliminaries
+
+The US EPA used the spsurvey package to design a GRTS survey for 32 reservoirs in the midwestern US.  Each reservoir was treated as an independent area resource and each sample frame was defined by a shapefile derived from the NHD.  One of the following four design options was used per reservoir: (1) Unstratified, equal probability; (2) Unstratified, unequal probability; (3) Stratified, equal probability; or (4) Stratified, unequal probability.  
+
+All survey designs included 15 main sites, plus oversample sites.  Oversample sites were used by mdcaty in the case of unequal probability designs, otherwise oversample sites were used by stratum. After weight adjustment, the cont.analysis function will be used to estimate chlorophyll a and methane emissions at the stratum and whole-lake scales.
+
+All surveys were executed between June 2 and September 15, 2016. The field crew encountered a number of situations leading to the use of oversample sites.  In some cases, I am not certain how the weights should be adjusted to reflect the use of oversample sites.  The examples below illustrate these issues.
+
+# 2.  Survey design
+
+The reservoir used for these examples is Caesar Creek.  The reservoir is located within an Ohio State Park (http://parks.ohiodnr.gov/caesarcreek), drains an agricultural watershed (78% cultivated crops), and has a surface area of 10.63 km2.  
+
+A stratified unequal-probability survey design was used.  The stratification includes two levels: "open-water" and "trib".  The "open-water" stratum was divided into two unequal probability categories: "north" and "south".  Unequal probability categories were used in the "open-water" stratum to minimize travel time when oversample sites were needed.  For example, if the field staff enountered a physically inaccessible main site at the extreme north end of the open_water stratum, they could use an oversample site from the "north" mdcaty, which was likely to be located near the inaccessible main site.  If an equal probability design had been used, it is possible the oversample site could be located at the extreme south end of the open-water stratum, neccesitating considerable extra time on the water to drive to the oversample site.  
+
+5 main sites and between 9 and 11 oversamples sites were allocated to each mdcaty.  
+
+First load the libraries and set working directory
+```{r results='hide', message=FALSE, warning=FALSE}
+library(rgdal)  # for reading shapefiles
+library(ggmap)  # for mapping
+library(maptools) # for fortify function
+library(spsurvey)
+library(dplyr)
+library(foreign)  # read.dbf function
+library(knitr) # for knitting html
+
+# For Jake Beaulieu.  Modify for your machine.
+opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/kettlebell') 
+```
+
+
+Load and plot the sample frame.
+```{r, message=FALSE, warning=FALSE}
+# First load and project polygon
+caesarCreekEqArea <- readOGR(dsn = "inputData", 
+                             layer = "caesarCreekEqArea")  # shapefile name
+
+# Project spatial polygon into WGS84 for plotting in ggmap/ggplot 
+caesarCreekEqArea84 <- spTransform(x = caesarCreekEqArea, 
+                                 CRS("+proj=longlat +datum=WGS84")) # specifies projection
+
+caesarCreekEqArea84@data$id = rownames(caesarCreekEqArea84@data)
+
+caesarCreekEqArea84.f <- fortify(caesarCreekEqArea84, region="id")  # fortify polygon for ggmap
+
+caesarCreekEqArea84.f <- merge(caesarCreekEqArea84.f, caesarCreekEqArea84@data, 
+                             by="id")  # bring attributes back in 
+
+# Load and project survey points
+caesarCreekSitesEqAreaPlot <- readOGR(dsn = "inputData", 
+                              layer = "caesarCreekSitesEqArea")  # shapefile from grts function
+
+caesarCreekSites84 <- spTransform(x = caesarCreekSitesEqAreaPlot, #reproject
+                                CRS("+proj=longlat +datum=WGS84")) # WGS84 needed for google maps
+
+caesarCreekSites84@data <- mutate(caesarCreekSites84@data, 
+                                long=coordinates(caesarCreekSites84)[,1], # add long to @data slot
+                                lat=coordinates(caesarCreekSites84)[,2]) # add lat to @data slot
+                               
+# Create map
+bbox <- make_bbox(data=caesarCreekEqArea84.f, #defines map extent based on sample site lat/lon
+                  long, lat, f=0.5) # f is zoom.  Large #, less zoom. tweak for each lake.  
+caesarCreekSat <- get_map(location = bbox,
+                        color = "color",
+                        source = "google",
+                        maptype = "satellite")
+
+# Plot sample frame
+ggmap(caesarCreekSat) +
+  ylab("Latitude") +
+  xlab ("Longitude") +
+  geom_polygon(data=caesarCreekEqArea84.f, aes(long, lat, group=group, fill=section)) +
+  scale_fill_manual(values = c("#000066", "#333399", "#006666"), 
+                    guide = guide_legend(title = "mdcaty")) +
+  geom_point(data=caesarCreekSites84@data, 
+             aes(x=long, y=lat, color = panel),
+             size = 1) +
+  scale_color_discrete(name = "Sites",
+                       labels = c("Main", "Oversample")) +
+  coord_equal() +                                         
+  ggtitle("Caesar Creek Lake Sample Frame")
+```
+
+
+# 3.  Weight adjustment for routine use of oversample site
+Lets start by exploring how to adjust weights following the routine use of an oversample site.  Start by reading the .dbf file from the point shapefile containing the survey results.
+
+
+```{r}
+caesarCr <- read.dbf(file = "inputData/caesarCreekSitesEqArea1.dbf", as.is = TRUE)
+```
+
+Display the initial six lines in the data file
+```{r}
+head(caesarCr)
+```
+
+The 'EvalStatus' column can assume the values 'sampled', 'notSampled', or 'NotEval'.  The 'EvalReason' column can assume the following values (1) 'targetSampled', indicating the site was in the target population and sampled, (2) 'physicallyInaccessible', indicating the site was in the target population, but could not be accessed, (3) 'nonTarget', indicating the site was not in the target population (i.e. located on dry land), or (4) 'NA' indicating the site was not evaluated.
+
+In this hypothetical survey, main site SU-02 in the north mdcaty was physically inaccesible and was replaced with the first site in the oversample list for the north mdcaty (SU-11).  
+
+The weight adjustment for the routine use of oversample sites by mdcaty would occur as follows.
+```{r}
+# Create sites data frame
+caesarCrSitesAdj <- ifelse(caesarCr$EvalStatus == "sampled",
+                        TRUE, FALSE)
+
+# Create initial weight data frame
+caesarCrWgtAdj <- caesarCr$wgt
+
+# Create wtcat data frame.  Oversample sites were used by mdcaty, 
+caesarCrWgtCat <- caesarCr$mdcaty  # mdcaty for unequal probability
+
+# Need to define framesize by mdcaty since oversample sites
+# were used by this category.
+northFrame <- filter(caesarCr, mdcaty == "north") %>%  # area of "north" mdcaty
+  distinct(Area_km2) %>% select(Area_km2)
+
+southFrame <- filter(caesarCr, mdcaty == "south") %>%  # area of "south" mdcaty
+  distinct(Area_km2) %>% select(Area_km2)
+
+tribFrame <- filter(caesarCr, mdcaty == "Equal") %>%  # area of the one mdcaty in the 'trib' strata.By default, grts named the mdcaty "Equal"
+  distinct(Area_km2) %>% select(Area_km2)
+
+caesarCrFramesizeAdj <- c(northFrame[1,1], southFrame[1,1], tribFrame[1,1]) # combine frames
+attributes(caesarCrFramesizeAdj) <- NULL  # strip attributes
+names(caesarCrFramesizeAdj) <- c("north", "south", "Equal")  # Name the vector
+
+# Adjust weights
+caesarCr$adjWgt <- adjwgt(caesarCrSitesAdj, caesarCrWgtAdj, caesarCrWgtCat, caesarCrFramesizeAdj)
+```
+
+# 4. Weight adjusment when oversample sites are physically inaccessible
+In this example assume main site SU-02 in the north mdcaty and the first site in the oversample list for the north mdcaty (SU-11) were physically inaccesible.  Main site SU-02 was therefore replaced with the second site in the oversample list (SU-13).  Do we still have a probability sample in this scenario?  Would the code above need to be modified to execute the weight adjustment.  File "inputData/caesarCreekSitesEqArea2.dbf" illustrates this situation.
+
+# 5.  Weight adjustment when main sites are replaced with oversample sites from another mdcaty 
+
+An extension of scenario 4 occurred at a lake with an active dredging operation.  In this instance, 3 of the 5 main sites in the 'trib' stratum were physically inaccessible due to dredging activity.  To make matters worse, 9 of the 10 oversample sites were also physically inaccessible.  Since there were an insufficient number of accessible oversample sites in the 'trib' strata to replace the inaccessible main sites, the field crew used oversample sites from the 'north' mdcaty.  Again, do we still have a probability sample in this scenario? Would the code above need to be modified to execute the weight adjustment. File "inputData/caesarCreekSitesEqArea3.dbf" illustrates this situation.
+
+# 6.  Weight adjustment in the case of measurement error.
+In this example all main sites were sampled (no use of oversample sites); however, due to a problem in the laboratory, we do not have a reliable number for chlorophyll a concentration at site SU-02.  Is a weight adjustment needed to account for this, or do we retain the original weights and run the cont.analysis function with an NA for chlorophyll at this site?  This scenario is illustrated in "inputData/caesarCreekSitesEqArea4.dbf"
+
+# 7. Weight adjustment for non-target vs physically inaccessible site
+Suppose that the reservoir shapefile was innacurate and site SU-02 in the 'north' mdcaty was actually on an island and therefore not in the target population.  As described in section 4 above, the site was replaced with the first oversample site in the 'north' mdcaty.  Is the weight adjustment procedure any different when the site was not sampled because it was not in the target population?
+
+

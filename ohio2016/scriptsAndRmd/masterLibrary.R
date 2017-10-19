@@ -34,9 +34,9 @@ library(piecewiseSEM) # for rsquared of lme model
 library(plyr)  # for 'join' in ggplot plotting of shapefile
 library(dplyr)   # For data manipulation
 
-# Dissolved gas calculation function.  Loading from local repo.
-# May be able to load package in future.
-source("C:/Users/JBEAULIE/GitRepository/NEON-dissolved-gas/neonDissGas/R/def.calc.sdg.R")
+# Dissolved gas calculation function. Loading function copied from local NEON
+# repo.  May be able to load from package in future.
+source("ohio2016/scriptsAndRmd/def.calc.sdg.R")
 
 
 # TRIM FUNCTION--------------------------

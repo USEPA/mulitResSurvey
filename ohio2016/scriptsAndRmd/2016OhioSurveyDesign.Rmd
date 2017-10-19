@@ -54,7 +54,7 @@ opts_knit$set(root.dir = 'C:/Users/JBEAULIE/GitRepository/mulitResSurvey')
 
 **Read, Inspect, and Format Ohio NID Data**
 ```{r}
-ohioRes <- read_excel("ohio2016/inputData/ohioReservoirGeomorphology12.17.15.xlsx") 
+ohioRes <- read_excel("ohio2016/inputData/watershedAndMorphology/ohioResLuMorphoDepth.xlsx") 
 names(ohioRes) = tolower(names(ohioRes)) # Change all names to all lowercase letters
 names(ohioRes) = gsub(pattern = "/", replacement = "_", x = names(ohioRes)) # / causing problems with select
 ohioRes  <-  mutate(ohioRes, 
@@ -101,14 +101,14 @@ Four of USACE LD reservoirs are located in Ohio and are
 included in the NID data set.  Will strip these out to avoid duplicates.
 ```{r}
 # Reservoir geometry
-ldGeom <- read.xls("ohio2016/inputData/WA 3-93 reservoirsurfacegeometry.xlsx", 
+ldGeom <- read.xls("ohio2016/inputData/watershedAndMorphology/WA 3-93 reservoirsurfacegeometry.xlsx", 
                    sheet="Task 1a", stringsAsFactors = FALSE)
 ldGeom <- ldGeom[1:20, c("Reservoir", "NHDArea.sqkm.", "NHDPerimeter.mi.", "Fetch..m.")]  # Subset
 names(ldGeom) <- c("Reservoir", "Reservoir.Area.sqkm", "Reservoir.Perimeter.km", "Fetch.m.")  # Rename perimeter to km
 ldGeom$Reservoir.Perimeter.km <- ldGeom$Reservoir.Perimeter.km * 1.609  # Converts mile to kilometer
 
 # Watershed land use
-ldLu <- read.xls("ohio2016/inputData/WatershedAreaCharacterization.xlsx", 
+ldLu <- read.xls("ohio2016/inputData/watershedAndMorphology/ldWatershedAreaCharacterization.xlsx", 
                  sheet="FinalForm", stringsAsFactors = FALSE)
 str(ldLu)
 ldLu <- subset(ldLu, select=-c(Code, State, X))
@@ -116,7 +116,7 @@ names(ldLu) = c("Reservoir", "Watershed.area.km2", "prop.crops", "prop.pasture",
               "prop.wetland", "prop.urban", "prop.forest")
 
 # Reservoir Hydrology
-ldHyd <- read.xls("ohio2016/inputData/LouisDistReservoirHydrology.xlsx", 
+ldHyd <- read.xls("ohio2016/inputData/watershedAndMorphology/LouisDistReservoirHydrology.xlsx", 
                   sheet="hydrology", stringsAsFactors=FALSE)
 ldHyd <- select(ldHyd, -Lake)
 

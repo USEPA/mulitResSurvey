@@ -1,7 +1,7 @@
 # SCRIPT TO GATHER ANCILLARY DATA FOR MEGAN'S SEDIMENT SITES
 
 # Read excel file specifying sediment sampling locations
-sedSite <- read_excel(path = "ohio2016/inputData/multiReservoirSedimentSamplingSites.xlsx")
+sedSite <- read_excel(path = "ohio2016/inputData/sedimentData/multiReservoirSedimentSamplingSites.xlsx")
 
 # Merge with site specific data
 sedBySite <- merge(sedSite, eqAreaData, all.x = TRUE) %>% 

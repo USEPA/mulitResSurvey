@@ -6,8 +6,11 @@
 ## CREATED IN OhioSurveyDesign.Rmd.
 
 #Read, Inspect, and Format Ohio NID Data
-  
-ohioRes <- read_excel("ohio2016/inputData/ohioReservoirGeomorphology12.17.15.xlsx") 
+#The watershed and some of the morphology data in this file were compiled
+#by Dynamac and can be found at:L:\Lab\GISData\GIS-User\Damico-Golden-Prues\
+#aprues\Jake_Beaulieu\GHG_Emissions\deliverables\GHG_Tables_4Jun15\GHG_Emissions.xlsx
+#Pegasus subsequently added information regarding maximum reservoir depth.  
+ohioRes <- read_excel("ohio2016/inputData/watershedAndMorphology/ohioResLuMorphoDepth.xlsx") 
 names(ohioRes) = tolower(names(ohioRes)) # Change all names to all lowercase letters
 names(ohioRes) = gsub(pattern = "/", replacement = "_", x = names(ohioRes)) # / causing problems with select
 ohioRes  <-  mutate(ohioRes, 
@@ -54,14 +57,14 @@ names(ohioResC) = gsub(pattern = "_", replacement = ".", x = names(ohioResC))  #
 # included in the NID data set.  Will strip these out to avoid duplicates.
 
 # Reservoir geometry
-ldGeom <- read.xls("ohio2016/inputData/WA 3-93 reservoirsurfacegeometry.xlsx", 
+ldGeom <- read.xls("ohio2016/inputData/watershedAndMorphology/WA 3-93 reservoirsurfacegeometry.xlsx", 
                    sheet="Task 1a", stringsAsFactors = FALSE)
 ldGeom <- ldGeom[1:20, c("Reservoir", "NHDArea.sqkm.", "NHDPerimeter.mi.", "Fetch..m.")]  # Subset
 names(ldGeom) <- c("Reservoir", "Reservoir.Area.sqkm", "Reservoir.Perimeter.km", "Fetch.m.")  # Rename perimeter to km
 ldGeom$Reservoir.Perimeter.km <- ldGeom$Reservoir.Perimeter.km * 1.609  # Converts mile to kilometer
 
 # Watershed land use
-ldLu <- read.xls("ohio2016/inputData/WatershedAreaCharacterization.xlsx", 
+ldLu <- read.xls("ohio2016/inputData/watershedAndMorphology/ldWatershedAreaCharacterization.xlsx", 
                  sheet="FinalForm", stringsAsFactors = FALSE)
 str(ldLu)
 ldLu <- subset(ldLu, select=-c(Code, State, X))
@@ -125,34 +128,48 @@ descRes <- filter(descRes, lLake_Name %in% tolower(translationKeydf$Lake_Name)) 
 
 ###############################################################################
 # Data imported above are similar to those used for the survey design 
-# (2016OhioSurveyDesign.Rmd).  Now we need to pull in the morphology and hydrology 
-# data Michelle Platz compiled.  Merging these two data sources is a bit confusing
-# because Michelle had to calculate reservoir area in the process of calculating lake 
-# volume and mean depth.  This means that 'reservoir area' will represented twice
-# in the data set.  The first estimate was used for the survey design while the
-# second was used for Michelle's morphology calculations.  
+# (2016OhioSurveyDesign.Rmd).  Now we need to pull in the detailed morphology 
+# data Amy and Ellen compiled. Deliverables are stored at:
+# L:\Lab\GISData\GIS-User\Damico-Golden-Prues\aprues\Jake_Beaulieu\Lake_Volume\deliverables
+# Also see L:\Priv\Cin\NRMRL\ReservoirEbullitionStudy\multiResSurvey2016 for 
+# GIS bathymetry data and electronic notebook for more details:
+# https://usepa-my.sharepoint.com/personal/damico_ellen_epa_gov/_layouts/15/
+# WopiFrame.aspx?sourcedoc=%7B3792AC40-8526-4B11-AFD6-3818B1F2DF23%7D&file=Technical
+# %20Directive_%20GIS%20Support%20for%20Reservoir%20Project&action=default&RootFolder=
+# %2fpersonal%2fdamico%5fellen%5fepa%5fgov%2fDocuments%2fNotebooks%2fTechnical%
+# 20Directive%5f%20GIS%20Support%20for%20Reservoir%20Project&d=w3792ac4085264b11
+# afd63818b1f2df23&e=5:9a5d1f7a476c41ddb56d9a3778549b16.  
+# Merging these two data sources is a bit confusing because Pegasus recalculated
+# reservoir area in the process of calculating lake volume and mean depth.  This 
+# means that 'reservoir area' will represented twice in the data set.  The first 
+# estimate was used for the survey design while the second, more accurate estimate,
+# was derived from Pegasus's detailed bathymetry analysis.  
 
 # Reservoir Hydrology and morphology
-morphoHydro <- read.xls(xls = file.path("L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/",
-                                  "multiResSurvey2016/data/lakeMorpho/",
-                                  "reservoirVolumeAndMeanDepthCalculations_Army.xlsx",
-                                  fsep = ""), 
-                  sheet="done", stringsAsFactors=FALSE, skip = 1)
+multiMorpho <- read.xls(xls = "ohio2016/inputData/watershedAndMorphology/Lake_Volume_Final_101117.xlsx",
+                  stringsAsFactors=FALSE)
 
-names(morphoHydro) = tolower(names(morphoHydro))
+names(multiMorpho) = tolower(names(multiMorpho))
 
 #keep Lake_Name uppercase to be consistent with eqAreaData and meanVariance.c
-morphoHydro <- rename(morphoHydro, Lake_Name = lake_name) 
+multiMorpho <- rename(multiMorpho, 
+                      Lake_Name = lake,
+                      reservoir.volume.m3 = volume.m3.,
+                      reservoir.area.m2.morpho = surface.area..m2.,
+                      mean.depth.m.morpho = mean.reservoir.depth..m.,
+                      prop.less.3m = proportion.of.reservoir.area.shallower.than.3m) %>%
+  mutate(hypoxic.frac = hypoxic..volume / reservoir.volume.m3,
+         hypol.frac = hypolimnion.volume / reservoir.volume.m3)
 
 # Simplify df and create lLower_Lake for merging with above
-morphoHydro <- select(morphoHydro, Lake_Name, outflow.cfs, reservoir.volume.m3,
+multiMorpho <- select(multiMorpho, Lake_Name, reservoir.volume.m3,
                       reservoir.area.m2.morpho, mean.depth.m.morpho,
-                      anoxicfrac) %>%
+                      prop.less.3m, hypoxic.frac, hypol.frac) %>%
   mutate(lLake_Name = tolower(Lake_Name))
 
 
 # Merge
-descRes <- merge(descRes,morphoHydro, all = TRUE)
+descRes <- merge(descRes,multiMorpho, all = TRUE)
 
 str(descRes)  #32 obs, good
 
@@ -167,12 +184,15 @@ descRes[descRes$Lake_Name == "Cave Run Lake", "max.depth.ft"] = 70
 
 # Calculate Derived Quantities
 descRes <- mutate(descRes, 
-                  residence.time.yr = (reservoir.volume.m3 * 35.3147)  # convert to ft3
-                                / (outflow.cfs*60*60*24*365),
                   rda = watershed.area.m2 / reservoir.area.m2,
                   si = res.perimeter.m / (2*sqrt(pi*reservoir.area.m2)),
                   percent.agg.ag = percent.pasture.hay + 
                     percent.cultivated.crops)
+
+# Could calculate residence time, but don't have flow data for many
+# systems
+# residence.time.yr = (reservoir.volume.m3 * 35.3147)  # convert to ft3
+# / (outflow.cfs*60*60*24*365),
 
 
 
