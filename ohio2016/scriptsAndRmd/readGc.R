@@ -27,6 +27,18 @@ gas.9 <- read.xls(paste(rootDir, "Chamber_17_01_19_UNK_STD.xlsx", sep = ""),
                   as.is = TRUE, skip = 28)
 gas.10 <- read.xls(paste(rootDir, "Ebul_DgasAir_16_10_05_UNK_STD.xlsx", sep = ""),
                    as.is = TRUE, skip = 33)
+# This file contains all gas data from 2017 sampling.  This includes Acton Lake,
+# NLA, Harsha, etc.  Need to strip out Acton Lake grts data.  This file has been 
+# somewhat formatted and will need to be trated differently, then merged in later.
+gas.11 <- read.table(paste(rootDir, "gcMasterFile2017updated2017-11-20.txt", sep = ""),
+                     as.is = TRUE, header = TRUE) %>%
+  filter(grepl(x = sample, pattern = "ACT")) %>% # Exlcude samples not from Acton Lake
+  # Exclude unecesary columns. LN2 module broke, only have composite O2/Ar peak.  Remove.
+  select(-contains("flag"), -o2.ar.percent) %>% 
+  rename(n2 = n2.perc) %>% # rename N2 variable
+  mutate(sample = as.numeric(substr(sample, 4, 9))) # format sample name
+
+
 
 # Need to strip a few samples before all are merged.
 # These are floating chamber gas samples collected manually at Cowan Lake. These
@@ -102,6 +114,10 @@ filter(gas.all, duplicated(sample,fromLast = TRUE) | duplicated(sample,fromLast 
 # A few fixes to be made upstream of merge with xtrCodes
 gas.all[gas.all$sample == 16023 & !is.na(gas.all$sample), "sample"] = 16230  # sample entered incorrectly in sequence
 
+# Now merge in Acton Lake 2017 data.
+gas.all <- merge(gas.all, gas.11, all = TRUE)
+
+
 # PREPARE EXETAINER CODES----------------------
 # Extract from eqAreaData
 xtrCodes <- filter(eqAreaData, EvalStatus == "sampled") %>%
@@ -145,9 +161,9 @@ xtrCodes.m <- filter(xtrCodes.m, !logicalIndicator)
 
 xtrCodes.gas <- merge(xtrCodes.m, gas.all, by.x = "value", by.y = "sample", all = TRUE)
 
-str(xtrCodes.m)  #980 observations
-str(gas.all) # 1004 observations
-str(xtrCodes.gas) # 1007 observations
+str(xtrCodes.m)  #1121 observations
+str(gas.all) # 1207 observations, expected because data contains samples from other Acton 2017 monitoring
+str(xtrCodes.gas) # 1285 observations.  Acton Lake samples not yet run, plus see above.
 
 # Specific fixes
 # Still need to add codes for MIT trap redeployment
@@ -176,11 +192,14 @@ xtrCodes.gas <- filter(xtrCodes.gas, !(value %in% omitCodes))
 
                        
 # Sample run on GC, but not in data sheets
-filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value)  # none
+# All appear to be Acton Lake samples from 2017, which is expected.  These are
+# Sarah's additional monitoring samples.
+filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value) %>% select(value) 
 
 # Samples in data sheets, but GC data not yet read into R.  
 filter(xtrCodes.gas, is.na(xtrCodes.gas$co2.ppm)) %>% arrange(variable, value)
 # 16312. No record of this sample being run.  Have reps
+# All other samples are from Sarah's work.  Still need to be run.
 
 # Take a look at values
 ggplot(filter(xtrCodes.gas, variable == "tp.xtr"), aes(Lake_Name, n2o.ppm)) + 

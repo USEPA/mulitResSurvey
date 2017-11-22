@@ -33,10 +33,11 @@ for (i in 1:length(fileNames)){  # for each file
 
 
 # 3. Strip column names that are not consisent (or necessary) across different .dbf
-# files.  Inconsistency related to source of original GIS shapefile.
+# files.  Inconsistency related to source of original GIS shapefile.  Also because
+# data for Acton 2017 came from Sarah's EC study.
 
 # Vector of columns to remove
-columnsToRemove <- c("OBJECTID|Permanent_|FDate|Resolution|GNIS_ID|Elevation|ReachCode|FType|FCode|Connectivi|Issue_Type|Lake_Name_|Reservoir_|QC")
+columnsToRemove <- c("OBJECTID|Permanent_|FDate|Resolution|GNIS_ID|Elevation|ReachCode|FType|FCode|Connectivi|Issue_Type|Lake_Name_|Reservoir_|QC|ECstudy")
                                   
 # remove columns from all dfs in list
 mylist1 <- lapply(mylist, function(x) select(x, -matches(columnsToRemove))) # matches allows for multiple terms

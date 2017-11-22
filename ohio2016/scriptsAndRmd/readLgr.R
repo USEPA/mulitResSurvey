@@ -1,6 +1,4 @@
-# SCRIPT TO PERFORM A QUICK PREVIEW OF LGR GHG DATA COLLECTED DURING THE 
-# AUGUST 2014 SURVEY OF CH4 EMISSIONS FROM HARSHA LAKE.  ANALYZER WAS
-# PROGRAMMED TO RECORD EVERY 20 SECONDS.
+# SCRIPT TO PERFORM A QUICK PREVIEW OF LGR GHG DATA 
 
 # LIBRARIES---------------
 # library(ggplot2) # load from masterLibrary
@@ -8,8 +6,8 @@
 # source("ohio2016/scriptsAndRmd/masterLibrary.R")
 
 
-# READ DATA-----------------
-# List of .txt files containing data
+# READ DATA -----------------
+# List of .txt files containing data from 2016 survey
 txtFiles <- list.files("L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/data/greenhouseGasAnalyzer/", 
                        pattern="*.txt$", recursive = TRUE) # $ matches end of string, excludes '...txt.zip' file
 
@@ -20,6 +18,7 @@ txtFiles <- txtFiles[!grepl(pattern = "_s|_l|_b", x = txtFiles)] # exclude files
 ggaList <- list()  # Empty list to hold results
 
 for (i in 1:length(txtFiles)) {  # loop to read and format each file
+  if (!grepl(pattern = "2017", x = txtFiles[i])) {
   gga.i <- read.table(paste("L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/data/greenhouseGasAnalyzer/", 
                             txtFiles[i], sep=""),
                       sep=",",  # comma separate
@@ -28,7 +27,18 @@ for (i in 1:length(txtFiles)) {  # loop to read and format each file
                       as.is=TRUE, # Prevent conversion to factor
                       header=TRUE, # Import column names
                       fill=TRUE)  # Needed to deal with empty cells in last column
-
+  }
+  
+  if (grepl(pattern = "2017", x = txtFiles[i])) {
+    gga.i <- read.table(paste("L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/multiResSurvey2016/data/greenhouseGasAnalyzer/", 
+                              txtFiles[i], sep=""),
+                        sep=",",  # comma separate
+                        skip=1,  # Skip first line of file.  Header info
+                        colClasses = c("character", rep("numeric", 21), rep("NULL", 6)),
+                        as.is=TRUE, # Prevent conversion to factor
+                        header=TRUE, # Import column names
+                        fill=TRUE) 
+  }
   # FORMAT DATA
 # gga.i <- gga.i[1:(which(gga.i$Time == "-----BEGIN PGP MESSAGE-----") - 1), ]  # Remove PGP message
   gga.i$Time <- gsub("^\\s+|\\s+$", "", gga.i$Time)  #  Strip white spaces
@@ -52,6 +62,7 @@ for (i in 1:length(txtFiles)) {  # loop to read and format each file
 
 # Merge files
 gga <- do.call("rbind", ggaList)  # Coerces list into dataframe.
+
 
 
 # Merge in floating chamber data from Cowan Lake where manual samples
@@ -108,10 +119,10 @@ gga <- rbind(gga, cowanChmTimesGas) # rbind is smart enough to match col names
 
 
 # BASIC PLOTS-----------------
-# ggplot(gga, aes(RDateTime, CH4._ppm)) + geom_point() + 
+# ggplot(gga, aes(RDateTime, CH4._ppm)) + geom_point() +
 #   scale_x_datetime(labels=date_format ("%m/%d %H:%M"))
 # 
-# ggplot(gga, aes(RDateTime, CO2._ppm)) + geom_point() + 
+# ggplot(gga, aes(RDateTime, CO2._ppm)) + geom_point() +
 #   scale_x_datetime(labels=date_format ("%m/%d %H:%M"))
 
 

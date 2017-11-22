@@ -11,8 +11,8 @@ meanVariance.c.lake.lu <- merge(filter(meanVariance.c,
 # DOT PLOT LAKE SPECIFIC DATA--------------
 ##---------------------------------------------------------------------------##
 # Volumetric rates
-# Highlight Harsha Lake data with color
-plotColor <- ifelse(meanVariance.c.lake.lu$Lake_Name == "William H Harsha Lake", 
+# Highlight lakes of interest with color
+plotColor <- ifelse(grepl(pattern = c("Acton|Harsha"), meanVariance.c.lake.lu$Lake_Name), 
                     "red", "black")
 
 # Set plotting order for volumetric emission rate
@@ -33,7 +33,9 @@ ggsave('ohio2016/output/figures/ch4VolDotChart.tiff',  # export as .tif
 ##---------------------------------------------------------------------------##
 # CH4 rates first
 # Highlight Harsha Lake data with color
-plotColor <- ifelse(meanVariance.c.lake.lu$Lake_Name == "William H Harsha Lake", "red", "black")
+# Highlight lakes of interest with color
+plotColor <- ifelse(grepl(pattern = c("Acton|Harsha"), meanVariance.c.lake.lu$Lake_Name), 
+                    "red", "black")
 
 # Diffusive CH4  flux
 # Reset plotting order for CH4 diffusion
@@ -305,7 +307,20 @@ ggsave('ohio2016/output/figures/ch4TotbyRDA.tiff',  # export as .tif
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")
 
+# CH4 total vs % <3M
+ggplot(meanVariance.c.lake.lu,
+       aes(prop.less.3m, ch4.trate.mg.h_Estimate)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ylab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
+  xlab("proportion < 3m")
 
+ggsave('ohio2016/output/figures/ch4TotbyRDA.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=5,   # 1 column
+       height=5, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
 
 
 # CH4 total vs TP
@@ -401,7 +416,7 @@ ggplot(meanVariance.c.lake.lu, aes(tp_Estimate, chla_Estimate)) +
   ylab(expression(chl~a~{mu}*g~L^{-1}))
 
 
-###### Plots of site values
+###### PLOTS OF SITE VALUES-------------------
 
 ### CH4 ebullition by site and site depth
 

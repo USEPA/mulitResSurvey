@@ -319,10 +319,10 @@ ebResults <- do.call("rbind", myEbList) %>%  # This coerces the list into a data
          n2o.erate.mg.h = ebN2omgM2h)
 
 
-str(eqAreaData) # 1426 observations
-str(ebResults)  # 1426 observations
+str(eqAreaData) # 1426 observations, need to update (11/22/17)
+str(ebResults)  # 1531 observations
 eqAreaData <- merge(eqAreaData,ebResults, all = TRUE) 
-str(eqAreaData) # 1426 observations
+str(eqAreaData) # 1531 observations
 
 
 # CALCULATE TOTAL EMISSION RATES------------------

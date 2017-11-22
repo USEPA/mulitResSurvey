@@ -171,7 +171,7 @@ multiMorpho <- select(multiMorpho, Lake_Name, reservoir.volume.m3,
 # Merge
 descRes <- merge(descRes,multiMorpho, all = TRUE)
 
-str(descRes)  #32 obs, good
+str(descRes)  #35 obs, included 32 2016 surveys + 3 2017 acton surveys. good
 
 # The only remaining data to bring in is the max depth estimate for the LD
 # reservoirs not in Ohio.  In 2016OhioSurveyDesign.Rmd these data were brought 
@@ -195,4 +195,13 @@ descRes <- mutate(descRes,
 # / (outflow.cfs*60*60*24*365),
 
 
+# Next, need to deal with 2017 Acton data.  The Lake_Name used for these
+# data are Acton Lake July, Acton Lake Aug, and Acton Lake Oct.  These names
+# don't match up with GIS data, so many columns are empty.  The multiMorpho
+# data object (i.e. depth to hypo, anoxia, etc) does contain these names, however.
+# The code below assigns the 'Acton Lake' GIS data to these three 2017 surveys.
+poo <- filter(descRes, grepl(c("July|Aug|Oct"), Lake_Name)) # Rows of interest
+logicalIndicator <- apply(poo, MARGIN = 2, FUN = anyNA) %>% unname() #columns w/NAs to be replaced
 
+descRes[grepl(c("July|Aug|Oct"), descRes$Lake_Name), logicalIndicator] = # NA data
+  descRes[descRes$Lake_Name == "Acton Lake", logicalIndicator]  # replacement data
