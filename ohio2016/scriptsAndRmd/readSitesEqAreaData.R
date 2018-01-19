@@ -75,7 +75,8 @@ mylist4 <- lapply(mylist3, function(x) {
                       trapRtrvDtTm = as.POSIXct(paste(trim(RtrvDat), # trim removes white space
                                                        trim(RtrvTim), sep=""),
                                                  format = "%m/%d/%Y%H:%M",
-                                                 tz="UTC"))  
+                                                 tz="UTC"),
+                      deplyDt = as.Date(deplyDt, format = "%m/%d/%Y"))  
 
  # Columns that should be converted to numeric
  cols <- c("chm_vol", "wtrDpth", "smDpthS", "Tmp_C_S", "DOPrc_S", "DO__L_S",   

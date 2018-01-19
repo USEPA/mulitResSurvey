@@ -159,7 +159,9 @@ multiMorpho <- rename(multiMorpho,
                       mean.depth.m.morpho = mean.reservoir.depth..m.,
                       prop.less.3m = proportion.of.reservoir.area.shallower.than.3m) %>%
   mutate(hypoxic.frac = hypoxic..volume / reservoir.volume.m3,
-         hypol.frac = hypolimnion.volume / reservoir.volume.m3)
+         hypol.frac = hypolimnion.volume / reservoir.volume.m3,
+         # remove "%" from prop.less.3m.  convert to numeric proportion.
+         prop.less.3m = as.numeric(substr(prop.less.3m, start = 1, nchar(prop.less.3m)-1))/100)
 
 # Simplify df and create lLower_Lake for merging with above
 multiMorpho <- select(multiMorpho, Lake_Name, reservoir.volume.m3,

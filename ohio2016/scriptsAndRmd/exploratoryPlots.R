@@ -365,7 +365,7 @@ ggsave('ohio2016/output/figures/ch4.ppmTrap.tiff',  # export as .tif
 
 
 # Trap CH4 by date
-ggplot(meanVariance.c.lake.lu, aes(deplyDt, (trap_ch4.ppm_Estimate/10000))) +
+ggplot(meanVariance.c.lake.lu, aes(format(deplyDt, "%m/%d"), (trap_ch4.ppm_Estimate/10000))) +
   geom_point() +
   geom_text(aes(label = Lake_Name),
             hjust = 0, vjust = 0, size = 2)

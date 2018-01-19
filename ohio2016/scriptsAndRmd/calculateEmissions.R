@@ -222,12 +222,6 @@ for (i in 1:length(unique(paste(gga.model$Lake_Name, gga.model$siteID)))) {  # F
 dev.off()
 start.time;Sys.time() 
 
-ggplot(OUT, aes(ch4.diff.max))+
-  geom_histogram(binwidth = 0.5)
-  
-ggsave(filename="ohio2016/output/figures/ch4maxHistogram.tiff",
-       width=8,height=5.5, units="in",
-       dpi=800,compression="lzw")
 
 # STEP 2: USE AIC TO DETERMINE WHETHER LINEAR OR NON-LINEAR FIT IS BEST.
 #         CONFIRM CHOICE BY INSPECTING RAW DATA
@@ -274,7 +268,7 @@ OUT <- filter(OUT, !is.na(Lake_Name)) # Just one NA slipped in
 eqAreaData <- merge(eqAreaData, OUT, by.x = c("Lake_Name", "siteID"), 
       by.y = c("Lake_Name", "site"), all=TRUE)
 
-str(eqAreaData) # 1426 observations
+str(eqAreaData) # 1531 observations
 
 # Any sites not have a diffusive rate?
 # Only a subset of Cowan Lake sites were sampled due to water in LGR.

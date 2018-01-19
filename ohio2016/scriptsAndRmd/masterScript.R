@@ -20,4 +20,6 @@ source("ohio2016/scriptsAndRmd/grtsMeanVariance.R") # 20s
 
 # Data analysis
 source("ohio2016/scriptsAndRmd/descRes.R")
-source("ohio2016/scriptsAndRmd/exploratoryPlots.R")
+source("ohio2016/scriptsAndRmd/exploratoryPlots.R") # Needed to add morphology to grts output
+# source("ohio2016/scriptsAndRmd/statModels.R") # under development
+# source("ohio2016/scriptsAndRmd/responseSurfacePlots.R") # uses models from above

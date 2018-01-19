@@ -23,8 +23,8 @@ gas.7 <- read.xls(paste(rootDir, "Ebullition_16_10_12_STD_UNK.xlsx", sep=""),
                   as.is=TRUE, skip=46)
 gas.8 <- read.xls(paste(rootDir, "Ebul_Trap_6ml_16_10_20_UNK_STD.xlsx", sep = ""),
                   as.is = TRUE, skip = 46)
-gas.9 <- read.xls(paste(rootDir, "Chamber_17_01_19_UNK_STD.xlsx", sep = ""),
-                  as.is = TRUE, skip = 28)
+gas.9 <- read.xls(paste(rootDir, "18_01_08_Cowan_Chamber_STD_UNK_FID_ECD.xlsx", sep = ""),
+                  as.is = TRUE, skip = 31)
 gas.10 <- read.xls(paste(rootDir, "Ebul_DgasAir_16_10_05_UNK_STD.xlsx", sep = ""),
                    as.is = TRUE, skip = 33)
 # This file contains all gas data from 2017 sampling.  This includes Acton Lake,
@@ -42,10 +42,12 @@ gas.11 <- read.table(paste(rootDir, "gcMasterFile2017updated2017-11-20.txt", sep
 
 # Need to strip a few samples before all are merged.
 # These are floating chamber gas samples collected manually at Cowan Lake. These
-# data need to be dealt with separately.
+# data need to be dealt with separately.  Some of these samples were analyzed
+# with a cryo run which couldn't detect the CH4.  Those samples were discarded
+# and cannot be rerun.
 # Put in df
-cowanChm <- merge(filter(gas.5, Sample %in% c(16126:16129, 16133:16136)), # Run w/cryo
-                  filter(gas.9, Sample %in% c(16101:16104, 16115:16118,  # Run w/large loop
+cowanChm <- merge(filter(gas.5, Sample %in% c(16126:16129, 16133:16136)), # Run w large sample loop, but high std curve
+                  filter(gas.9, Sample %in% c(16101:16104, 16115:16118,  # Run w/large loop and air std curve 1/19/2018
                                               16108:16111, 16119:16122,
                                               16094:16097)),
                   all=TRUE)
@@ -96,6 +98,7 @@ cowanChm <- select(cowanChm, select = -Sample.code, -Sample.abb, # Exlcude varia
                   -Area.CO2, -Area.Methane, 
                   -Area.N2O, 
                   -N2O.chk, -CO2.chk, -CH4.chk,
+                  -Flag.N2O, -Flag.CO2, -Flag.CH4,
                   -X, -X.1, -X.2, -X.3, -X.4, -X.5, -X.6, -X.7, -X.8, -X.9)  %>%
   filter(!(grepl("STD", cowanChm$Sample)), # remove standards
          !(grepl("Std", cowanChm$Sample)), # remove standards
@@ -198,7 +201,7 @@ filter(xtrCodes.gas, is.na(Lake_Name)) %>% arrange(value) %>% select(value)
 
 # Samples in data sheets, but GC data not yet read into R.  
 filter(xtrCodes.gas, is.na(xtrCodes.gas$co2.ppm)) %>% arrange(variable, value)
-# 16312. No record of this sample being run.  Have reps
+# 16312. No record of this sample being run.  Have reps, so don't worry
 # All other samples are from Sarah's work.  Still need to be run.
 
 # Take a look at values
