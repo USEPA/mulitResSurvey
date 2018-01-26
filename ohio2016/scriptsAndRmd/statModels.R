@@ -28,21 +28,21 @@ cor(select(meanVariance.c.lake.lu,
 
 # TOTAL AND VOLUMETRIC EMISSIONS BY LANDSCAPE AND MORPHOMETRIC MODELS----------
 # First will work with model containing only morphometric and 
-# and watershed indices.
-# %ag, max depth, mean depth, reservoir size, watershed size, perimeter, rda, si, 
-# fetch, prop.less.3m
+# and watershed indices available in national models.
+# max depth, mean depth, volume, reservoir size, perimeter, rda, si, 
+# fetch, watershed size, %ag, 
 # 
 # Lots of collinearity.  Want to select non correlated variables based
 # on variance inflation factors, but VIF doesn't seem to work when all variables
 # are provided, possibly too few observations.Start with simple COR analysis.
 corData.z <- cor(select(meanVariance.c.lake.lu, 
            #max.depth.ft,
-           mean.depth.m.morpho, 
-           prop.less.3m, 
+           mean.depth.m.morpho,
+           #reservoir.volume.m3,
            #res.perimeter.m, 
            res.fetch.m, 
            reservoir.area.m2, 
-           #watershed.area.m2, 
+           watershed.area.m2, 
            percent.agg.ag, 
            rda,  
            si), 
@@ -53,9 +53,9 @@ corData.z[abs(corData.z) < 0.5] <- NA # drop less than abs(0.5)
 corData.z <- na.omit(melt(corData.z)) # melt! 
 corData.z <- corData.z[order(-abs(corData.z$value)),] # sort
 corData.z[seq(1, length(corData.z[,1]), 2),] # omit duplicate rows
-# res perimeter is highly correlated with several variables.
+# res perimeter, area, and volume are highly correlated.  Retain area.
 # mean and max depth are highly correlated. Omit max.
-# 
+# A few strong correlations remaining.  Retain and check VIF.
 
 # Calculate VIF.  
 # First, use the corvif function provided by Highland Stats (aka Alain Zuur).
@@ -64,26 +64,26 @@ corData.z[seq(1, length(corData.z[,1]), 2),] # omit duplicate rows
 # Iteratively remove variable with highest VIF, 
 # then recalculate until all VIF < 5
 
-#Can't get this function to work?
-corvif(cbind(meanVariance.c.lake.lu$mean.depth.m.morpho,
-             meanVariance.c.lake.lu$reservoir.area.m2.morpho,  
-             # meanVariance.c.lake.lu$watershed.area.m2, # remove first
-             meanVariance.c.lake.lu$percent.agg.ag,
-             meanVariance.c.lake.lu$rda,
-             meanVariance.c.lake.lu$si,
-             # meanVariance.c.lake.lu$max.depth.ft,
-             # meanVariance.c.lake.lu$res.perimeter.m,
-             meanVariance.c.lake.lu$mean.depth.m.morpho,
-             meanVariance.c.lake.lu$prop.less.3m))
+# Get some very high values, but also a warning message.
+corvif(with(meanVariance.c.lake.lu,
+            cbind(#max.depth.ft,
+              mean.depth.m.morpho,
+              #reservoir.volume.m3,
+              #res.perimeter.m, 
+              res.fetch.m, 
+              reservoir.area.m2, 
+              watershed.area.m2, 
+              percent.agg.ag, 
+              rda,  
+              si)))
 
 # Try using VIF function in fsmb package.
 # vif_func (defined in masterLibrary.R), is a convenient
 # wrapper for fmsb::VIF
-# Gives same results as above, with no warning message
 vif_func(in_frame = select(meanVariance.c.lake.lu,
                            #max.depth.ft,
-                           mean.depth.m.morpho, 
-                           prop.less.3m, 
+                           mean.depth.m.morpho,
+                           #reservoir.volume.m3,
                            #res.perimeter.m, 
                            res.fetch.m, 
                            reservoir.area.m2, 
@@ -92,15 +92,15 @@ vif_func(in_frame = select(meanVariance.c.lake.lu,
                            rda,  
                            si),
          thresh = 5, trace = TRUE)
-
 # This set of variables are OK.  Had to drop watershed area, but might be OK
 # because rda was retained.
 
 #################################################################
 # Set up TOTAL EMISSION RATE model with non correlated variables
-m1.T <- lm(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + prop.less.3m +
+# Not considering any interactions.  Not enough observations.
+m1.T <- lm(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + res.fetch.m +
                                         reservoir.area.m2 +
-                                        percent.agg.ag + rda + si)^2, # include 2-way interactions
+                                        percent.agg.ag + rda + si), 
            weights = 1/ch4.trate.mg.h_StdError^2, #inverse of variance
            data = meanVariance.c.lake.lu)
 summary(m1.T);anova(m1.T)  # a few things going
@@ -109,11 +109,8 @@ plot(m1.T) # yikes!
 # assess Multi-collinearity of model
 sqrt(car::vif(m1.T)) # car, vif>2 indicates problems? (http://www.statmethods.net/stats/rdiagnostics.html)
 fmsb::VIF(m1.T) # fmsb, vif < 10, all good here.
-
-# Why to the fmsb and car variance inflation factors give different
-# answers?
-# Note that the car function gives vif values for interactions.  Should interactions
-# be considered in vif_func above.
+# fmsb::VIF applied to model and independent variables indicate no problems.
+# car::vif is pretty close (2.07 > 2)
 
 # Move forward with stepwise model selection
 m.T.null <- lm(ch4.trate.mg.h_Estimate ~ 1, 
@@ -121,11 +118,9 @@ m.T.null <- lm(ch4.trate.mg.h_Estimate ~ 1,
                data = meanVariance.c.lake.lu)
 m.T.step <- step(m.T.null, # model to start with
                    scope = list(lower = m.T.null, upper = m1.T), # range to fit
-                   direction ="both")
-anova(m.T.step) # rda and percent ag effects.  Interactionnot significant, remove.
-m.T.step <- update(m.T.step, .~. - rda:percent.agg.ag) # remove interaction
-anova(m.T.step) # rda and percent ag effects
-summary(m.T.step) # positive rda and percent ag coefficient, p=0.006, adj r2=0.28
+                   direction ="both") # selects best model iva AIC
+anova(m.T.step) # rda and marginal percent ag effects.  
+summary(m.T.step) # positive rda and percent ag coefficient, p=0.009, adj r2=0.22
 
 # Diagnostics
 plot(m.T.step) # Positively skewed residuals.
@@ -145,13 +140,13 @@ ggplot(m.T.stepDf, aes(observed, mPred)) +
   ylab("Predicted")
 
 # CONSIDER LOG TRANSFORMING VARIABLE
-m2.T <- lm(log10(ch4.trate.mg.h_Estimate) ~ (mean.depth.m.morpho + prop.less.3m +
+m2.T <- lm(log10(ch4.trate.mg.h_Estimate) ~ (mean.depth.m.morpho + res.fetch.m +
                                                reservoir.area.m2 +
-                                               percent.agg.ag + rda + si)^2, # include 2-way interactions
+                                               percent.agg.ag + rda + si),
            weights = 1/ch4.trate.mg.h_StdError^2, # inverse of variance
            data = meanVariance.c.lake.lu)
 summary(m2.T);anova(m2.T)  # a few things going
-plot(m2.T) # two outliers, but better than before
+plot(m2.T) # not much better
 
 # Move forward with stepwise model selection
 # This uses AIC for model selection.  Is that what I want?
@@ -161,7 +156,7 @@ m2.T.null <- lm(log10(ch4.trate.mg.h_Estimate) ~ 1,
 m2.T.step <- step(m2.T.null, # model to start with
                  scope = list(lower = m2.T.null, upper = m2.T), # range to fit
                  direction ="both")
-anova(m2.T.step);summary(m2.T.step) # positive rda and percent ag coefficient, p=0.01, adj r2=0.24
+anova(m2.T.step);summary(m2.T.step) # positive rda, fetch, and area coefficienst, p=0.002, adj r2=0.32
 
 # Diagnostics
 hist(residuals(m2.T.step)) # looks ok
@@ -175,7 +170,7 @@ m2.T.stepDf <- data.frame(mPred = fitted(m2.T.step),
                                                                  "ch4.trate.mg.h_Estimate"]))
 
 # Really not much better
-ggplot(m.T.stepDf, aes(observed, mPred)) + 
+ggplot(m2.T.stepDf, aes(observed, mPred)) + 
   geom_point() +
   geom_abline(intercept = 0, slope = 1) +
   ylab("Predicted")
@@ -190,22 +185,23 @@ meanVariance.c.lake.lu.full <- filter(meanVariance.c.lake.lu,
                                       !is.na(ch4.trate.mg.h_Estimate))
 wts <- 1/meanVariance.c.lake.lu.full$ch4.trate.mg.h_StdError^2
 vf1 <- varFixed(~wts) # how is this different than 'weights' in lm.
-m3.T <- gls(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + prop.less.3m +
+m3.T <- gls(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + res.fetch.m +
                                          reservoir.area.m2 +
-                                         percent.agg.ag + rda + si)^2, # include 2-way interactions
+                                         percent.agg.ag + rda + si),
             weights = vf1, # weighted by inverse of variance
             data = meanVariance.c.lake.lu.full)
 
 # Diagnostics
 E.m3.T <- resid(m3.T, type = "normalized")
 E.m3.fitted <- fitted(m3.T)
-plot(E.m3.T ~ E.m3.fitted) # more even spread around 0
+plot(E.m3.T ~ E.m3.fitted) # preponderance of negative residuals
 hist(E.m3.T) # not so bad
 plot(E.m3.T ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) # no strong pattern
-plot(E.m3.T ~ meanVariance.c.lake.lu.full$reservoir.area.m2) # only 2 large lakes
-plot(E.m3.T ~ meanVariance.c.lake.lu.full$percent.agg.ag) # no pattern
-plot(E.m3.T ~ meanVariance.c.lake.lu.full$rda) # less variance at higher rda
-plot(E.m3.T ~ meanVariance.c.lake.lu.full$si) # only 3 lakes w/large si
+plot(E.m3.T ~ meanVariance.c.lake.lu.full$res.fetch.m) # no strong pattern
+plot(E.m3.T ~ meanVariance.c.lake.lu.full$reservoir.area.m2) # no strong pattern
+plot(E.m3.T ~ meanVariance.c.lake.lu.full$percent.agg.ag) # no strong pattern
+plot(E.m3.T ~ meanVariance.c.lake.lu.full$rda) # no strong pattern
+plot(E.m3.T ~ meanVariance.c.lake.lu.full$si) # no strong pattern
 # Are these diagnostics OK?  More options  below, but I'm not sure they are needed.
 # Move to variable selection?
 
@@ -213,16 +209,17 @@ plot(E.m3.T ~ meanVariance.c.lake.lu.full$si) # only 3 lakes w/large si
 # Add mean.depth.m.morpho as variance covariate
 vf2 <- varFixed(~mean.depth.m.morpho)
 vf3 <- varComb(vf1, vf2)
-m3.T.a <- gls(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + reservoir.area.m2 +
-                                           percent.agg.ag + rda + si)^2, # include 2-way interactions
+m3.T.a <- gls(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + res.fetch.m +
+                                           reservoir.area.m2 +
+                                           percent.agg.ag + rda + si), 
               weights = vf3, 
               data = meanVariance.c.lake.lu.full)
 
 # Diagnostics
 E.m3.T.a <- resid(m3.T.a, type = "normalized")
 m3.T.a.fitted <- fitted(m3.T.a)
-plot(E.m3.T.a ~ E.m3.fitted) # hmm, a bit better than lm
-plot(E.m3.T.a ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) # Only positive residuals in deep lakes
+plot(E.m3.T.a ~ E.m3.fitted) # no improvement
+plot(E.m3.T.a ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) 
 plot(E.m3.T.a ~ meanVariance.c.lake.lu.full$reservoir.area.m2) # only 3 large lakes
 plot(E.m3.T.a ~ meanVariance.c.lake.lu.full$percent.agg.ag) # no pattern
 plot(E.m3.T.a ~ meanVariance.c.lake.lu.full$rda) # not much
@@ -232,15 +229,16 @@ plot(E.m3.T.a ~ meanVariance.c.lake.lu.full$si) # only 3 large lakes w/large si
 # Add reservoir.area.m2 as variance covariate
 vf4 <- varFixed(~reservoir.area.m2)
 vf5 <- varComb(vf1, vf4)
-m3.T.b <- gls(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + reservoir.area.m2 +
-                                           percent.agg.ag + rda + si)^2, # include 2-way interactions
+m3.T.b <- gls(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + res.fetch.m +
+                                           reservoir.area.m2 +
+                                           percent.agg.ag + rda + si),
               weights = vf5, 
               data = meanVariance.c.lake.lu.full)
 
 # Diagnostics
 E.m3.T.b <- resid(m3.T.b, type = "normalized")
 m3.T.b.fitted <- fitted(m3.T.b)
-plot(E.m3.T.b ~ E.m3.fitted) # hmm, a bit better than lm
+plot(E.m3.T.b ~ E.m3.fitted) # 
 plot(E.m3.T.b ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) # not much
 plot(E.m3.T.b ~ meanVariance.c.lake.lu.full$reservoir.area.m2) # only 2 large lakes
 plot(E.m3.T.b ~ meanVariance.c.lake.lu.full$percent.agg.ag) # no pattern
@@ -252,15 +250,16 @@ plot(E.m3.T.b ~ meanVariance.c.lake.lu.full$si) # only 3 large lakes w/large si
 # spread for each lake.
 vf6 <- varIdent(~Lake_Name)
 vf7 <- varComb(vf1, vf6)
-m3.T.c <- gls(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + reservoir.area.m2 +
-                                           percent.agg.ag + rda + si)^2, # include 2-way interactions
+m3.T.c <- gls(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + res.fetch.m +
+                                           reservoir.area.m2 +
+                                           percent.agg.ag + rda + si), 
               weights = vf7, 
               data = meanVariance.c.lake.lu.full)
 
 # Diagnostics
 E.m3.T.c <- resid(m3.T.c, type = "normalized")
 m3.T.c.fitted <- fitted(m3.T.c) #
-plot(E.m3.T.c ~ E.m3.fitted) # hmm, a bit better than lm
+plot(E.m3.T.c ~ E.m3.fitted) # h
 plot(E.m3.T.c ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) # Only positive residuals in deep lakes
 plot(E.m3.T.c ~ meanVariance.c.lake.lu.full$reservoir.area.m2) # only 2 large lakes
 plot(E.m3.T.c ~ meanVariance.c.lake.lu.full$percent.agg.ag) # no pattern
@@ -270,8 +269,9 @@ plot(E.m3.T.c ~ meanVariance.c.lake.lu.full$si) # only 2 large lakes w/large si
 # That didn't work.  Try adding Lake_Name as predictor variable.  Not enough
 # DoF to support Lake_Name as main effect.  Try random effect.
 # Need lme for 'random'
-m4.T <- lme(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + reservoir.area.m2 +
-                                           percent.agg.ag + rda + si)^2, # include 2-way interactions
+m4.T <- lme(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + res.fetch.m +
+                                         reservoir.area.m2 +
+                                         percent.agg.ag + rda + si), 
               weights = vf1, # using vf7 (includes ~Lake_name made no differenc)
             random = ~1 | Lake_Name,
               data = meanVariance.c.lake.lu.full)
@@ -279,9 +279,9 @@ m4.T <- lme(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + reservoir.area.m2 +
 # Diagnostics
 E.m4.T <- resid(m4.T, type = "normalized")
 m4.T.fitted <- fitted(m4.T)
-plot(E.m4.T ~ m4.T.fitted) # hmm, a bit better than what we saw above
-plot(E.m4.T ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) # Only positive residuals in deep lakes
-plot(E.m4.T ~ meanVariance.c.lake.lu.full$reservoir.area.m2) # only 3 large lakes
+plot(E.m4.T ~ m4.T.fitted) # model overestimates lakes w/low emissions 
+plot(E.m4.T ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) # 
+plot(E.m4.T ~ meanVariance.c.lake.lu.full$reservoir.area.m2) # 
 plot(E.m4.T ~ meanVariance.c.lake.lu.full$percent.agg.ag) # no pattern
 plot(E.m4.T ~ meanVariance.c.lake.lu.full$rda) # less variance at higher rda
 plot(E.m4.T ~ meanVariance.c.lake.lu.full$si) # only 3 large lakes w/large si
@@ -290,8 +290,9 @@ plot(E.m4.T ~ meanVariance.c.lake.lu.full$si) # only 3 large lakes w/large si
 # Better.  Try adding form =~ fitted.
 vf8 <- varPower(form =~fitted(.))
 vf9 <- varComb(vf1, vf8)
-m4.T.a <- lme(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + reservoir.area.m2 +
-                                         percent.agg.ag + rda + si)^2, # include 2-way interactions
+m4.T.a <- lme(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + res.fetch.m +
+                                           reservoir.area.m2 +
+                                           percent.agg.ag + rda + si), 
             weights = vf9, 
             random = ~1 | Lake_Name,
             data = meanVariance.c.lake.lu.full)
@@ -299,8 +300,8 @@ m4.T.a <- lme(ch4.trate.mg.h_Estimate ~ (mean.depth.m.morpho + reservoir.area.m2
 # Diagnostics
 E.m4.T.a <- resid(m4.T.a, type = "normalized")
 m4.T.a.fitted <- fitted(m4.T.a)
-plot(E.m4.T.a ~ m4.T.fitted) # values are much smaller, with a few relatively large magnitude negatve close to zero
-plot(E.m4.T.a ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) # negative values @4
+plot(E.m4.T.a ~ m4.T.fitted) # about the same
+plot(E.m4.T.a ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) # negative values @5
 plot(E.m4.T.a ~ meanVariance.c.lake.lu.full$reservoir.area.m2) # only 3 large lakes
 plot(E.m4.T.a ~ meanVariance.c.lake.lu.full$percent.agg.ag) # no pattern
 plot(E.m4.T.a ~ meanVariance.c.lake.lu.full$rda) # less variance at higher rda
@@ -309,30 +310,64 @@ plot(E.m4.T.a ~ meanVariance.c.lake.lu.full$si) # only 3 large lakes w/large si
 anova(m4.T, m4.T.a) # m4.T is the winner, for now.
 
 # MODEL SELECTION PROCEDURE
-# 12/7/17 revised to use m3.T, simplest gls model from above.
+# 1/26/17 revised to use m3.T, simplest gls model from above.
 # May need to update after consultation with Neptune.
+# step function doesn't work with gls models.
 # No multi level factors as predictor variables; should be able to use
 # t-statistic from summary function to select variables (Zuur pg. 91).
 # How should the summary tool be used for model selection?  Remove all non-significant
-# variables from full model?  Remove highest order interactions first?
+# variables from full model?  
 
-summary(m3.T) # none of the two way interactions are significant.  Remove all at once?
-m3.T.1 <- gls(ch4.trate.mg.h_Estimate ~ mean.depth.m.morpho + prop.less.3m +
+summary(m3.T) # Remove least significant term (res.fetch.m), then refit?
+m3.T.1 <- gls(ch4.trate.mg.h_Estimate ~ mean.depth.m.morpho + 
+                reservoir.area.m2 +
+                percent.agg.ag + rda + si, 
+              weights = vf1, # weighted by inverse of variance
+              data = meanVariance.c.lake.lu.full)
+
+# Remove least significant term, reasses?
+summary(m3.T.1) # mean.depth is least significant (p-value = 0.57)
+m3.T.2 <- update(m3.T.1, .~. -mean.depth.m.morpho)
+summary(m3.T.2) # % ag is least significant (p-value = 0.33)
+m3.T.3 <- update(m3.T.2, .~. -percent.agg.ag)
+summary(m3.T.3) # all variables significant (p-value <= 0.02)
+anova(m3.T.3) # Different p-values than from summary command?
+rsquared(m3.T.3) # function from piecewiseSEM for r2 of lme and gls models r2 (Marginal?) = 0.49
+
+# Diagnostics
+E.m3.T.3 <- resid(m3.T.3, type = "normalized")
+E.m3.fitted <- fitted(m3.T.3)
+plot(E.m3.T ~ E.m3.fitted) # preponderance of negative residuals
+hist(E.m3.T.3) # not so bad
+plot(E.m3.T.3 ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) # no strong pattern
+plot(E.m3.T.3 ~ meanVariance.c.lake.lu.full$res.fetch.m) # no strong pattern
+plot(E.m3.T.3 ~ meanVariance.c.lake.lu.full$reservoir.area.m2) # no strong pattern
+plot(E.m3.T.3 ~ meanVariance.c.lake.lu.full$percent.agg.ag) # no strong pattern
+plot(E.m3.T.3 ~ meanVariance.c.lake.lu.full$rda) # no strong pattern
+plot(E.m3.T.3 ~ meanVariance.c.lake.lu.full$si) # no strong pattern
+# OK?
+
+
+# TRY GLS WITH LOG TRANSFORMATION
+m5.T <- gls(log10(ch4.trate.mg.h_Estimate) ~ (mean.depth.m.morpho + res.fetch.m +
                                          reservoir.area.m2 +
-                                         percent.agg.ag + rda + si, # remove 2-way interactions
+                                         percent.agg.ag + rda + si),
             weights = vf1, # weighted by inverse of variance
             data = meanVariance.c.lake.lu.full)
 
-# Remove least significant term, reasses?
-summary(m3.T.1) # si is least significant (p-value = 0.57)
-m3.T.2 <- update(m3.T.1, .~. -si)
-summary(m3.T.2) # % ag is least significant (p-value = 0.31)
-m3.T.3 <- update(m3.T.2, .~. -percent.agg.ag)
-summary(m3.T.3) # reservoir.area is least significant (p-value = 0.046)
-m3.T.4 <- update(m3.T.3, .~. -reservoir.area.m2)
-summary(m3.T.4) # all significant (p-value < 0.0000)
-anova(m3.T.4) # Different p-values than from summary command?
-rsquared(m3.T.4) # function from piecewiseSEM for r2 of lme and gls models r2 (Marginal?) = 0.62
+# Diagnostics
+E.m5.T <- resid(m5.T, type = "normalized")
+E.m5.fitted <- fitted(m5.T)
+plot(E.m5.T ~ E.m5.fitted) # preponderance of negative residuals
+hist(E.m5.T) # not so bad
+plot(E.m5.T ~ meanVariance.c.lake.lu.full$mean.depth.m.morpho) # no strong pattern
+plot(E.m5.T ~ meanVariance.c.lake.lu.full$res.fetch.m) # no strong pattern
+plot(E.m5.T ~ meanVariance.c.lake.lu.full$reservoir.area.m2) # no strong pattern
+plot(E.m5.T ~ meanVariance.c.lake.lu.full$percent.agg.ag) # no strong pattern
+plot(E.m5.T ~ meanVariance.c.lake.lu.full$rda) # no strong pattern
+plot(E.m5.T ~ meanVariance.c.lake.lu.full$si) # no strong pattern
+# log transformation didn't really help
+
 
 
 #################################################################

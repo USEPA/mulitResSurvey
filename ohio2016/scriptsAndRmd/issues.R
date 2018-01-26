@@ -22,4 +22,10 @@
 
 # Need assistance in evaluating residual pattern in lme model.  Good enough?  What else can we try?
 
+# Drawbacks of lme model for upscaling?
+
 # How to asses overall p-value for lme model?
+
+# Do we need to aggregate time series data from acton?
+
+# What to do when AIC selects a model with non-significant terms?
