@@ -1,0 +1,121 @@
+variable,description
+Lake_Name,reservoir name
+Subpopulation,"the grts algorithm calculates population statistics for each strata in the grts design (i.e. open-water, tributary).  This file only contains results for the whole-lake strata."
+ch4.drate.mg.m2.h_Estimate,diffusive methane emission rate (mg CH4 m-2 h-1)
+ch4.drate.mg.m2.h_LCB95Pct,
+ch4.drate.mg.m2.h_UCB95Pct,
+ch4.drate.mg.m2.h_StdError,
+ch4.erate.mg.h_Estimate,ebullitive methane emission rate (mg CH4 m-2 h-1)
+ch4.erate.mg.h_LCB95Pct,
+ch4.erate.mg.h_UCB95Pct,
+ch4.erate.mg.h_StdError,
+ch4.sat.ratio_Estimate,ratio of observed to equilibrium dissolved CH4 concentration
+ch4.sat.ratio_LCB95Pct,
+ch4.sat.ratio_UCB95Pct,
+ch4.sat.ratio_StdError,
+ch4.trate.mg.h_Estimate,total methane emission rate (ebullitive + diffusive) (mg CH4 m-2 h-1)
+ch4.trate.mg.h_LCB95Pct,
+ch4.trate.mg.h_UCB95Pct,
+ch4.trate.mg.h_StdError,
+chla_Estimate,chlorophyll a (ug/L)
+chla_LCB95Pct,
+chla_UCB95Pct,
+chla_StdError,
+co2.drate.mg.m2.h_Estimate,carbon dioxide diffusive emission rate (mg CO2 m-2 h-1)
+co2.drate.mg.m2.h_LCB95Pct,
+co2.drate.mg.m2.h_UCB95Pct,
+co2.drate.mg.m2.h_StdError,
+co2.erate.mg.h_Estimate,carbon dioxide ebullitive emission rate (mg CO2 m-2 h-1)
+co2.erate.mg.h_LCB95Pct,
+co2.erate.mg.h_UCB95Pct,
+co2.erate.mg.h_StdError,
+co2.sat.ratio_Estimate,ratio of observed to equilibrium dissolved CO2 concentration
+co2.sat.ratio_LCB95Pct,
+co2.sat.ratio_UCB95Pct,
+co2.sat.ratio_StdError,
+co2.trate.mg.h_Estimate,carbon dioxide total emission rate (diffusive + ebullitive; mg CO2 m-2 h-1)
+co2.trate.mg.h_LCB95Pct,
+co2.trate.mg.h_UCB95Pct,
+co2.trate.mg.h_StdError,
+dissolved.ch4_Estimate,dissolved CH4 concentration (umol/L)
+dissolved.ch4_LCB95Pct,
+dissolved.ch4_UCB95Pct,
+dissolved.ch4_StdError,
+dissolved.co2_Estimate,dissolved CO2 concentration (umol/l)
+dissolved.co2_LCB95Pct,
+dissolved.co2_UCB95Pct,
+dissolved.co2_StdError,
+dissolved.n2o_Estimate,dissolved n2o concentration (umol/l)
+dissolved.n2o_LCB95Pct,
+dissolved.n2o_UCB95Pct,
+dissolved.n2o_StdError,
+ebMlHrM2_Estimate,volumetric ebullitive emission rate (ml m-2 h-1)
+ebMlHrM2_LCB95Pct,
+ebMlHrM2_UCB95Pct,
+ebMlHrM2_StdError,
+n2o.erate.mg.h_Estimate,nitrous oxide ebullitive emission rate (mg N2O m-2 hr-1)
+n2o.erate.mg.h_LCB95Pct,
+n2o.erate.mg.h_UCB95Pct,
+n2o.erate.mg.h_StdError,
+n2o.sat.ratio_Estimate,ratio of observed to equilibrium dissolved N2O concentration
+n2o.sat.ratio_LCB95Pct,
+n2o.sat.ratio_UCB95Pct,
+n2o.sat.ratio_StdError,
+tn_Estimate,total nitrogen (mg/l)
+tn_LCB95Pct,
+tn_UCB95Pct,
+tn_StdError,
+tnh4_Estimate,total ammonium (ug/l)
+tnh4_LCB95Pct,
+tnh4_UCB95Pct,
+tnh4_StdError,
+tno2_Estimate,total nitrite (ug/l)
+tno2_LCB95Pct,
+tno2_UCB95Pct,
+tno2_StdError,
+tp_Estimate,total phosphorus (ug/l)
+tp_LCB95Pct,
+tp_UCB95Pct,
+tp_StdError,
+trap_ch4.ppm_Estimate,methane concentration in gas collected in funnels (ppm)
+trap_ch4.ppm_LCB95Pct,
+trap_ch4.ppm_UCB95Pct,
+trap_ch4.ppm_StdError,
+deplyDt,date of equipment deployment
+lLake_Name,lowercase lake name
+res.perimeter.m,reservoir perimeter (m)
+res.fetch.m,reservoir fetch (m)
+reservoir.area.m2,reservoir surface area (m2)
+watershed.area.m2,watershed area (m2)
+percent.openwater,percent of watershed covered by open water
+percent.urban,percent of watershed covered by urban lands
+percent.forest,percent of watershed covered by covered by forest
+percent.pasture.hay,percent of watershed covered by pasture
+percent.cultivated.crops,percent of watershed covered by cultivated crops
+percent.wetlands,percent of watershed covered by wetlands
+reservoir.id,not sure what this is
+dam,name of dam
+dam.former.name,former dam name
+state,state reservoir resides in
+main.dam,"yes if main dam, no if secondary dam"
+reservoir.polygon.yn,does a GIS polygon exist for reservoir
+issue.type,peculiarity of reservoir shape
+overlap.watershed.yn,watershed overlap with that of adjacent reservoir
+percent.barren,percent of watershed covered by barren lands
+percent.shrub.scrub,percent of watershed covered by shrub or scrub
+percent.grassland.herbaceous,percent of watershed covered by grasslands
+max.depth.ft,maximum reservoir depth
+max.contour.ft,maximum depth contour present in bathymetric map
+contour.interval.ft,bathymetric map contour interval
+last.surveyed,Data of last bathymetric survey
+min.contour.ft,shallowest contour in bathymetric map
+reservoir.volume.m3,reservoir volume
+reservoir.area.m2.morpho,"reservoir area derived from same data used to estimate volume, fetch, and perimeter.  Use this one!"
+mean.depth.m.morpho,"reservoir depth derived from same data used to estimate volume, fetch, and perimeter.  Use this one!"
+prop.less.3m,proportion of reservoir with a depth less than 3 meters
+hypoxic.frac,fraction of reservoir volume with dissolved oxygen less than 1 mg/l
+hypol.frac,fraction of reservoir volume contained below the thermocline
+rda,ratio of watershed to reservoir surface area
+si,shoreline index.  Higher value indicates more tortuous shorelines.
+percent.agg.ag,percent of watershed covered by cultivated crops or pasture/hay
+fLake_Name,reservoir name coded as ordered factor.  Useful for controlling plotting order.
