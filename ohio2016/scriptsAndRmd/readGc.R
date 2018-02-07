@@ -29,8 +29,8 @@ gas.10 <- read.xls(paste(rootDir, "Ebul_DgasAir_16_10_05_UNK_STD.xlsx", sep = ""
                    as.is = TRUE, skip = 33)
 # This file contains all gas data from 2017 sampling.  This includes Acton Lake,
 # NLA, Harsha, etc.  Need to strip out Acton Lake grts data.  This file has been 
-# somewhat formatted and will need to be trated differently, then merged in later.
-gas.11 <- read.table(paste(rootDir, "gcMasterFile2017updated2017-11-20.txt", sep = ""),
+# somewhat formatted and will need to be treated differently, then merged in later.
+gas.11 <- read.table(paste(rootDir, "gcMasterFile2017updated2018-02-07.txt", sep = ""),
                      as.is = TRUE, header = TRUE) %>%
   filter(grepl(x = sample, pattern = "ACT")) %>% # Exlcude samples not from Acton Lake
   # Exclude unecesary columns. LN2 module broke, only have composite O2/Ar peak.  Remove.
@@ -165,8 +165,8 @@ xtrCodes.m <- filter(xtrCodes.m, !logicalIndicator)
 xtrCodes.gas <- merge(xtrCodes.m, gas.all, by.x = "value", by.y = "sample", all = TRUE)
 
 str(xtrCodes.m)  #1121 observations
-str(gas.all) # 1207 observations, expected because data contains samples from other Acton 2017 monitoring
-str(xtrCodes.gas) # 1285 observations.  Acton Lake samples not yet run, plus see above.
+str(gas.all) # 1336 observations, expected because data contains samples from other Acton 2017 monitoring
+str(xtrCodes.gas) # 1363 observations.  Acton Lake samples not yet run, plus see above.
 
 # Specific fixes
 # Still need to add codes for MIT trap redeployment
