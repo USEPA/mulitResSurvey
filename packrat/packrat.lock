@@ -33,8 +33,8 @@ Hash: cef924b1619219cfc32edbb8a340e652
 
 Package: Matrix
 Source: CRAN
-Version: 1.2-6
-Hash: 6d5b4689f994e2af7e9cc11324c5cbeb
+Version: 1.2-12
+Hash: c134ceb3a533b93c266a93fd7e1b652c
 Requires: lattice
 
 Package: MatrixModels
@@ -90,7 +90,7 @@ Requires: MASS, survival
 Package: TMB
 Source: CRAN
 Version: 1.7.11
-Hash: 9b7ca01f8fb71b37edb2a41d64144389
+Hash: dd9731b4038d2c6fcbee9529dd81a65e
 Requires: Matrix, RcppEigen
 
 Package: TeachingDemos
@@ -297,7 +297,7 @@ Requires: Rcpp, ggplot2, scales
 Package: glmmTMB
 Source: CRAN
 Version: 0.1.4
-Hash: 6fd4aa99e9994f7784f487a2e33f54b3
+Hash: 05334c9ec0f216f7b69118178b0d0b39
 Requires: Matrix, RcppEigen, TMB, lme4, nlme
 
 Package: glue

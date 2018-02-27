@@ -27,7 +27,13 @@ library(plot3Drgl)
 # http://www.statmethods.net/stats/rdiagnostics.html)
 library(car) # vif function
 library(fmsb) # variance inflation factor 'VIF' function
-library(relaimpo)  # dependent on MASS, which masks dplyr select
+
+# relaimpo used for calculating relative importance of variables in linear
+# models.  It depends of survey and survival, which in turn are dependent
+# on matrix.  Version 1.2-6 of matrix was causing problems with Will's packrat,
+# so I updated that package to 1.2-12.  Everything seems to be running fine after 
+#  update,  Matrix also dependent on MASS, which masks dplyr select
+library(relaimpo)  
 library(nlme) # for gls function
 library(piecewiseSEM) # for rsquared of lme model
 
