@@ -146,7 +146,7 @@ descRes <- filter(descRes, lLake_Name %in% tolower(translationKeydf$Lake_Name)) 
 # was derived from Pegasus's detailed bathymetry analysis.  
 
 # Reservoir Hydrology and morphology
-multiMorpho <- read.xls(xls = "ohio2016/inputData/watershedAndMorphology/Lake_Volume_Final_101117.xlsx",
+multiMorpho <- read.xls(xls = "ohio2016/inputData/watershedAndMorphology/Lake_Volume_Final_101117_with_Extra_Acton_Visits.xlsx",
                   stringsAsFactors=FALSE)
 
 names(multiMorpho) = tolower(names(multiMorpho))
@@ -207,3 +207,6 @@ logicalIndicator <- apply(poo, MARGIN = 2, FUN = anyNA) %>% unname() #columns w/
 
 descRes[grepl(c("July|Aug|Oct"), descRes$Lake_Name), logicalIndicator] = # NA data
   descRes[descRes$Lake_Name == "Acton Lake", logicalIndicator]  # replacement data
+
+# Merge with meanVariance.c
+meanVariance.c.lake.lu <- merge(filter(meanVariance.c, Subpopulation == "lake"), descRes)
