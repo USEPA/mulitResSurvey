@@ -267,6 +267,12 @@ Source: CRAN
 Version: 1.5
 Hash: 258cf79a8dbeedf1c981cdb53837d2af
 
+Package: gbm
+Source: CRAN
+Version: 2.1.3
+Hash: fd26a027100111d924a4a8bc319c6968
+Requires: lattice, survival
+
 Package: gdata
 Source: CRAN
 Version: 2.18.0

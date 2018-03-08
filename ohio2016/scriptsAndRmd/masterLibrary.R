@@ -12,6 +12,7 @@ library(scatterplot3d)  # for plotting
 library(reshape) # For merge_recurse function
 library(reshape2) # For melt/dcast
 library(tidyr)  # for separate
+library(gbm) # for boosted regression
 
 library(knitr)   # To knit rmarkdown document
 library(ggmap)   # For ggmap plot of reservoirs
