@@ -146,11 +146,11 @@ resp = "ch4.trate.mg.h_Estimate"
 covar = covarList 
 weights = 1/datGbm$ch4.trate.mg.h_StdError^2 
 nTrees = 10000
-evalch4trate <- evalGBM(x <- datGbm[,c("ch4.trate.mg.h_Estimate",covarList)],
-        resp = "ch4.trate.mg.h_Estimate",
-        covar = covarList,
-        weights = 1/datGbm$ch4.trate.mg.h_StdError^2,
-        nTrees = 10000)
+evalch4trate <- evalGBM(x = x,
+        resp = resp,
+        covar = covar,
+        weights = weights,
+        nTrees = nTrees)
 # Look at plots
 evalch4trate$plots[[1]]
 evalch4trate$plots[[2]]
