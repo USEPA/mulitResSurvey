@@ -27,4 +27,4 @@ source("ohio2016/scriptsAndRmd/descRes.R")
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/statModels.R") # under development
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/responseSurfacePlots.R") # uses models from above
 source("ohio2016/scriptsAndRmd/aggregateActon.R")  # Aggregates Acton reps.  meanVariance.c.lake.lu.agg
-# source("ohio2016/scriptsAndRmd/brtModel.R") # 5 hours per model, careful!
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/brtModel.R") # 5 hours per model, careful!
