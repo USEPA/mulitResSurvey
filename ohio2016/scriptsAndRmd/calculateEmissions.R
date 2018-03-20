@@ -278,7 +278,30 @@ filter(eqAreaData, EvalStatus == "sampled", is.na(ch4.drate.mg.h.best)) %>%
          ch4.lm.drate.mg.h, ch4.ex.drate.mg.h, ch4.drate.mg.h.best,
          co2.lm.drate.mg.h, co2.ex.drate.mg.h, co2.drate.mg.h.best)
 
+# Calculate diffusive CO2 emissions for Cowan Lake site where we 
+# had diffusive CH4 and dissolved gases, but not diffusive CO2.  This
+# is only site 04, but combined with the estimate from site 09, will provide
+# sufficient observations (n=2) for grts function to work. Recall LGR got
+# wet at Cowan and samples were manually collected
 
+logInd <- with(eqAreaData, grepl(pattern = "Cowan", x = Lake_Name) & # cowan lake
+                 !is.na(co2.sat.ratio) & # has dissolved co2
+                 !is.na(ch4.sat.ratio) & # has dissolved ch4
+                 !is.na(ch4.drate.mg.h.best) & # has diffusive CH4
+                 is.na(co2.drate.mg.h.best)) # does not have diffusive CO2
+
+dco2Tmp <- filter(eqAreaData, logInd) %>%
+  # 10,000 L->m3; 1mol CH4 = 16 g CH4; 1000mgCH4 = 1g CH4
+  mutate(excessCo2 = (dissolved.co2 - (dissolved.co2/co2.sat.ratio)) * 10000*44*1000, # mg/m3
+         excessCh4 = (dissolved.ch4 - (dissolved.ch4/ch4.sat.ratio)) * 10000*16*1000, # mg/m3
+         kCh4 = ch4.drate.mg.h.best / excessCh4, # m/h
+         scCh4 = 1897.8 - (114.28*Tmp_C_S) + (3.2902*(Tmp_C_S^2)) - (0.039061*(Tmp_C_S^3)), # CH4 schmidt number
+         scCo2 = 1911.1 - (118.11*Tmp_C_S) + (3.4527*(Tmp_C_S^2)) - (0.04132*(Tmp_C_S^3)), # CO2 schmidt number
+         kCo2 = kCh4 * ((scCo2/scCh4)^-0.5), # k for CH4 converted to CO2 (m/h)
+         co2.drate.mg.h.best = kCo2 * excessCo2) %>%
+  select(co2.drate.mg.h.best) %>% as.numeric
+
+eqAreaData[logInd, "co2.drate.mg.h.best"] = dco2Tmp
 
 # CALCULATE EBULLITION RATE------------------
 
@@ -313,7 +336,7 @@ ebResults <- do.call("rbind", myEbList) %>%  # This coerces the list into a data
          n2o.erate.mg.h = ebN2omgM2h)
 
 
-str(eqAreaData) # 1426 observations, need to update (11/22/17)
+str(eqAreaData) # 1531 observations
 str(ebResults)  # 1531 observations
 eqAreaData <- merge(eqAreaData,ebResults, all = TRUE) 
 str(eqAreaData) # 1531 observations

@@ -8,10 +8,6 @@
 # at Acton lake aggregated into one value (aggregateActon.R)
 dataGbm <- meanVariance.c.lake.lu.agg
 
-# Missing diffusive and total CO2 from Cowan (LGR got water in it).
-# gbm function can't handle NA, so remove
-dataGbmCo2d.t <- filter(meanVariance.c.lake.lu.agg, 
-                        !is.na(co2.drate.mg.m2.h_Estimate))
 
 # Predictor variables
 allCovar = covarList # See aggregateActon.R for list.
@@ -163,11 +159,11 @@ evalCh4erateNat$parameterGrid
 
 # CO2 total emission rate---------------------------------
 resp = "co2.trate.mg.h_Estimate"
-weights = 1/dataGbmCo2d.t$co2.trate.mg.h_StdError^2 
+weights = 1/dataGbm$co2.trate.mg.h_StdError^2 
 nTrees = 10000
 
 # All predictors
-evalCo2trateFull <- evalGBM(x = dataGbmCo2d.t, 
+evalCo2trateFull <- evalGBM(x = dataGbm, 
                             resp = resp,
                             covar = allCovar,
                             weights = weights,
@@ -182,7 +178,7 @@ evalCo2trateFull$plots[[2]]
 evalCo2trateFull$parameterGrid
 
 # National scale predictors
-evalCo2trateNat <- evalGBM(x = dataGbmCo2d.t, 
+evalCo2trateNat <- evalGBM(x = dataGbm, 
                            resp = resp,
                            covar = nationalCovar,
                            weights = weights,
@@ -198,11 +194,11 @@ evalCo2trateNat$parameterGrid
 
 # CO2 diffusive emission rate---------------------------------
 resp = "co2.drate.mg.m2.h_Estimate"
-weights = 1/dataGbmCo2d.t$co2.drate.mg.m2.h_StdError^2 
+weights = 1/dataGbm$co2.drate.mg.m2.h_StdError^2 
 nTrees = 10000
 
 # All predictors
-evalCo2drateFull <- evalGBM(x = dataGbmCo2d.t, 
+evalCo2drateFull <- evalGBM(x = dataGbm, 
                             resp = resp,
                             covar = allCovar,
                             weights = weights,
@@ -217,7 +213,7 @@ evalCo2drateFull$plots[[2]]
 evalCo2drateFull$parameterGrid
 
 # National scale predictors
-evalCo2drateNat <- evalGBM(x = dataGbmCo2d.t, 
+evalCo2drateNat <- evalGBM(x = dataGbm, 
                            resp = resp,
                            covar = nationalCovar,
                            weights = weights,
@@ -252,7 +248,7 @@ evalCo2erateFull$plots[[2]]
 evalCo2erateFull$parameterGrid
 
 # National scale predictors
-evalCo2erateNat <- evalGBM(x = dataGbm.t, 
+evalCo2erateNat <- evalGBM(x = dataGbm, 
                            resp = resp,
                            covar = nationalCovar,
                            weights = weights,
