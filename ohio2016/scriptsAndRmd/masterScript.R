@@ -18,8 +18,13 @@ source("ohio2016/scriptsAndRmd/calculateDissGas.R")
 source("ohio2016/scriptsAndRmd/grtsWgtAdj.R") # Merges with eqAreaData, 2s
 source("ohio2016/scriptsAndRmd/grtsMeanVariance.R") # 20s
 
-# Data analysis
+# Add LU and morophology data to grts estimates
 source("ohio2016/scriptsAndRmd/descRes.R")
-source("ohio2016/scriptsAndRmd/dataAnalysisScripts/exploratoryPlots.R") # Needed to add morphology to grts output
+
+# Data analysis
+# load('ohio2016/output/meanVariance.c.lake.lu.RData') # can run obove, or load data
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/exploratoryPlots.R") # linear models
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/statModels.R") # under development
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/responseSurfacePlots.R") # uses models from above
+source("ohio2016/scriptsAndRmd/aggregateActon.R")  # Aggregates Acton reps.  meanVariance.c.lake.lu.agg
+# source("ohio2016/scriptsAndRmd/brtModel.R") # 5 hours per model, careful!

@@ -322,7 +322,6 @@ vif_func<-function(in_frame,thresh=10,trace=T,...){
 
 #Copyright Highland Statistics LTD.
 
-#####################################################################
 #VIF FUNCTION.
 #To use:  corvif(YourDataFile)
 corvif <- function(dataz) {
@@ -423,3 +422,84 @@ translationKey <-
 translationKeydf <- data.frame(Lake_Name = translationKey[seq(1,length(translationKey), 2)],
                                site = translationKey[seq(2,length(translationKey), 2)],
                                stringsAsFactors = FALSE)
+
+# FUNCTION FOR INVESTIGATING BEST FITTING GBM's----------------------
+#### Will Barnett, Feb 2018
+evalGBM <- function(x, resp, covar, weights=NULL, nTrees = 10000,
+                    shrMin=0.005, shrMax = 10e-6, bfMin = 0.5,
+                    bfMax = 0.9, cvFolds = 10, trainProp = 0.9, n = 10){
+  ## x is a data frame with a response variable, and covariates
+  ## weights is a vector of numbers
+  ## nTrees is the number of trees
+  ## shrMin and shrMax are upper and lower bounds for shrinkage in gbm()
+  ## bfMin and bfMax are upper and lower bounds for bag.fraction in gbm()
+  ## trainProp is the proportion of the data to use for training (vs. testing)
+  ## cvFolds is passed on to gbm() as cv.folds argument
+  ## n is he number of items in a sequence for shrinkage and bag.fraction
+  
+  ## Example 
+  # x <- datGbm[,c("ch4.trate.mg.h_Estimate",covarList)]
+  # resp = "ch4.trate.mg.h_Estimate"; covar = covarList; weights = 1/datGbm$ch4.trate.mg.h_StdError^2; nTrees = 10000
+  # shrMin=0.005; shrMax = 10e-6; bfMin = 0.5; bfMax = 0.9; cvFolds = 10; trainProp = 0.75; n = 10
+  gbmFormula <- as.formula(paste(resp,"~",paste(covar, collapse="+")))
+  parmGrid <- expand.grid(seq(shrMin, shrMax, length.out = n),
+                          seq(bfMin, bfMax, length.out = n))
+  names(parmGrid) <- c("shr", "bf")
+  parmGrid$isMSE <- as.numeric(NA)
+  parmGrid$osMSE <- as.numeric(NA)
+  parmGrid$optTrees <- as.integer(NA)
+  if(is.null(weights)){
+    wts <- rep(1, nrow(x))
+  }else {
+    wts <- weights 
+  }
+  
+  ## Loop
+  for(i in 1:nrow(parmGrid)){
+    # i = 1
+    isMSE <- NULL
+    osMSE <- NULL
+    numTrees <- NULL
+    for(j in 1:10){
+      # i = 1; j = 1
+      trainInds <- sample(1:nrow(x), floor(nrow(x)*trainProp))
+      tmpTrain <- x[trainInds,]
+      tmpTest <- x[-trainInds,]
+      tmpGbm <- gbm(formula = gbmFormula, 
+                    distribution = "gaussian",
+                    data = tmpTrain,
+                    weights = wts[trainInds],
+                    n.trees = nTrees,
+                    n.minobsinnode = 2,
+                    interaction.depth = 2,
+                    shrinkage = parmGrid$shr[i],
+                    bag.fraction = parmGrid$bf[i],
+                    cv.folds = cvFolds)
+      optTrees <- gbm.perf(tmpGbm)
+      
+      ## MSE
+      isPreds <- predict.gbm(tmpGbm, newdata = tmpTrain, n.trees = optTrees)
+      mse_is <- sum(c(isPreds - tmpTrain[,resp])^2)/nrow(tmpTrain)
+      isMSE <- c(isMSE,mse_is)
+      osPreds <- predict.gbm(tmpGbm, newdata = tmpTest, n.trees = optTrees)
+      mse_os <- sum(c(isPreds - tmpTest[,resp])^2)/nrow(tmpTest)
+      osMSE <- c(osMSE,mse_os)
+      numTrees <- c(numTrees, optTrees)
+    }
+    ## Find average MSE over 10 folds
+    parmGrid$isMSE[i] <- mean(isMSE)
+    parmGrid$osMSE[i] <- mean(osMSE)
+    parmGrid$optTrees[i] <- mean(numTrees)
+  }
+  
+  ## Make a contour plot for the  shrinkage and bag.fraction surface
+  p1 <- ggplot(parmGrid, aes(x = shr, y =  bf, z = osMSE)) +
+    xlab("Shrinkage Rate") + ylab("Bag Fraction") + ggtitle("Out-of-sample MSE") +
+    geom_raster(aes(fill = osMSE)) +
+    geom_contour(colour = "white")
+  p2 <- ggplot(parmGrid, aes(x = shr, y =  bf, z = isMSE)) +
+    xlab("Shrinkage Rate") + ylab("Bag Fraction") + ggtitle("In-sample MSE") +
+    geom_raster(aes(fill = isMSE)) +
+    geom_contour(colour = "white")
+  return(list("parameterGrid"=parmGrid, "plots"=list(p1,p2)))
+}

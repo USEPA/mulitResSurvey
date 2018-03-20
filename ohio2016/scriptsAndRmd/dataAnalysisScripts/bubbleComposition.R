@@ -13,6 +13,11 @@ ggplot(filter(eqAreaData, grepl(pattern = "Acton", Lake_Name)),
        aes(RtrvDat, ebMlHrM2)) +
   geom_boxplot(aes(color = RtrvDat))
 
+# See here for Acton Lake data from biweekly sampling
+# L:/Priv/Cin/NRMRL/ReservoirEbullitionStudy/actonEddyCovariance/survey/actonTrapGasComposition.csv 
+
+
+
 # Harsha through time
 load("ohio2016/inputData/literatureData/harsha2015bubbleComp.RData")
 ggplot(harsha2015, aes(deployment.rdate, ch4.ppm/10000)) + geom_point()
