@@ -248,7 +248,7 @@ evalCo2erateFull$plots[[2]]
 evalCo2erateFull$parameterGrid
 
 # National scale predictors
-evalCo2erateNat <- evalGBM(x = dataGbm.t, 
+evalCo2erateNat <- evalGBM(x = dataGbm, 
                            resp = resp,
                            covar = nationalCovar,
                            weights = weights,
