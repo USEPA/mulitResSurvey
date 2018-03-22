@@ -8,7 +8,6 @@
 # at Acton lake aggregated into one value (aggregateActon.R)
 dataGbm <- meanVariance.c.lake.lu.agg
 
-
 # Predictor variables
 allCovar = covarList # See aggregateActon.R for list.
 nationalCovar <- c("max.depth.ft",
@@ -38,11 +37,12 @@ evalVolRateFull$parameterGrid
 
 
 # National scale predictors
-evalVolRateNat <- evalGBM(x = dataGbm, 
+evalVolRateNat <- evalGBM(x = dataGbm, # 11 hours
                            resp = resp,
                            covar = nationalCovar,
                            weights = weights,
                            nTrees = nTrees)
+
 
 # Write to disk
 save(evalVolRateNat, file = "ohio2016/output/evalVolRateNat.RData")
@@ -248,7 +248,7 @@ evalCo2erateFull$plots[[2]]
 evalCo2erateFull$parameterGrid
 
 # National scale predictors
-evalCo2erateNat <- evalGBM(x = dataGbm, 
+evalCo2erateNat <- evalGBM(x = dataGbm.t, 
                            resp = resp,
                            covar = nationalCovar,
                            weights = weights,
