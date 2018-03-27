@@ -1,0 +1,90 @@
+---
+title: "evalGBM"
+author: "J. Beaulieu"
+date: "March 27, 2018"
+output: pdf_document
+classoption: 
+  - landscape
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Results of evalGBM function for evaluation shrinkage rate and bag fraction values for brt model of data collected from 2016 reservoir survey.
+
+```{r, echo=FALSE}
+# volumetric
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalVolRateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalVolRateNat.RData")
+
+# CH4 total
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalCh4trateFull.RData")
+
+# CO2 diffusion
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalCo2drateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalCo2drateNat.RData")
+
+# CO2 ebullition
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalCo2erateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalCo2erateNat.RData")
+
+
+```
+
+\pagebreak
+**Volumetric ebullition rate, all predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalVolRateFull$plots[[1]]
+evalVolRateFull$plots[[2]]
+```
+
+\pagebreak
+**Volumetric ebullition rate, national predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalVolRateNat$plots[[1]]
+evalVolRateNat$plots[[2]]
+```
+
+
+\pagebreak
+**Total CH4 emission rate, all predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalCh4trateFull$plots[[1]]
+evalCh4trateFull$plots[[2]]
+```
+
+\pagebreak
+**CO2 diffusion rate, all predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalCo2drateFull$plots[[1]]
+evalCo2drateFull$plots[[2]]
+```
+
+\pagebreak
+**CO2 diffusion rate, national predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalCo2drateNat$plots[[1]]
+evalCo2drateNat$plots[[2]]
+```
+
+\pagebreak
+**CO2 ebullition rate, national predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalCo2erateFull$plots[[1]]
+evalCo2erateFull$plots[[2]]
+```
+
+\pagebreak
+**CO2 ebullition rate, national predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalCo2erateNat$plots[[1]]
+evalCo2erateNat$plots[[2]]
+```
