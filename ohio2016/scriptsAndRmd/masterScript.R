@@ -20,12 +20,14 @@ source("ohio2016/scriptsAndRmd/grtsWgtAdj.R") # Merges with eqAreaData, 2s
 source("ohio2016/scriptsAndRmd/grtsMeanVariance.R") # 20s
 
 # Add LU and morophology data to grts estimates
-source("ohio2016/scriptsAndRmd/descRes.R")
+source("ohio2016/scriptsAndRmd/descRes.R") # creates meanVariance.c.lake.lu
+source("ohio2016/scriptAndRmd/harrisonData.R")  # merges Harrison data w/ res survey
+# source(ohio2016/scriptAndRmd/bevelhimerData.R")  # merges Bevelhimer data w/ res survey
+source("ohio2016/scriptsAndRmd/aggregateActon.R")  # Aggregate Acton reps.  meanVariance.c.lake.lu.agg
 
 # Data analysis
 # load('ohio2016/output/meanVariance.c.lake.lu.RData') # can run obove, or load data
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/exploratoryPlots.R") # linear models
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/statModels.R") # under development
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/responseSurfacePlots.R") # uses models from above
-source("ohio2016/scriptsAndRmd/aggregateActon.R")  # Aggregates Acton reps.  meanVariance.c.lake.lu.agg
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/brtModel.R") # 5 hours per model, careful!

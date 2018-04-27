@@ -210,3 +210,6 @@ descRes[grepl(c("July|Aug|Oct"), descRes$Lake_Name), logicalIndicator] = # NA da
 
 # Merge with meanVariance.c
 meanVariance.c.lake.lu <- merge(filter(meanVariance.c, Subpopulation == "lake"), descRes)
+
+# Add citation column to facilitate merging with literature data
+meanVariance.c.lake.lu$citation = "EPA"
