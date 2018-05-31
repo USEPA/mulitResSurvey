@@ -11,16 +11,20 @@ names(harRate) = gsub(pattern = c("\\(| |#|)|/|-|\\+"), replacement = ".",
                      x = names(harRate))
 
 # BRING IN MORPHOMETRIC DATA--------------------
-harMorph <- read_excel("L:/Lab/GISData/GIS-User/Damico-Golden-Prues/aprues/Jake_Beaulieu/ORWA/deliverables/PNW/PNW_Volumes_SAs_042518.xlsx")
+harMorph <- read_excel(paste("ohio2016/inputData/watershedAndMorphology/fromGisUserAprues/",
+                             "PNW_Volumes_SAs_053118.xlsx", sep = ""))
 
 names(harMorph) = gsub(pattern = c("\\(| |#|)|/|-|<|\\+"), replacement = ".", 
                        x = names(harMorph)) %>%
   tolower()
 
 # Adopt consistent naming conventions
-harMorph <- rename(harMorph, Lake_Name = lake,
-                   surface.area.less.3m.or.closest = 
-                     surface.area...3m..or.closest.contour.) %>% 
+harMorph <- mutate(harMorph,
+                   proportion.of.reservoir.area.shallower.than.xm.contour =
+                     percent.reservoir.area.shallower.than.xm.contour / 100) %>%
+  rename(Lake_Name = lake,
+         surface.area.less.3m.or.closest = 
+           surface.area...3m..or.closest.contour.) %>% 
   mutate(Lake_Name = replace(Lake_Name,
                              grep(pattern = "Elum", x = Lake_Name),
                              "Cle Elum"),
@@ -47,7 +51,8 @@ harMorph <- filter(harMorph, Lake_Name != "Keno")
 
 
 # BRING IN LU AND MORPHOLOGY--------------------
-harMorphLu <- read_excel("L:/Lab/GISData/GIS-User/Damico-Golden-Prues/aprues/Jake_Beaulieu/ORWA/deliverables/PNW/ORWA_GHG_Emissions.xlsx")
+harMorphLu <- read_excel(paste("ohio2016/inputData/watershedAndMorphology/fromGisUserAprues/",
+                               "ORWA_GHG_Emissions_053118.xlsx", sep =""))
 
 names(harMorphLu) = gsub(pattern = c("\\(| |#|)|/|-|_|\\+"), replacement = ".", 
                          x = names(harMorphLu)) %>%
@@ -95,16 +100,16 @@ harMerge <- left_join(harMorph, harMorphLu)
 # 3) calculate distance to 3m depth using bed slope.
 harMerge <- harMerge %>%
   mutate( # first calculate mean distance from shore to contour
-    largeLitWidth = ifelse(shallow.contour..m. != 3, # If min contour NOT 3m!
+    largeLitWidth = ifelse(xm.shallow.contour..m. != 3, # If min contour NOT 3m!
                            surface.area.less.3m.or.closest /
                              res.perimeter.m,
                            NA), # else NA
-    litSlope = shallow.contour..m. / largeLitWidth, # rise/run out to contour mark
+    litSlope = xm.shallow.contour..m. / largeLitWidth, # rise/run out to contour mark
     estLitWidth = 3 / litSlope,  # Distance to 3m contour line
     estLitArea = estLitWidth * res.perimeter.m, # Area of res < 3m
-    prop.less.3m = ifelse(shallow.contour..m. != 3,
+    prop.less.3m = ifelse(xm.shallow.contour..m. != 3,
                           estLitArea / surface.area..m2., # use estimated value
-                          proportion.of.reservoir.area.shallower.than.3m) # use value from bathymetry
+                          proportion.of.reservoir.area.shallower.than.xm.contour) # use value from bathymetry
   ) 
 
 # Calculate Derived Quantities
@@ -130,15 +135,18 @@ harDat <- harDat %>%
          reservoir.volume.m3 = volume.m3.) %>%        #ATTEND TO UNIT CONVERSION
   select(-percent.perennial.ice.snow,  # omit unneeded columns
          -largeLitWidth, -litSlope, -estLitWidth, -estLitArea,
-         -surface.area.less.3m.or.closest, -shallow.contour..m.,
-         -notes, -more.notes, -source, 
-         -proportion.of.reservoir.area.shallower.than.3m,
-         ) %>%
+         -surface.area.less.3m.or.closest, -xm.shallow.contour..m.,
+         -notes, -more.notes, -source, -state, - reservoir.volume.m3,
+         -proportion.of.reservoir.area.shallower.than.xm.contour,
+         -percent.reservoir.area.shallower.than.xm.contour,
+         -reservoir.id, -dam, -dam.former.name, -main.dam, 
+         -reservoir.polygon.yn, -issue.type, -overlap.watershed.yn  
+  ) %>%
   mutate(Subpopulation = "Lake")
 
 
-# Merge with meanVariance.c.lake.lu
-meanVariance.c.lake.lu <- bind_rows(harDat, meanVariance.c.lake.lu)
+# # Merge with meanVariance.c.lake.lu
+# meanVariance.c.lake.lu <- bind_rows(harDat, meanVariance.c.lake.lu)
 
 
 
