@@ -25,9 +25,16 @@ source("ohio2016/scriptAndRmd/harrisonData.R")  # merges Harrison data w/ res su
 # source(ohio2016/scriptAndRmd/bevelhimerData.R")  # merges Bevelhimer data w/ res survey
 source("ohio2016/scriptsAndRmd/aggregateActon.R")  # Aggregate Acton reps.  meanVariance.c.lake.lu.agg
 
-# Data analysis
+# Exploratory Data Analysis and Linear Models
 # load('ohio2016/output/meanVariance.c.lake.lu.RData') # can run obove, or load data
-# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/exploratoryPlots.R") # linear models
-# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/statModels.R") # under development
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/linearModels/exploratoryPlots.R") # linear models
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/linearModels/statModels.R") # under development
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/responseSurfacePlots.R") # uses models from above
-# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/brtModel.R") # 5 hours per model, careful!
+
+# GBM scripts
+# evalGBM.R calls evalGBM() which is sourced from masterLibrary.R
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBM.R") # 5 hours per model, careful!
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/runGBM.R") # load function
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/runGbmEpa.R") # apply function, produce gbmohio.pdf
+
+

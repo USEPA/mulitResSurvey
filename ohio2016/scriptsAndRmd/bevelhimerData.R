@@ -113,7 +113,7 @@ bevDif <- mutate(bevDif,
 bevAllEmis <- merge(bevEbul, bevDif) %>%
   mutate(ch4.trate.mg.h_Estimate = ch4.drate.mg.m2.h_Estimate +
            ch4.erate.mg.h_Estimate,
-         co2.trate.mg.m2.h_Estimate = co2.erate.mg.h_Estimate +
+         co2.trate.mg.h_Estimate = co2.erate.mg.h_Estimate +
            co2.drate.mg.m2.h_Estimate)
 
 # LAND USE AND MORPHOLOGY DATA-------------------------------
@@ -185,7 +185,7 @@ bevMorph <- mutate(bevMorph,
 bevMerge <- Reduce(function(...) merge(..., all=T), 
                    list(bevAllEmis, bevTable1, bevMorph))
 
-# Format for consistency with meanVariance.c.lake.lu.agg
+# Format for consistency with meanVariance.c.lake.lu
 bevMerge <- bevMerge %>%
   rename(reservoir.area.m2.morpho = surface.area..m2.) %>%
   mutate(Subpopulation = "Lake",
@@ -200,4 +200,9 @@ bevMerge <- bevMerge %>%
          -reservoir.volume.m3, -state, -max.reservoir.depth..m.) 
 
 # # Merge with meanVariance.c.lake.lu
-# meanVariance.c.lake.lu <- bind_rows(harDat, meanVariance.c.lake.lu)
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 120 columns, 40 rows
+
+meanVariance.c.lake.lu <- bind_rows(bevMerge, meanVariance.c.lake.lu) %>%
+  as.data.frame() # convert back to df.  tibbleDf causes problems.
+
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 120 columns, 46 rows, good

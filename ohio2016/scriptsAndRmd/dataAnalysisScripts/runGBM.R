@@ -62,6 +62,8 @@ runGBM <- function(resp, covarType = "Full", nTrees = 10000, seed = 2222){
     geom_point() +
     geom_abline(slope = 1, intercept = 0) +
     ylab("predicted") +
+    xlim(range(c(tmpTrain$resp, tmpTrain$isPreds))) + # equal range x/y axis
+    ylim(range(c(tmpTrain$resp, tmpTrain$isPreds))) + # equal range x/y axis
     ggtitle(paste(gasNm, gasSrc, "~", covarType, "\n",
                   "mse_is =", round(mse_is, 1),
                   "  mse_os =", round(mse_os, 1), "\n",

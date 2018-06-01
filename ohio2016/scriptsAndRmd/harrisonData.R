@@ -24,7 +24,8 @@ harMorph <- mutate(harMorph,
                      percent.reservoir.area.shallower.than.xm.contour / 100) %>%
   rename(Lake_Name = lake,
          surface.area.less.3m.or.closest = 
-           surface.area...3m..or.closest.contour.) %>% 
+           surface.area...3m..or.closest.contour.,
+         reservoir.area.m2 = surface.area..m2.) %>% 
   mutate(Lake_Name = replace(Lake_Name,
                              grep(pattern = "Elum", x = Lake_Name),
                              "Cle Elum"),
@@ -108,14 +109,14 @@ harMerge <- harMerge %>%
     estLitWidth = 3 / litSlope,  # Distance to 3m contour line
     estLitArea = estLitWidth * res.perimeter.m, # Area of res < 3m
     prop.less.3m = ifelse(xm.shallow.contour..m. != 3,
-                          estLitArea / surface.area..m2., # use estimated value
+                          estLitArea / reservoir.area.m2, # use estimated value
                           proportion.of.reservoir.area.shallower.than.xm.contour) # use value from bathymetry
   ) 
 
 # Calculate Derived Quantities
 harMerge <- mutate(harMerge, 
-                  rda = watershed.area.m2 / surface.area..m2.,
-                  si = res.perimeter.m / (2*sqrt(pi*surface.area..m2.)),
+                  rda = watershed.area.m2 / reservoir.area.m2,
+                  si = res.perimeter.m / (2*sqrt(pi*reservoir.area.m2)),
                   percent.agg.ag = percent.pasture.hay + 
                     percent.cultivated.crops)
 # FINAL MERGES AND FORMATTING-----------------------
@@ -127,28 +128,32 @@ harDat <- left_join(harMerge, harRate)
 
 
 
-# Format for consistency with meanVariance.c.lake.lu.agg
+# Format for consistency with meanVariance.c.lake.lu
 harDat <- harDat %>%
-  rename(reservoir.area.m2.morpho = surface.area..m2.,
+  rename(reservoir.area.m2.morpho = reservoir.area.m2,
          mean.depth.m.morpho = mean.reservoir.depth..m.,
-         max.depth.ft = max.reservoir.depth..m.,
-         reservoir.volume.m3 = volume.m3.) %>%        #ATTEND TO UNIT CONVERSION
+         reservoir.volume.m3 = volume.m3.) %>%        
+  mutate(Subpopulation = "Lake",
+         max.depth.ft = max.reservoir.depth..m.*3.28) %>%
   select(-percent.perennial.ice.snow,  # omit unneeded columns
          -largeLitWidth, -litSlope, -estLitWidth, -estLitArea,
          -surface.area.less.3m.or.closest, -xm.shallow.contour..m.,
-         -notes, -more.notes, -source, -state, - reservoir.volume.m3,
+         -notes, -more.notes, -source, -state,
          -proportion.of.reservoir.area.shallower.than.xm.contour,
          -percent.reservoir.area.shallower.than.xm.contour,
          -reservoir.id, -dam, -dam.former.name, -main.dam, 
-         -reservoir.polygon.yn, -issue.type, -overlap.watershed.yn  
-  ) %>%
-  mutate(Subpopulation = "Lake")
+         -reservoir.polygon.yn, -issue.type, -overlap.watershed.yn,
+         -max.reservoir.depth..m.) 
+  
 
 
-# # Merge with meanVariance.c.lake.lu
-# meanVariance.c.lake.lu <- bind_rows(harDat, meanVariance.c.lake.lu)
+# Merge with meanVariance.c.lake.lu
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 120 columns, 35 rows
 
+meanVariance.c.lake.lu <- bind_rows(harDat, meanVariance.c.lake.lu) %>%
+ as.data.frame() # convert back to df.  tibbleDf causes problems.
 
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 120 columns, 40 rows, good
 
 
 

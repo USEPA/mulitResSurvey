@@ -1,10 +1,5 @@
 # EXPLORATORY PLOTS
 
-# Merge meanVariance.c with landuse and morphology data for descRes script.
-meanVariance.c.lake.lu <- merge(filter(meanVariance.c,
-                                       Subpopulation == "lake"),
-                           descRes)
-
 # GRTS ESTIMATES---------------
 # Initial looks at emission rates
 
@@ -71,7 +66,7 @@ ggsave('ohio2016/output/figures/ch4EbDotChart.tiff',  # export as .tif
        compression = "lzw")
 
 # CH4 total rate
-# Reset plotting order for CH4 ebullition
+# Reset plotting order for CH4 total
 meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "ch4.t")
 ggplot(meanVariance.c.lake.lu,
        aes(ch4.trate.mg.h_Estimate, fLake_Name)) +
