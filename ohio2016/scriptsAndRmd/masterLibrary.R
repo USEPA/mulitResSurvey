@@ -483,7 +483,7 @@ evalGBM <- function(x, resp, covar, weights=NULL, nTrees = 10000,
       mse_is <- sum(c(isPreds - tmpTrain[,resp])^2)/nrow(tmpTrain)
       isMSE <- c(isMSE,mse_is)
       osPreds <- predict.gbm(tmpGbm, newdata = tmpTest, n.trees = optTrees)
-      mse_os <- sum(c(isPreds - tmpTest[,resp])^2)/nrow(tmpTest) # shouldn't this be osPreds?
+      mse_os <- sum(c(osPreds - tmpTest[,resp])^2)/nrow(tmpTest) 
       osMSE <- c(osMSE,mse_os)
       numTrees <- c(numTrees, optTrees)
     }
