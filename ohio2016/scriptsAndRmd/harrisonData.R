@@ -10,6 +10,22 @@ harRate <- read_excel("ohio2016/inputData/literatureData/harrison.xlsx")
 names(harRate) = gsub(pattern = c("\\(| |#|)|/|-|\\+"), replacement = ".", 
                      x = names(harRate))
 
+## WB June 10, 2018:
+## The Harrison paper says 'Lake-wide ebullition fluxes were estimated by area-weighting fluxes from two 
+## zones (profundal and littoral, defined as greater and less than 4 m depth, 
+## respectively) in each reservoir, using a minimum of 2 traps in each 
+## zone for each reservoir.' The raw data are not presented, so there's no
+## way to verify that they calculated the lake-wide SE correctly (with area weights).
+## Table S1 in the Supplemental Information simply adds the SEs for 
+## diffusive and ebullitive fluxes, and calls it a total. This is incorrect.
+## Assuming the diffusive and ebullitive flux SEs are calculated with the 
+## proper weighting and they are uncorrelated, the SE of the total flus is the sqrt of 
+## the sum of both SEs squared.That is, SE_Total = sqrt (SE_Diff^2 + SE_Ebul^2).
+## Change that here.
+harRate$ch4.trate.mg.h_StdError <- sqrt(harRate$ch4.drate.mg.m2.h_StdError^2 +
+                                          harRate$ch4.erate.mg.h_StdError^2)
+
+
 # BRING IN MORPHOMETRIC DATA--------------------
 harMorph <- read_excel(paste("ohio2016/inputData/watershedAndMorphology/fromGisUserAprues/",
                              "PNW_Volumes_SAs_053118.xlsx", sep = ""))

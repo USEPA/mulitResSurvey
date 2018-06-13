@@ -51,15 +51,23 @@ bevEbul <- mutate(bevEbul,
   # Assume equal to mean of all other reservoirs.  Will, feel free to 
   # modify this approach.
   mutate(co2.erate.mg.h_StdError = replace(co2.erate.mg.h_StdError,
-                                           which(is.nan(co2.erate.mg.h_StdError)),
+                                           which(is.na(co2.erate.mg.h_StdError)), # This needs to be is.na(), not is.nan()
                                            mean(co2.erate.mg.h_StdError, na.rm = TRUE)),
          ch4.erate.mg.h_StdError = replace(ch4.erate.mg.h_StdError,
-                                           which(is.nan(ch4.erate.mg.h_StdError)),
+                                           which(is.na(ch4.erate.mg.h_StdError)), # Ditto.
                                            mean(ch4.erate.mg.h_StdError, na.rm = TRUE))) %>%
   # Scale to entire lake.  Still need to convert StdError to account for scaling
+  #### Will Barnett, June 2018
+  #### The variance of the weighted sample mean is 
+  #### s_xbar^2 = sum( w_i^2 * s_i^2)
+  #### In this case, the weights are (w_i, 0) for the Cove / Open-Water sites.
+  #### So the formula above simplifies to s_xbar^2 = w_i^2 * s_i^2
+  #### The standard error of the sample mean, then, is s_xbar = sqrt (w_i^2 * s_i^2)
   full_join(bevCove) %>% # bring in proportion of cove
   mutate(co2.erate.mg.h_Estimate = co2.erate.mg.h_Estimate * propCove,
-         ch4.erate.mg.h_Estimate = ch4.erate.mg.h_Estimate * propCove) %>%
+         ch4.erate.mg.h_Estimate = ch4.erate.mg.h_Estimate * propCove,
+         co2.erate.mg.h_StdError = sqrt( propCove^2 * co2.erate.mg.h_StdError^2),
+         ch4.erate.mg.h_StdError = sqrt( propCove^2 * ch4.erate.mg.h_StdError^2)) %>%
   select(-propCove)
 
 
@@ -91,30 +99,50 @@ bevDif <- mutate(bevDif,
   ) %>%
   # Weight habitat specific (cove, open-water) emission rates by proportion of
   # reservoir surface occupied by each habitat.
-  # Wil please address std error calcs
+  # See SE note above for bevEbul. Now that we have open-water and cove sites,
+  # the weighted SE is the sum of w_i^2 * s_i^2 at each site.
   full_join(bevCove) %>% # Add proportion of cove
   mutate(co2.drate.mg.m2.h_Estimate.weighted = ifelse(habitat == "cove",
                                                       co2.drate.mg.m2.h_Estimate * propCove,
                                                       co2.drate.mg.m2.h_Estimate * (1 - propCove)),
          ch4.drate.mg.m2.h_Estimate.weighted = ifelse(habitat == "cove",
                                                       ch4.drate.mg.m2.h_Estimate * propCove,
-                                                      ch4.drate.mg.m2.h_Estimate * (1 - propCove))) %>%
+                                                      ch4.drate.mg.m2.h_Estimate * (1 - propCove)),
+         co2.drate.mg.m2.h_Var.weighted = ifelse(habitat == "cove",
+                                                      co2.drate.mg.m2.h_StdError^2 * propCove^2,
+                                                      co2.drate.mg.m2.h_StdError^2 * (1 - propCove)^2),
+         ch4.drate.mg.m2.h_Var.weighted = ifelse(habitat == "cove",
+                                                 ch4.drate.mg.m2.h_StdError^2 * propCove^2,
+                                                 ch4.drate.mg.m2.h_StdError^2 * (1 - propCove)^2)) %>%
   # Now scale habitat weighted emission rates to entire lake.  
-  # Still need to deal with std error!!!!!!!!!!!!!!!!!
   group_by(Lake_Name) %>% 
   # Lake-scale estimate is sum of habitat weighted estimates for each lake
+  # Lake-scale SE estimates are the square-root of the sum of the weighted SE's
   summarize(co2.drate.mg.m2.h_Estimate = sum(co2.drate.mg.m2.h_Estimate.weighted),
-            ch4.drate.mg.m2.h_Estimate = sum(ch4.drate.mg.m2.h_Estimate.weighted))
+            ch4.drate.mg.m2.h_Estimate = sum(ch4.drate.mg.m2.h_Estimate.weighted),
+            co2.drate.mg.m2.h_StdError = sqrt(sum(co2.drate.mg.m2.h_Var.weighted)),
+            ch4.drate.mg.m2.h_StdError = sqrt(sum(ch4.drate.mg.m2.h_Var.weighted)))
 
-         
+
+
 # TOTAL EMISSIONS DATA--------------------
 # Total emissions is simply the sum of diffusive and ebullitive
 # Need to deal with SE calculations
+# WB June 10, 2018: If the two emissions types are uncorrelated,
+# then the variance of the sum is the sum of the variances.
 bevAllEmis <- merge(bevEbul, bevDif) %>%
   mutate(ch4.trate.mg.h_Estimate = ch4.drate.mg.m2.h_Estimate +
            ch4.erate.mg.h_Estimate,
          co2.trate.mg.h_Estimate = co2.erate.mg.h_Estimate +
-           co2.drate.mg.m2.h_Estimate)
+           co2.drate.mg.m2.h_Estimate,
+         ch4.trate.mg.h_StdError = sqrt(ch4.drate.mg.m2.h_StdError^2 +
+           ch4.erate.mg.h_StdError^2),
+         co2.trate.mg.h_StdError = sqrt(co2.drate.mg.m2.h_StdError^2 +
+                                          co2.erate.mg.h_StdError^2))
+
+## WB June 10, 2018: I didn't edit below here. We should make sure the 
+## Se estimates are included wherever necessary.
+
 
 # LAND USE AND MORPHOLOGY DATA-------------------------------
 # Pegasus will not be providing lake volume or mean depth due to the excessive
