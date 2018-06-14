@@ -21,8 +21,8 @@ source("ohio2016/scriptsAndRmd/grtsMeanVariance.R") # 20s
 
 # Add LU and morophology data to grts estimates
 source("ohio2016/scriptsAndRmd/descRes.R") # creates meanVariance.c.lake.lu
-source("ohio2016/scriptAndRmd/harrisonData.R")  # merges Harrison data w/ res survey
-source("ohio2016/scriptAndRmd/bevelhimerData.R")  # merges Bevelhimer data w/ res survey
+source("ohio2016/scriptsAndRmd/harrisonData.R")  # merges Harrison data w/ res survey
+source("ohio2016/scriptsAndRmd/bevelhimerData.R")  # merges Bevelhimer data w/ res survey
 source("ohio2016/scriptsAndRmd/aggregateActon.R")  # Aggregate Acton reps.  meanVariance.c.lake.lu.agg
 source("ohio2016/scriptsAndRmd/convertMaxDepthToMeter.R")  # converts max depth from ft to m.
 
