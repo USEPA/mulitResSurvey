@@ -32,7 +32,7 @@ for(i in 1:ncol(actonDat)){
   tmpNm <- names(actonDat)[i]
   if(!grepl("StdError", tmpNm)){
     aggEst <- mean(actonDat[,i], na.rm = TRUE)
-  }else {
+  } else {
     # Count the number of non-NA SE estimates
     numNA <- sum(is.na(actonDat[,i]))
     # The variance of independent random variables is just the sum of the variances.
@@ -46,12 +46,18 @@ for(i in 1:ncol(actonDat)){
 }
 tmp <- data.frame(t(outVec))
 names(tmp) <- names(actonDat)
+tmp$citation <- "EPA" # Add citation column
+tmp$Lake_Name <- "Acton Lake" # Add Lake_Name
+
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 120 columns, 46 rows
+
 meanVariance.c.lake.lu.agg <- rbind(tmp, 
                                     meanVariance.c.lake.lu[!actonInds,
                                                            c(respList, 
                                                              gsub("Estimate","StdError",respList),
-                                                             covarList)
+                                                             covarList, "citation", "Lake_Name")
                                                            ])
 
-
-
+# Columns restricted to response variables, covariates, and id variables
+# (i.e. citation, Lake_Name)
+ncol(meanVariance.c.lake.lu.agg); nrow(meanVariance.c.lake.lu.agg) # 31 columns, 43 rows

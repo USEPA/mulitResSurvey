@@ -13,6 +13,7 @@ library(reshape) # For merge_recurse function
 library(reshape2) # For melt/dcast
 library(tidyr)  # for separate
 library(gbm) # for boosted regression
+library(pdp) # for partial dependence plots
 
 library(knitr)   # To knit rmarkdown document
 library(ggmap)   # For ggmap plot of reservoirs
@@ -482,7 +483,7 @@ evalGBM <- function(x, resp, covar, weights=NULL, nTrees = 10000,
       mse_is <- sum(c(isPreds - tmpTrain[,resp])^2)/nrow(tmpTrain)
       isMSE <- c(isMSE,mse_is)
       osPreds <- predict.gbm(tmpGbm, newdata = tmpTest, n.trees = optTrees)
-      mse_os <- sum(c(isPreds - tmpTest[,resp])^2)/nrow(tmpTest)
+      mse_os <- sum(c(osPreds - tmpTest[,resp])^2)/nrow(tmpTest) 
       osMSE <- c(osMSE,mse_os)
       numTrees <- c(numTrees, optTrees)
     }

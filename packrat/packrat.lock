@@ -558,6 +558,12 @@ Version: 0.4-7
 Hash: f195c3a0f527f69c491569c5cbaaf1db
 Requires: MASS, Matrix, lme4
 
+Package: pdp
+Source: CRAN
+Version: 0.6.0
+Hash: 5adb607ebe844c958d6e65cfaed59c90
+Requires: ggplot2, gridExtra, lattice, magrittr, mgcv, plyr, viridis
+
 Package: piecewiseSEM
 Source: CRAN
 Version: 1.2.1
