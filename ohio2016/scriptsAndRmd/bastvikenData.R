@@ -65,15 +65,17 @@ litDat <-
          chla_Estimate = chlorophyll.a..ug.l.,
          mean.depth.m.morpho = mean.depth..m.,
          reservoir.area.m2 = surface.area..km2.,
+         watershed.area.m2 = catchment.area..km2.,
          tn_Estimate = tn.mg.l.) %>%
   # fix units
     mutate(ch4.trate.mg.h_Estimate = ch4.trate.mg.h_Estimate/24,
            ch4.drate.mg.h_Estimate = ch4.drate.mg.m2.h_Estimate/24,
            ch4.erate.mg.h_Estimate = ch4.erate.mg.h_Estimate/24,
-           reservoir.area.m2 = reservoir.area.m2 * 1000) %>%
+           reservoir.area.m2 = reservoir.area.m2 * 1000000,
+           watershed.area.m2 = watershed.area.m2 * 1000000) %>%
     select(Lake_Name, source, type, ch4.trate.mg.h_Estimate, ch4.drate.mg.m2.h_Estimate,
            ch4.erate.mg.h_Estimate, chla_Estimate, mean.depth.m.morpho,
-           reservoir.area.m2, tn_Estimate)
+           reservoir.area.m2, watershed.area.m2, tn_Estimate)
 
 # Bring in 2016 multi reservoir survey data
 allDat <- Reduce(full_join, list(litDat, meanVariance.c.lake.lu)) 
