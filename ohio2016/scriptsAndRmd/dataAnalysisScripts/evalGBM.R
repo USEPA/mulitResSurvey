@@ -16,22 +16,30 @@ localDataGbmIndex <- grepl(pattern = "EPA", x = meanVariance.c.lake.lu.agg$citat
 localDataGbm <- meanVariance.c.lake.lu.agg[localDataGbmIndex, ] # local data
 
 # Predictor variables
-allCovar = covarList # See aggregateActon.R for list.
+# allCovar similar to covarList in aggregateActon.R, but here max.depth.ft
+# is replaced with max.depth.m
+allCovar <- c("chla_Estimate", "tp_Estimate", "tn_Estimate", "max.depth.m",
+              "mean.depth.m.morpho", "prop.less.3m", "hypoxic.frac", "hypol.frac",
+              "res.perimeter.m", "res.fetch.m", "reservoir.area.m2", 
+              "watershed.area.m2", "percent.agg.ag", "rda")
+
+# See aggregateActon.R for list.
 nationalCovar <- c("max.depth.m", # exclude SI due to correlation with res size
                    "mean.depth.m.morpho", "prop.less.3m",
                    "res.perimeter.m", "res.fetch.m", "reservoir.area.m2", 
                    "watershed.area.m2", "percent.agg.ag", "rda")
 
 # Volumetric ebullition rate---------------------------------
+# This response variable not available at national scale
 resp = "ebMlHrM2_Estimate"
-weights = 1/dataGbm$ebMlHrM2_StdError^2 
+localWeights = 1/localDataGbm$ebMlHrM2_StdError^2
 nTrees = 10000
 
 # All predictors: local emission data 
 evalLocalVolRateFull <- evalGBM(x = localDataGbm, 
                         resp = resp,
                         covar = allCovar,
-                        weights = weights,
+                        weights = localWeights,
                         nTrees = nTrees)
 
 # Write to disk
@@ -47,7 +55,7 @@ evalLocalVolRateFull$parameterGrid
 evalLocalVolRateNat <- evalGBM(x = localDataGbm, # 11 hours
                            resp = resp,
                            covar = nationalCovar,
-                           weights = weights,
+                           weights = localWeights,
                            nTrees = nTrees)
 
 
@@ -59,32 +67,18 @@ evalLocalVolRateNat$plots[[1]]
 evalLocalVolRateNat$plots[[2]]
 evalLocalVolRateNat$parameterGrid
 
-# National scale predictors: National scale emission data
-evalNatVolRateNat <- evalGBM(x = natDataGbm, # 11 hours
-                               resp = resp,
-                               covar = nationalCovar,
-                               weights = weights,
-                               nTrees = nTrees)
-
-
-# Write to disk
-save(evalNatVolRateNat, file = "ohio2016/output/evalNatVolRateNat.RData")
-
-# Look at plots
-evalNatVolRateNat$plots[[1]]
-evalNatVolRateNat$plots[[2]]
-evalNatVolRateNat$parameterGrid
 
 # Total CH4 emission rate---------------------------------
 resp = "ch4.trate.mg.h_Estimate"
-weights = 1/dataGbm$ch4.trate.mg.h_StdError^2 
+localWeights = 1/localDataGbm$ch4.trate.mg.h_StdError^2 
+natWeights = 1/natDataGbm$ch4.trate.mg.h_StdError^2
 nTrees = 10000
 
 # All predictors: local emission data
 evalLocalCh4trateFull <- evalGBM(x = localDataGbm, # ~ 5 hours to run
                         resp = resp,
                         covar = allCovar,
-                        weights = weights,
+                        weights = localWeights,
                         nTrees = nTrees)
 
 # Write to disk
@@ -99,7 +93,7 @@ evalLocalCh4trateFull$parameterGrid
 evalLocalCh4trateNat <- evalGBM(x = localDataGbm, 
                             resp = resp,
                             covar = nationalCovar,
-                            weights = weights,
+                            weights = localWeights,
                             nTrees = nTrees)
 
 # Write to disk
@@ -114,7 +108,7 @@ evalLocalCh4trateNat$parameterGrid
 evalNatCh4trateNat <- evalGBM(x = natDataGbm, 
                                 resp = resp,
                                 covar = nationalCovar,
-                                weights = weights,
+                                weights = natWeights,
                                 nTrees = nTrees)
 
 # Write to disk
@@ -127,14 +121,15 @@ evalNatCh4trateNat$parameterGrid
 
 # Diffusive CH4 emission rate---------------------------------
 resp = "ch4.drate.mg.m2.h_Estimate"
-weights = 1/dataGbm$ch4.drate.mg.m2.h_StdError^2 
+localWeights = 1/localDataGbm$ch4.drate.mg.m2.h_StdError^2 
+natWeights = 1/natDataGbm$ch4.drate.mg.m2.h_StdError^2
 nTrees = 10000
 
 # All predictors : local emission data
 evalLocalCh4drateFull <- evalGBM(x = localDataGbm, 
                             resp = resp,
                             covar = allCovar,
-                            weights = weights,
+                            weights = localWeights,
                             nTrees = nTrees)
 
 # Write to disk
@@ -149,7 +144,7 @@ evalLocalCh4drateFull$parameterGrid
 evalLocalCh4drateNat <- evalGBM(x = localDataGbm, 
                             resp = resp,
                             covar = nationalCovar,
-                            weights = weights,
+                            weights = localWeights,
                             nTrees = nTrees)
 
 # Write to disk
@@ -164,7 +159,7 @@ evalLocalCh4drateNat$parameterGrid
 evalNatCh4drateNat <- evalGBM(x = natDataGbm, 
                                 resp = resp,
                                 covar = nationalCovar,
-                                weights = weights,
+                                weights = natWeights,
                                 nTrees = nTrees)
 
 # Write to disk
@@ -177,14 +172,15 @@ evalNatCh4drateNat$parameterGrid
 
 # Ebullitive CH4 emission rate---------------------------------
 resp = "ch4.erate.mg.h_Estimate"
-weights = 1/dataGbm$ch4.erate.mg.h_StdError^2 
+localWeights = 1/localDataGbm$ch4.erate.mg.h_StdError^2 
+natWeights = 1/natDataGbm$ch4.erate.mg.h_StdError^2 
 nTrees = 10000
 
 # All predictors : local emission data
 evalLocalCh4erateFull <- evalGBM(x = localDataGbm, 
                             resp = resp,
                             covar = allCovar,
-                            weights = weights,
+                            weights = localWeights,
                             nTrees = nTrees)
 
 # Write to disk
@@ -199,7 +195,7 @@ evalLocalCh4erateFull$parameterGrid
 evalLocalCh4erateNat <- evalGBM(x = localDataGbm, 
                            resp = resp,
                            covar = nationalCovar,
-                           weights = weights,
+                           weights = localWeights,
                            nTrees = nTrees)
 
 # Write to disk
@@ -214,7 +210,7 @@ evalLocalCh4erateNat$parameterGrid
 evalLocalCh4erateNat <- evalGBM(x = natDataGbm, 
                                 resp = resp,
                                 covar = nationalCovar,
-                                weights = weights,
+                                weights = natWeights,
                                 nTrees = nTrees)
 
 # Write to disk
@@ -226,15 +222,16 @@ evalNatCh4erateNat$plots[[2]]
 evalNatCh4erateNat$parameterGrid
 
 # CO2 total emission rate---------------------------------
+# Dont have national scale total CO2 emission rates
 resp = "co2.trate.mg.h_Estimate"
-weights = 1/dataGbm$co2.trate.mg.h_StdError^2 
+localWeights = 1/localDataGbm$co2.trate.mg.h_StdError^2 
 nTrees = 10000
 
 # All predictors : local emission data
 evalLocalCo2trateFull <- evalGBM(x = localDataGbm, 
                             resp = resp,
                             covar = allCovar,
-                            weights = weights,
+                            weights = localWeights,
                             nTrees = nTrees)
 
 # Write to disk
@@ -249,7 +246,7 @@ evalLocalCo2trateFull$parameterGrid
 evalLocalCo2trateNat <- evalGBM(x = localDataGbm, 
                            resp = resp,
                            covar = nationalCovar,
-                           weights = weights,
+                           weights = localWeights,
                            nTrees = nTrees)
 
 # Write to disk
@@ -260,30 +257,18 @@ evalLocalCo2trateNat$plots[[1]]
 evalLocalCo2trateNat$plots[[2]]
 evalLocalCo2trateNat$parameterGrid
 
-# National scale predictors : national emission data
-evalNatCo2trateNat <- evalGBM(x = natDataGbm, 
-                                resp = resp,
-                                covar = nationalCovar,
-                                weights = weights,
-                                nTrees = nTrees)
 
-# Write to disk
-save(evalNatCo2trateNat, file = "ohio2016/output/evalNatCo2trateNat.RData")
-
-# Look at plots
-evalNatCo2trateNat$plots[[1]]
-evalNatCo2trateNat$plots[[2]]
-evalNatCo2trateNat$parameterGrid
 # CO2 diffusive emission rate---------------------------------
+# Dont have national scale CO2 diffusion rates
 resp = "co2.drate.mg.m2.h_Estimate"
-weights = 1/dataGbm$co2.drate.mg.m2.h_StdError^2 
+localWeights = 1/localDataGbm$co2.drate.mg.m2.h_StdError^2 
 nTrees = 10000
 
 # All predictors : local emission data
 evalLocalCo2drateFull <- evalGBM(x = localDataGbm, 
                             resp = resp,
                             covar = allCovar,
-                            weights = weights,
+                            weights = localWeights,
                             nTrees = nTrees)
 
 # Write to disk
@@ -298,7 +283,7 @@ evalLocalCo2drateFull$parameterGrid
 evalLocalCo2drateNat <- evalGBM(x = localDataGbm, 
                            resp = resp,
                            covar = nationalCovar,
-                           weights = weights,
+                           weights = localWeights,
                            nTrees = nTrees)
 
 # Write to disk
@@ -309,30 +294,18 @@ evalLocalCo2drateNat$plots[[1]]
 evalLocalCo2drateNat$plots[[2]]
 evalLocalCo2drateNat$parameterGrid
 
-# National scale predictors : national emission data
-evalNatCo2drateNat <- evalGBM(x = natDataGbm, 
-                                resp = resp,
-                                covar = nationalCovar,
-                                weights = weights,
-                                nTrees = nTrees)
 
-# Write to disk
-save(evalNatCo2drateNat, file = "ohio2016/output/evalNatCo2drateNat.RData")
-
-# Look at plots
-evalNatCo2drateNat$plots[[1]]
-evalNatCo2drateNat$plots[[2]]
-evalNatCo2drateNat$parameterGrid
 # CO2 ebullitive emission rate---------------------------------
+# Dont have national scale CO2 ebullition rates
 resp = "co2.erate.mg.h_Estimate"
-weights = 1/dataGbm$co2.erate.mg.h_StdError^2 
+localWeights = 1/localDataGbm$co2.erate.mg.h_StdError^2 
 nTrees = 10000
 
 # All predictors : local emission data
 evalLocalCo2erateFull <- evalGBM(x = localDataGbm, 
                             resp = resp,
                             covar = allCovar,
-                            weights = weights,
+                            weights = localWeights,
                             nTrees = nTrees)
 
 # Write to disk
@@ -347,7 +320,7 @@ evalLocalCo2erateFull$parameterGrid
 evalLocalCo2erateNat <- evalGBM(x = localDataGbm, 
                            resp = resp,
                            covar = nationalCovar,
-                           weights = weights,
+                           weights = localWeights,
                            nTrees = nTrees)
 
 # Write to disk
@@ -357,18 +330,3 @@ save(evalLocalCo2erateNat, file = "ohio2016/output/evalLocalCo2erateNat.RData")
 evalLocalCo2erateNat$plots[[1]]
 evalLocalCo2erateNat$plots[[2]]
 evalLocalCo2erateNat$parameterGrid
-
-# National scale predictors : national emission data
-evalNatCo2erateNat <- evalGBM(x = natDataGbm, 
-                                resp = resp,
-                                covar = nationalCovar,
-                                weights = weights,
-                                nTrees = nTrees)
-
-# Write to disk
-save(evalNatCo2erateNat, file = "ohio2016/output/evalNatCo2erateNat.RData")
-
-# Look at plots
-evalNatCo2erateNat$plots[[1]]
-evalNatCo2erateNat$plots[[2]]
-evalNatCo2erateNat$parameterGrid
