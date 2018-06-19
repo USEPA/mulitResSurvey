@@ -14,10 +14,11 @@ respList <- c("ebMlHrM2_Estimate",
               "co2.drate.mg.m2.h_Estimate",
               "co2.erate.mg.h_Estimate")
 
+# excluding SI from covarList due to strong correlation with res size
 covarList <- c("chla_Estimate", "tp_Estimate", "tn_Estimate", "max.depth.ft",
                "mean.depth.m.morpho", "prop.less.3m", "hypoxic.frac", "hypol.frac",
                "res.perimeter.m", "res.fetch.m", "reservoir.area.m2", 
-               "watershed.area.m2", "percent.agg.ag", "rda", "si")
+               "watershed.area.m2", "percent.agg.ag", "rda")
 
 actonInds <- grepl("Acton", meanVariance.c.lake.lu$Lake_Name)
 actonDat <- meanVariance.c.lake.lu[actonInds,
@@ -60,4 +61,4 @@ meanVariance.c.lake.lu.agg <- rbind(tmp,
 
 # Columns restricted to response variables, covariates, and id variables
 # (i.e. citation, Lake_Name)
-ncol(meanVariance.c.lake.lu.agg); nrow(meanVariance.c.lake.lu.agg) # 31 columns, 43 rows
+ncol(meanVariance.c.lake.lu.agg); nrow(meanVariance.c.lake.lu.agg) # 30 columns, 43 rows

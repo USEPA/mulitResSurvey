@@ -2,7 +2,7 @@
 # LARGE RESERVOIRS IN THE SOUTHEASTERN UNITED STATES.  NO MEASUREMENTS OF
 # VARIANCE (i.e. STD ERROR, STD DEV, ...) ARE PRESENTED IN PAPER, SO RAW
 # DATA WERE OBTAINED FROM CORRESPONDING AUTHOR.  THE CODE BELOW READS AND
-# AGGREGRATES THE DATA.  NEPTUNE WILL ADD CODE TO PROPERLY HANDLE THE VARIANCE
+# AGGREGRATES THE DATA.  NEPTUNE PROVIDED CODE TO PROPERLY HANDLE THE VARIANCE
 # ESTIMATES.
 
 # Bevelhimer, M. S., A. J. Stewart, A. M. Fortner, J. R. Phillips and J. J.
@@ -38,8 +38,8 @@ bevEbul <- mutate(bevEbul,
   select(Lake_Name, co2.erate.mg.h_Estimate, ch4.erate.mg.h_Estimate) %>%
   group_by(Lake_Name) %>%
   summarize(
-    # calculating SE error here to be consistent with output for grts function.
-    # evalGBM.R and runGBM.R weight by 1/SE^2
+    # calculate SE error for cove habitat in each lake.  This SE is not yet 
+    # scaled to entire lake.
     co2.erate.mg.h_StdError = sd(co2.erate.mg.h_Estimate) / # std error
       sqrt(length(co2.erate.mg.h_Estimate)),
     ch4.erate.mg.h_StdError = sd(ch4.erate.mg.h_Estimate) / # std error
@@ -48,15 +48,14 @@ bevEbul <- mutate(bevEbul,
     ch4.erate.mg.h_Estimate = mean(ch4.erate.mg.h_Estimate)  # mean
   ) %>%
   # Hartwell only has one measurement, therefore can't calculate SE
-  # Assume equal to mean of all other reservoirs.  Will, feel free to 
-  # modify this approach.
+  # Assume equal to mean of all other reservoirs.
   mutate(co2.erate.mg.h_StdError = replace(co2.erate.mg.h_StdError,
                                            which(is.na(co2.erate.mg.h_StdError)), # This needs to be is.na(), not is.nan()
                                            mean(co2.erate.mg.h_StdError, na.rm = TRUE)),
          ch4.erate.mg.h_StdError = replace(ch4.erate.mg.h_StdError,
                                            which(is.na(ch4.erate.mg.h_StdError)), # Ditto.
                                            mean(ch4.erate.mg.h_StdError, na.rm = TRUE))) %>%
-  # Scale to entire lake.  Still need to convert StdError to account for scaling
+  # Scale to entire lake.  Code below accounts for scaling in SE calculation
   #### Will Barnett, June 2018
   #### The variance of the weighted sample mean is 
   #### s_xbar^2 = sum( w_i^2 * s_i^2)
@@ -90,6 +89,8 @@ bevDif <- mutate(bevDif,
   select(Lake_Name, habitat, ch4.drate.mg.m2.h_Estimate, co2.drate.mg.m2.h_Estimate) %>%
   group_by(Lake_Name, habitat) %>%
   summarize(
+    # calculate SE error for each habitat in each lake.  This SE is not yet 
+    # scaled to entire lake.
     co2.drate.mg.m2.h_StdError = sd(co2.drate.mg.m2.h_Estimate) / # std error
       sqrt(length(co2.drate.mg.m2.h_Estimate)),
     ch4.drate.mg.m2.h_StdError = sd(ch4.drate.mg.m2.h_Estimate) / # std error
@@ -127,7 +128,6 @@ bevDif <- mutate(bevDif,
 
 # TOTAL EMISSIONS DATA--------------------
 # Total emissions is simply the sum of diffusive and ebullitive
-# Need to deal with SE calculations
 # WB June 10, 2018: If the two emissions types are uncorrelated,
 # then the variance of the sum is the sum of the variances.
 bevAllEmis <- merge(bevEbul, bevDif) %>%
@@ -140,8 +140,6 @@ bevAllEmis <- merge(bevEbul, bevDif) %>%
          co2.trate.mg.h_StdError = sqrt(co2.drate.mg.m2.h_StdError^2 +
                                           co2.erate.mg.h_StdError^2))
 
-## WB June 10, 2018: I didn't edit below here. We should make sure the 
-## Se estimates are included wherever necessary.
 
 
 # LAND USE AND MORPHOLOGY DATA-------------------------------
