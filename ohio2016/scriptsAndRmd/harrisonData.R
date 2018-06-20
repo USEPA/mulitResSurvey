@@ -5,12 +5,12 @@
 # FOR OUR ANALYSIS.  DATA WERE ENTERED INTO EXCEL AND ARE READ IN BELOW.
 
 # BRING IN EMISSION RATE DATA---------------
-harRate <- read_excel("ohio2016/inputData/literatureData/harrison.xlsx")
+harRate <- readxl::read_excel("ohio2016/inputData/literatureData/harrison.xlsx")
 
 names(harRate) = gsub(pattern = c("\\(| |#|)|/|-|\\+"), replacement = ".", 
                      x = names(harRate))
 
-## WB June 10, 2018:
+## WB June 2018:
 ## The Harrison paper says 'Lake-wide ebullition fluxes were estimated by area-weighting fluxes from two 
 ## zones (profundal and littoral, defined as greater and less than 4 m depth, 
 ## respectively) in each reservoir, using a minimum of 2 traps in each 
@@ -19,9 +19,20 @@ names(harRate) = gsub(pattern = c("\\(| |#|)|/|-|\\+"), replacement = ".",
 ## Table S1 in the Supplemental Information simply adds the SEs for 
 ## diffusive and ebullitive fluxes, and calls it a total. This is incorrect.
 ## Assuming the diffusive and ebullitive flux SEs are calculated with the 
-## proper weighting and they are uncorrelated, the SE of the total flus is the sqrt of 
+## proper weighting and they are uncorrelated, the SE of the total flux is the sqrt of 
 ## the sum of both SEs squared.That is, SE_Total = sqrt (SE_Diff^2 + SE_Ebul^2).
-## Change that here.
+
+## First though - the ebullition fux and SE at Cle Elum are both 0. This is
+## going to cause a problem since we inverse weight by the SE.
+## Jake figures that the likely measurement error from the device is from 
+## 0 to 0.008 mg / (m^2 * h). Using a uniform distribution, the SE of the mean
+## of n measurements is sqrt( (b - a)^2 / (12 * n)). Use that here.
+b = 0.008; a = 0; n = 4
+cleElumInd <- which(harRate$Lake_Name == "Cle Elum")
+harRate$ch4.erate.mg.h_StdError[cleElumInd] <- sqrt( (b - a)^2 / (12 * n))
+harRate[,c("ch4.erate.mg.h_Estimate","ch4.erate.mg.h_StdError")] # Fixed
+
+## Now fix the SE of the total, using the formula mentioned above.
 harRate$ch4.trate.mg.h_StdError <- sqrt(harRate$ch4.drate.mg.m2.h_StdError^2 +
                                           harRate$ch4.erate.mg.h_StdError^2)
 
