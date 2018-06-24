@@ -11,80 +11,193 @@ classoption:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Results of evalGBM function for evaluation shrinkage rate and bag fraction values for brt model of data collected from 2016 reservoir survey.
+Results of evalGBM function for evaluation of shrinkage rate and bag fraction values for brt model of 2016 reservoir survey data.
 
 ```{r, echo=FALSE}
 # volumetric
-load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalVolRateFull.RData")
-load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalVolRateNat.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalVolRateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalVolRateNat.RData")
 
 # CH4 total
-load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalCh4trateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4trateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4trateNat.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalNatCh4trateNat.RData")
+
+# CH4 diffusion
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4drateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4drateNat.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalNatCh4drateNat.RData")
+
+# CH4 ebullition
+# Waiting for Will
+# load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4erateFull.RData")
+# load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4erateNat.RData")
+# load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalNatCh4erateNat.RData")
 
 # CO2 diffusion
-load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalCo2drateFull.RData")
-load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalCo2drateNat.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2drateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2drateNat.RData")
 
 # CO2 ebullition
-load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalCo2erateFull.RData")
-load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalCo2erateNat.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2erateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2erateNat.RData")
 
-
+# CO2 total
+# Waiting for Will
+# load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2trateFull.RData")
+# load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2trateNat.RData")
 ```
 
 \pagebreak
-**Volumetric ebullition rate, all predictors**
+**Local volumetric ebullition rate, all predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-evalVolRateFull$plots[[1]]
-evalVolRateFull$plots[[2]]
+evalLocalVolRateFull$plots[[1]]
+evalLocalVolRateFull$plots[[2]]
 ```
 
 \pagebreak
-**Volumetric ebullition rate, national predictors**
+**Local volumetric ebullition rate, national predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-evalVolRateNat$plots[[1]]
-evalVolRateNat$plots[[2]]
+evalLocalVolRateNat$plots[[1]]
+evalLocalVolRateNat$plots[[2]]
 ```
 
 
+
+
 \pagebreak
-**Total CH4 emission rate, all predictors**
+**Local total CH4 emission rate, all predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-evalCh4trateFull$plots[[1]]
-evalCh4trateFull$plots[[2]]
+evalLocalCh4trateFull$plots[[1]]
+evalLocalCh4trateFull$plots[[2]]
 ```
 
 \pagebreak
-**CO2 diffusion rate, all predictors**
+**Local total CH4 emission rate, national predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-evalCo2drateFull$plots[[1]]
-evalCo2drateFull$plots[[2]]
+evalLocalCh4trateNat$plots[[1]]
+evalLocalCh4trateNat$plots[[2]]
 ```
 
 \pagebreak
-**CO2 diffusion rate, national predictors**
+**National total CH4 emission rate, national predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-evalCo2drateNat$plots[[1]]
-evalCo2drateNat$plots[[2]]
+evalNatCh4trateNat$plots[[1]]
+evalNatCh4trateNat$plots[[2]]
+```
+
+
+
+
+
+\pagebreak
+**Local diffusive CH4 emission rate, all predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalLocalCh4drateFull$plots[[1]]
+evalLocalCh4drateFull$plots[[2]]
 ```
 
 \pagebreak
-**CO2 ebullition rate, national predictors**
+**Local diffusive CH4 emission rate, national predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-evalCo2erateFull$plots[[1]]
-evalCo2erateFull$plots[[2]]
+evalLocalCh4drateNat$plots[[1]]
+evalLocalCh4drateNat$plots[[2]]
 ```
 
 \pagebreak
-**CO2 ebullition rate, national predictors**
+**National diffusive CH4 emission rate, national predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-evalCo2erateNat$plots[[1]]
-evalCo2erateNat$plots[[2]]
+evalNatCh4drateNat$plots[[1]]
+evalNatCh4drateNat$plots[[2]]
+```
+
+
+
+
+
+
+\pagebreak
+**Local ebullitive CH4 emission rate, all predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+# evalLocalCh4erateFull$plots[[1]]
+# evalLocalCh4erateFull$plots[[2]]
+```
+
+\pagebreak
+**Local ebullitive CH4 emission rate, national predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+# evalLocalCh4erateNat$plots[[1]]
+# evalLocalCh4erateNat$plots[[2]]
+```
+
+\pagebreak
+**National ebullitive CH4 emission rate, national predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+# evalNatCh4erateNat$plots[[1]]
+# evalNatCh4erateNat$plots[[2]]
+```
+
+
+
+\pagebreak
+**Local CO2 diffusion rate, all predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalLocalCo2drateFull$plots[[1]]
+evalLocalCo2drateFull$plots[[2]]
+```
+
+\pagebreak
+**Local CO2 diffusion rate, national predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalLocalCo2drateNat$plots[[1]]
+evalLocalCo2drateNat$plots[[2]]
+```
+
+
+
+\pagebreak
+**Local CO2 ebullition rate, all predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalLocalCo2erateFull$plots[[1]]
+evalLocalCo2erateFull$plots[[2]]
+```
+
+\pagebreak
+**Local CO2 ebullition rate, national predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+evalLocalCo2erateNat$plots[[1]]
+evalLocalCo2erateNat$plots[[2]]
+```
+
+
+
+\pagebreak
+**Local CO2 total rate, all predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+# evalLocalCo2trateFull$plots[[1]]
+# evalLocalCo2trateFull$plots[[2]]
+```
+
+\pagebreak
+**Local CO2 total rate, national predictors**
+
+```{r, echo=FALSE, out.width="50%"}
+# evalLocalCo2trateNat$plots[[1]]
+# evalLocalCo2trateNat$plots[[2]]
 ```
