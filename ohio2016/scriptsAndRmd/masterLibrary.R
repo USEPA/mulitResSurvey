@@ -457,12 +457,12 @@ evalGBM <- function(x, resp, covar, weights=NULL, nTrees = 10000,
   }
   
   ## Loop
+  set.seed(setSeed)
   for(i in 1:nrow(parmGrid)){
     # i = 1
     isMSE <- NULL
     osMSE <- NULL
     numTrees <- NULL
-    set.seed(setSeed)
     for(j in 1:nGBM){
       # i = 1; j = 1
       trainInds <- sample(1:nrow(x), floor(nrow(x)*trainProp))
