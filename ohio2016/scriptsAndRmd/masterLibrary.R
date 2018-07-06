@@ -428,7 +428,8 @@ translationKeydf <- data.frame(Lake_Name = translationKey[seq(1,length(translati
 #### Will Barnett, Feb 2018
 evalGBM <- function(x, resp, covar, weights=NULL, nTrees = 10000,
                     shrMin=0.005, shrMax = 10e-6, bfMin = 0.5,
-                    bfMax = 0.9, cvFolds = 10, trainProp = 0.9, n = 10){
+                    bfMax = 0.9, cvFolds = 10, trainProp = 0.9, 
+                    nGrid = 10, nGBM = 10, setSeed = 1111){
   ## x is a data frame with a response variable, and covariates
   ## weights is a vector of numbers
   ## nTrees is the number of trees
@@ -443,8 +444,8 @@ evalGBM <- function(x, resp, covar, weights=NULL, nTrees = 10000,
   # resp = "ch4.trate.mg.h_Estimate"; covar = covarList; weights = 1/datGbm$ch4.trate.mg.h_StdError^2; nTrees = 10000
   # shrMin=0.005; shrMax = 10e-6; bfMin = 0.5; bfMax = 0.9; cvFolds = 10; trainProp = 0.75; n = 10
   gbmFormula <- as.formula(paste(resp,"~",paste(covar, collapse="+")))
-  parmGrid <- expand.grid(seq(shrMin, shrMax, length.out = n),
-                          seq(bfMin, bfMax, length.out = n))
+  parmGrid <- expand.grid(seq(shrMin, shrMax, length.out = nGrid),
+                          seq(bfMin, bfMax, length.out = nGrid))
   names(parmGrid) <- c("shr", "bf")
   parmGrid$isMSE <- as.numeric(NA)
   parmGrid$osMSE <- as.numeric(NA)
@@ -461,7 +462,8 @@ evalGBM <- function(x, resp, covar, weights=NULL, nTrees = 10000,
     isMSE <- NULL
     osMSE <- NULL
     numTrees <- NULL
-    for(j in 1:10){
+    set.seed(setSeed)
+    for(j in 1:nGBM){
       # i = 1; j = 1
       trainInds <- sample(1:nrow(x), floor(nrow(x)*trainProp))
       tmpTrain <- x[trainInds,]
@@ -487,7 +489,7 @@ evalGBM <- function(x, resp, covar, weights=NULL, nTrees = 10000,
       osMSE <- c(osMSE,mse_os)
       numTrees <- c(numTrees, optTrees)
     }
-    ## Find average MSE over 10 folds
+    ## Find average MSE over n folds
     parmGrid$isMSE[i] <- mean(isMSE)
     parmGrid$osMSE[i] <- mean(osMSE)
     parmGrid$optTrees[i] <- mean(numTrees)
