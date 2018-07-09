@@ -429,7 +429,7 @@ translationKeydf <- data.frame(Lake_Name = translationKey[seq(1,length(translati
 evalGBM <- function(x, resp, covar, weights=NULL, nTrees = 10000,
                     shrMin=0.005, shrMax = 10e-6, bfMin = 0.5,
                     bfMax = 0.9, cvFolds = 10, trainProp = 0.9, 
-                    nGrid = 10, nGBM = 10, setSeed = 1111){
+                    nGrid = 10, nGBM = 25, setSeed = 2345){
   ## x is a data frame with a response variable, and covariates
   ## weights is a vector of numbers
   ## nTrees is the number of trees
