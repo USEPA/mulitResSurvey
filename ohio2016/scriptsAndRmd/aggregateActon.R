@@ -16,7 +16,7 @@ respList <- c("ebMlHrM2_Estimate",
 
 # excluding SI from covarList due to strong correlation with res size
 covarList <- c("chla_Estimate", "tp_Estimate", "tn_Estimate", "max.depth.ft",
-               "mean.depth.m.morpho", "prop.less.3m", "hypoxic.frac", "hypol.frac",
+               "mean.depth.m", "prop.less.3m", "hypoxic.frac", "hypol.frac",
                "res.perimeter.m", "res.fetch.m", "reservoir.area.m2", 
                "watershed.area.m2", "percent.agg.ag", "rda")
 
@@ -50,7 +50,7 @@ names(tmp) <- names(actonDat)
 tmp$citation <- "EPA" # Add citation column
 tmp$Lake_Name <- "Acton Lake" # Add Lake_Name
 
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 120 columns, 46 rows
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 119 columns, 46 rows
 
 meanVariance.c.lake.lu.agg <- rbind(tmp, 
                                     meanVariance.c.lake.lu[!actonInds,

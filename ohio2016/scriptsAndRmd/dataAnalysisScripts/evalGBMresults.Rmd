@@ -29,10 +29,9 @@ load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh
 load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalNatCh4drateNat.RData")
 
 # CH4 ebullition
-# Waiting for Will
-# load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4erateFull.RData")
-# load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4erateNat.RData")
-# load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalNatCh4erateNat.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4erateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4erateNat.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalNatCh4erateNat.RData")
 
 # CO2 diffusion
 load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2drateFull.RData")
@@ -43,9 +42,8 @@ load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo
 load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2erateNat.RData")
 
 # CO2 total
-# Waiting for Will
-# load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2trateFull.RData")
-# load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2trateNat.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2trateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCo2trateNat.RData")
 ```
 
 \pagebreak
@@ -128,24 +126,24 @@ evalNatCh4drateNat$plots[[2]]
 **Local ebullitive CH4 emission rate, all predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-# evalLocalCh4erateFull$plots[[1]]
-# evalLocalCh4erateFull$plots[[2]]
+evalLocalCh4erateFull$plots[[1]]
+evalLocalCh4erateFull$plots[[2]]
 ```
 
 \pagebreak
 **Local ebullitive CH4 emission rate, national predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-# evalLocalCh4erateNat$plots[[1]]
-# evalLocalCh4erateNat$plots[[2]]
+evalLocalCh4erateNat$plots[[1]]
+evalLocalCh4erateNat$plots[[2]]
 ```
 
 \pagebreak
 **National ebullitive CH4 emission rate, national predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-# evalNatCh4erateNat$plots[[1]]
-# evalNatCh4erateNat$plots[[2]]
+evalNatCh4erateNat$plots[[1]]
+evalNatCh4erateNat$plots[[2]]
 ```
 
 
@@ -190,14 +188,14 @@ evalLocalCo2erateNat$plots[[2]]
 **Local CO2 total rate, all predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-# evalLocalCo2trateFull$plots[[1]]
-# evalLocalCo2trateFull$plots[[2]]
+evalLocalCo2trateFull$plots[[1]]
+evalLocalCo2trateFull$plots[[2]]
 ```
 
 \pagebreak
 **Local CO2 total rate, national predictors**
 
 ```{r, echo=FALSE, out.width="50%"}
-# evalLocalCo2trateNat$plots[[1]]
-# evalLocalCo2trateNat$plots[[2]]
+evalLocalCo2trateNat$plots[[1]]
+evalLocalCo2trateNat$plots[[2]]
 ```

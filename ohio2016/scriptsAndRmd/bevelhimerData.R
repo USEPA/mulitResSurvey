@@ -151,7 +151,7 @@ bevTable1 <- data.frame(Lake_Name = c("Allatoona", "Douglas", "Fontana",
                         reservoir.volume.m3 = c(453, 1334, 1780, 1256, 3145, 1396) *
                           10^6,
                         surface.area.km2 = c(49, 115, 43, 279, 226, 176)) %>%
-  mutate(mean.depth.m.morpho = reservoir.volume.m3 / 
+  mutate(mean.depth.m = reservoir.volume.m3 / 
            (surface.area.km2 * 1000000)) %>%
   select(-surface.area.km2)  # will use SA from Pegasus
 
@@ -213,7 +213,7 @@ bevMerge <- Reduce(function(...) merge(..., all=T),
 
 # Format for consistency with meanVariance.c.lake.lu
 bevMerge <- bevMerge %>%
-  rename(reservoir.area.m2.morpho = surface.area..m2.) %>%
+  rename(reservoir.area.m2 = surface.area..m2.) %>%
   mutate(Subpopulation = "Lake",
          citation = "Bevelhimer",
          max.depth.ft = max.reservoir.depth..m.*3.28) %>% # convert m to ft
@@ -223,12 +223,12 @@ bevMerge <- bevMerge %>%
          -notes, -source, 
          -proportion.of.reservoir.area.shallower.than.xm.contour,
          -percent.reservoir.area.shallower.than.xm.contour,
-         -reservoir.volume.m3, -state, -max.reservoir.depth..m.) 
+         -state, -max.reservoir.depth..m.) 
 
 # # Merge with meanVariance.c.lake.lu
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 120 columns, 40 rows
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 119 columns, 40 rows
 
 meanVariance.c.lake.lu <- bind_rows(bevMerge, meanVariance.c.lake.lu) %>%
   as.data.frame() # convert back to df.  tibbleDf causes problems.
 
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 120 columns, 46 rows, good
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 119 columns, 46 rows, good

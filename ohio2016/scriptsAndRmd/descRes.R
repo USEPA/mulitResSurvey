@@ -143,7 +143,8 @@ descRes <- filter(descRes, lLake_Name %in% tolower(translationKeydf$Lake_Name)) 
 # reservoir area in the process of calculating lake volume and mean depth.  This 
 # means that 'reservoir area' will represented twice in the data set.  The first 
 # estimate was used for the survey design while the second, more accurate estimate,
-# was derived from Pegasus's detailed bathymetry analysis.  
+# was derived from Pegasus's detailed bathymetry analysis.  I omitted the original
+# estimate from the final descRes object.
 
 # Reservoir Hydrology and morphology
 multiMorpho <- read.xls(xls = "ohio2016/inputData/watershedAndMorphology/Lake_Volume_Final_101117_with_Extra_Acton_Visits.xlsx",
@@ -155,8 +156,8 @@ names(multiMorpho) = tolower(names(multiMorpho))
 multiMorpho <- rename(multiMorpho, 
                       Lake_Name = lake,
                       reservoir.volume.m3 = volume.m3.,
-                      reservoir.area.m2.morpho = surface.area..m2.,
-                      mean.depth.m.morpho = mean.reservoir.depth..m.,
+                      reservoir.area.m2 = surface.area..m2.,
+                      mean.depth.m = mean.reservoir.depth..m.,
                       prop.less.3m = proportion.of.reservoir.area.shallower.than.3m) %>%
   mutate(hypoxic.frac = hypoxic..volume / reservoir.volume.m3,
          hypol.frac = hypolimnion.volume / reservoir.volume.m3,
@@ -165,13 +166,14 @@ multiMorpho <- rename(multiMorpho,
 
 # Simplify df and create lLower_Lake for merging with above
 multiMorpho <- select(multiMorpho, Lake_Name, reservoir.volume.m3,
-                      reservoir.area.m2.morpho, mean.depth.m.morpho,
+                      reservoir.area.m2, mean.depth.m,
                       prop.less.3m, hypoxic.frac, hypol.frac) %>%
   mutate(lLake_Name = tolower(Lake_Name))
 
 
 # Merge
-descRes <- merge(descRes,multiMorpho, all = TRUE)
+descRes <- merge(select(descRes, -reservoir.area.m2), # omit original area estimate for survey design
+                 multiMorpho, all = TRUE)
 
 str(descRes)  #35 obs, included 32 2016 surveys + 3 2017 acton surveys. good
 

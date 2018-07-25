@@ -35,7 +35,10 @@ source("ohio2016/scriptsAndRmd/convertMaxDepthToMeter.R")  # converts max depth 
 # GBM scripts
 # evalGBM.R calls evalGBM() which is sourced from masterLibrary.R
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBM.R") # 5 hours per model, careful!
-# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/runGBM.R") # load function
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBM.R") # 5 hours per model, careful!
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBMresults.Rmd") # contour plots for evalGBM() generated objects
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBMcompare.R") # Effect of nGBM on reproducability
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/runGbmEpa.R") # apply function, produce gbmohio.pdf
-
+# run GBM using parameters extracted from evalGBM using nGBM > 10
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/runGbmngbm.50.R") # apply function, 
 

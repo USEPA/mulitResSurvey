@@ -19,13 +19,13 @@ localDataGbm <- meanVariance.c.lake.lu.agg[localDataGbmIndex, ] # local data
 # allCovar similar to covarList in aggregateActon.R, but here max.depth.ft
 # is replaced with max.depth.m
 allCovar <- c("chla_Estimate", "tp_Estimate", "tn_Estimate", "max.depth.m",
-              "mean.depth.m.morpho", "prop.less.3m", "hypoxic.frac", "hypol.frac",
+              "mean.depth.m", "prop.less.3m", "hypoxic.frac", "hypol.frac",
               "res.perimeter.m", "res.fetch.m", "reservoir.area.m2", 
               "watershed.area.m2", "percent.agg.ag", "rda")
 
 # See aggregateActon.R for list.
 nationalCovar <- c("max.depth.m", # exclude SI due to correlation with res size
-                   "mean.depth.m.morpho", "prop.less.3m",
+                   "mean.depth.m", "prop.less.3m",
                    "res.perimeter.m", "res.fetch.m", "reservoir.area.m2", 
                    "watershed.area.m2", "percent.agg.ag", "rda")
 

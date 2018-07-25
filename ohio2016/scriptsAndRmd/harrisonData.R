@@ -157,9 +157,8 @@ harDat <- left_join(harMerge, harRate)
 
 # Format for consistency with meanVariance.c.lake.lu
 harDat <- harDat %>%
-  rename(reservoir.area.m2.morpho = reservoir.area.m2,
-         mean.depth.m.morpho = mean.reservoir.depth..m.,
-         reservoir.volume.m3 = volume.m3.) %>%        
+  rename(mean.depth.m = mean.reservoir.depth..m.,
+    reservoir.volume.m3 = volume.m3.) %>%        
   mutate(Subpopulation = "Lake",
          max.depth.ft = max.reservoir.depth..m.*3.28) %>%
   select(-percent.perennial.ice.snow,  # omit unneeded columns
@@ -175,12 +174,12 @@ harDat <- harDat %>%
 
 
 # Merge with meanVariance.c.lake.lu
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 120 columns, 35 rows
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 119 columns, 35 rows
 
 meanVariance.c.lake.lu <- bind_rows(harDat, meanVariance.c.lake.lu) %>%
  as.data.frame() # convert back to df.  tibbleDf causes problems.
 
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 120 columns, 40 rows, good
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 119 columns, 40 rows, good
 
 
 
