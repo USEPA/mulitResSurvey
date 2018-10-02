@@ -1,7 +1,7 @@
 ---
 title: "evalGBM"
 author: "J. Beaulieu"
-date: "March 27, 2018"
+date: "Sept. 11, 2018"
 output: pdf_document
 classoption: 
   - landscape
@@ -19,7 +19,7 @@ load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalVo
 load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalVolRateNat.RData")
 
 # CH4 total
-load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4trateFull.RData")
+load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4trateFull50.2856.RData")
 load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalLocalCh4trateNat.RData")
 load("C:/Users/JBEAULIE/GitRepository/mulitResSurvey/ohio2016/output/evalNatCh4trateNat.RData")
 

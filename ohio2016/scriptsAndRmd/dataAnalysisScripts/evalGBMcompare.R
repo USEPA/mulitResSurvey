@@ -80,3 +80,12 @@ print(p1, vp = vplayout(1, 1:4))
 print(p2, vp = vplayout(1, 5))
 
 dev.off()
+
+
+# BF vs osMSE
+ggplot(evalAll.c, aes(bf, seed2_osMSE)) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0) +
+  facet_wrap(~model) 
+
+

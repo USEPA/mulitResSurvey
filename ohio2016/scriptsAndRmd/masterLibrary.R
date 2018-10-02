@@ -13,7 +13,9 @@ library(reshape) # For merge_recurse function
 library(reshape2) # For melt/dcast
 library(tidyr)  # for separate
 library(gbm) # for boosted regression
+library(dismo) #gbm.simplify, gbm.interactions.  Not used in main analysis
 library(pdp) # for partial dependence plots
+library(caret) # for defining training data
 
 library(knitr)   # To knit rmarkdown document
 library(ggmap)   # For ggmap plot of reservoirs

@@ -8,11 +8,10 @@
 ## Function assumes 'localDataGbm' and 'natDataGbm' exist in environments (defined
 ## in evalGBM.R).  Function takes a response, a set of covariates, and a National/Full
 ## designation - and finds the best parameters from previous simulations
-runGBM <- function(resp, covarType = "Full", nTrees = 10000, 
+runGBM.v2 <- function(resp, covarType = "Full", nTrees = 10000, 
                    seed = 2222, file, obs){
   ## This script assumes that covarList (defined in and nationalCovar
   ## objects are in the global environment.
-  ## covarType can be "Local" or "Nat"
   # resp = "ch4.trate.mg.h_Estimate"
   # covarType = "Full" # 'Full' or 'Nat'
   # seed = 2222
@@ -62,7 +61,7 @@ runGBM <- function(resp, covarType = "Full", nTrees = 10000,
                 n.minobsinnode = 2,
                 interaction.depth = 2,
                 shrinkage = bestPars$shr,
-                bag.fraction = bestPars$bf,
+                bag.fraction = bestPars$bf,  
                 cv.folds = 10)
   optTrees <- gbm.perf(tmpGbm)
   
@@ -73,9 +72,12 @@ runGBM <- function(resp, covarType = "Full", nTrees = 10000,
   mse_os <- sum(c(osPreds - tmpTest[,resp])^2)/nrow(tmpTest)
   mse <- data.frame(msetype = c("in_sample", "out_sample"),
                     mse_value = c(mse_is, mse_os))
+  rsq_is <- summary(
+    lm(isPreds ~ tmpTrain[,resp]))$r.squared
   
   ## Prediction plot
   tmpTrain <- mutate(tmpTrain, isPreds = isPreds)
+ 
   predPlot <- ggplot(tmpTrain, aes_string(resp, isPreds)) + 
     geom_point() +
     geom_abline(slope = 1, intercept = 0) +
@@ -87,7 +89,8 @@ runGBM <- function(resp, covarType = "Full", nTrees = 10000,
     ggtitle(paste(obs, gasNm, gasSrc, "~", covarType, "\n",
                   "mse_is =", round(mse_is, 1),
                   "  mse_os =", round(mse_os, 1), "\n",
-                  "optTrees =", optTrees)) +
+                  "optTrees =", optTrees, "\n",
+                  "r2 =", rsq_is)) +
     theme(plot.title = element_text(size = 12))
   
 
@@ -116,7 +119,8 @@ runGBM <- function(resp, covarType = "Full", nTrees = 10000,
   p1 <- gridExtra::marrangeGrob(l1, nrow = 4, ncol = 2)
   l2 <- pl[(numP1+1):numPlots]
   p2 <- gridExtra::marrangeGrob(l2, nrow = 4, ncol = 2)
-  return(list("gbm"=tmpGbm,"optTrees"=optTrees, "mse" = mse,
+  return(list("gbm"=tmpGbm,"optTrees"=optTrees, "mse" = mse, 
+              "rsq_is" = rsq_is,
               "predPlot"=predPlot, "RelInfPlot"=relInfPlot,
               "PDPlots"=list(p1,p2)))
 }

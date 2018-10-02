@@ -1,6 +1,6 @@
 ## Function that takes a response, a set of covariates, and a National/Full
 ## designation - and finds the best parameters from previous simulations
-runGBM <- function(resp, covarType = "Full", nTrees = 10000, seed = 2222){
+runGBM.v1 <- function(resp, covarType = "Full", nTrees = 10000, seed = 2222){
   ## This script assumes that the dataGbm object, covarList, and nationalCovar
   ## objects are in the global environment.
   ## covarType can be "Full" or "Nat"
@@ -55,6 +55,8 @@ runGBM <- function(resp, covarType = "Full", nTrees = 10000, seed = 2222){
   mse_os <- sum(c(osPreds - tmpTest[,resp])^2)/nrow(tmpTest)
   mse <- data.frame(msetype = c("in_sample", "out_sample"),
                     mse_value = c(mse_is, mse_os))
+  rsq_is <- summary(
+    lm(isPreds ~ tmpTrain[,resp]))$r.squared
   
   ## Prediction plot
   tmpTrain <- mutate(tmpTrain, isPreds = isPreds)
@@ -62,12 +64,15 @@ runGBM <- function(resp, covarType = "Full", nTrees = 10000, seed = 2222){
     geom_point() +
     geom_abline(slope = 1, intercept = 0) +
     ylab("predicted") +
-    xlim(range(c(tmpTrain$resp, tmpTrain$isPreds))) + # equal range x/y axis
-    ylim(range(c(tmpTrain$resp, tmpTrain$isPreds))) + # equal range x/y axis
+    xlim(range(c(select(tmpTrain, eval(resp)) , 
+                 tmpTrain$isPreds))) + # equal range x/y axis
+    ylim(range(c(select(tmpTrain, eval(resp)) , 
+                 tmpTrain$isPreds))) + # equal range x/y axis
     ggtitle(paste(gasNm, gasSrc, "~", covarType, "\n",
                   "mse_is =", round(mse_is, 1),
                   "  mse_os =", round(mse_os, 1), "\n",
-                  "optTrees =", optTrees)) +
+                  "optTrees =", optTrees, "\n",
+                  "r2 =", rsq_is)) +
     theme(plot.title = element_text(size = 12))
   
   ## Relative influence plot
@@ -95,6 +100,7 @@ runGBM <- function(resp, covarType = "Full", nTrees = 10000, seed = 2222){
   l2 <- pl[(numP1+1):numPlots]
   p2 <- gridExtra::marrangeGrob(l2, nrow = 4, ncol = 2)
   return(list("gbm"=tmpGbm,"optTrees"=optTrees, "mse" = mse,
+              "rsq_is" = rsq_is,
               "predPlot"=predPlot, "RelInfPlot"=relInfPlot,
               "PDPlots"=list(p1,p2)))
 }
