@@ -50,6 +50,9 @@ library(dplyr)   # For data manipulation
 # repo.  May be able to load from package in future.
 source("ohio2016/scriptsAndRmd/def.calc.sdg.R")
 
+# Function for k-means clustering.  Used to generate "replicate" training 
+# data sets
+source("ohio2016/scriptsAndRmd/kMeansSampling.R")
 
 # TRIM FUNCTION--------------------------
 # returns string w/o leading or trailing whitespace
@@ -508,3 +511,4 @@ evalGBM <- function(x, resp, covar, weights=NULL, nTrees = 10000,
     geom_contour(colour = "white")
   return(list("parameterGrid"=parmGrid, "plots"=list(p1,p2)))
 }
+
