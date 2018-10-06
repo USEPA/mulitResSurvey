@@ -26,6 +26,6 @@ kMeansTrainSet <- function(d, seed = NULL, k = 5,
 }
 
 ## Testing
-d <- data.frame("X"=rnorm(100),"Y"=rnorm(100),"Z"=rnorm(100))
-trainSetInds <- kMeansTrainSet(d, seed = 1111, k = 5, trainProp = 0.8)
-str(trainSetInds)
+# d <- data.frame("X"=rnorm(100),"Y"=rnorm(100),"Z"=rnorm(100))
+# trainSetInds <- kMeansTrainSet(d, seed = 1111, k = 5, trainProp = 0.8)
+# str(trainSetInds)

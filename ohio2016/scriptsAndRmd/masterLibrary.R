@@ -52,7 +52,7 @@ source("ohio2016/scriptsAndRmd/def.calc.sdg.R")
 
 # Function for k-means clustering.  Used to generate "replicate" training 
 # data sets
-source("ohio2016/scriptsAndRmd/kMeansSampling.R")
+source("ohio2016/scriptsAndRmd/dataAnalysisScripts/kMeansSampling.R")
 
 # TRIM FUNCTION--------------------------
 # returns string w/o leading or trailing whitespace
