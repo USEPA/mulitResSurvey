@@ -19,7 +19,7 @@ evalGBMKmeans <- function(x, resp, covar, weights=NULL, nTrees = 20000,
   ## nGridCv is the number of items in a sequence for cvFolds
   
   ## Example 
-  # x <- localDataGbm[,c("ch4.trate.mg.h_Estimate",allCovar)]
+  # x <- localDataGbm
   # resp = "ch4.trate.mg.h_Estimate"; covar = allCovar; weights = 1/localDataGbm$ch4.trate.mg.h_StdError^2; nTrees = 20000
   # shr = 0.0005; bf = 0.9; cvFoldsMin = 2; cvFoldsMax = 10; trainPropMin = 0.5
   # trainPropMax = 0.9; nGridCv = 5; nGridProp = 5; nGBM = 50; setSeed = 2345
@@ -43,11 +43,13 @@ evalGBMKmeans <- function(x, resp, covar, weights=NULL, nTrees = 20000,
   
   ## Loop
   set.seed(setSeed)
-  for(i in 1:nrow(parmGrid)){
+  for(i in 1:5){ #nrow(parmGrid)){
+    message(i)
     # i = 1
     # isMSE <- NULL
     # osMSE <- NULL
     # numTrees <- NULL
+    x <- x[, c(resp, covar)] # remove uneeded columns,  Must so this before kMeans
       trainInds <- kMeansTrainSet(x, k = 5, trainProp = parmGrid$trainProp[i])
       tmpTrain <- x[trainInds,]
       tmpTest <- x[-trainInds,]
@@ -78,11 +80,14 @@ evalGBMKmeans <- function(x, resp, covar, weights=NULL, nTrees = 20000,
 }
 
 # RUN SIMULATIONS WITH TOTAL CH4 EMISSION RATE, LOCAL OBSERVATIONS, ALLCOVAR
-evalGBMKmeans(x = localDataGbm, 
-              resp = "ch4.trate.mg.h_Estimate",
-              covar = allCovar, 
-              weights = 1/localDataGbm$ch4.trate.mg.h_StdError^2,
-              nTrees = 20000, shr = 0.0005, bf = 0.9,
-              cvFoldsMin = 2, cvFoldsMax = 10,
-              trainPropMin = 0.5, trainPropMax = 0.9,
-              nGridCv = 5, nGridProp = 5, nGBM = 50, setSeed = 2345)
+evalGBMKmeansResults <- evalGBMKmeans(x = localDataGbm, 
+                                      resp = "ch4.trate.mg.h_Estimate",
+                                      covar = allCovar, 
+                                      weights = 1/localDataGbm$ch4.trate.mg.h_StdError^2,
+                                      nTrees = 20000, shr = 0.0005, bf = 0.9,
+                                      cvFoldsMin = 2, cvFoldsMax = 10,
+                                      trainPropMin = 0.5, trainPropMax = 0.9,
+                                      nGridCv = 5, nGridProp = 5, nGBM = 50, setSeed = 2345)
+
+
+write.table(evalGBMKmeansResults, file = "ohio2016/output/evalGBMKmeansResults.txt")
