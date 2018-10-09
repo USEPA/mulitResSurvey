@@ -41,15 +41,18 @@ evalGBMKmeans <- function(x, resp, covar, weights=NULL, nTrees = 20000,
     wts <- weights 
   }
   
+  # data
+  x <- x[, c(resp, covar)] # remove uneeded columns,  Must so this before kMeans
+  
   ## Loop
   set.seed(setSeed)
-  for(i in 1:5){ #nrow(parmGrid)){
+  for(i in 1:nrow(parmGrid)){
     message(i)
     # i = 1
     # isMSE <- NULL
     # osMSE <- NULL
     # numTrees <- NULL
-    x <- x[, c(resp, covar)] # remove uneeded columns,  Must so this before kMeans
+
       trainInds <- kMeansTrainSet(x, k = 5, trainProp = parmGrid$trainProp[i])
       tmpTrain <- x[trainInds,]
       tmpTest <- x[-trainInds,]
@@ -77,6 +80,7 @@ evalGBMKmeans <- function(x, resp, covar, weights=NULL, nTrees = 20000,
       parmGrid$osMSE[i] <- sum(c(osPreds - tmpTest[,resp])^2)/nrow(tmpTest) 
       parmGrid$optTrees[i] <- optTrees
   }
+  return(parmGrid)
 }
 
 # RUN SIMULATIONS WITH TOTAL CH4 EMISSION RATE, LOCAL OBSERVATIONS, ALLCOVAR
