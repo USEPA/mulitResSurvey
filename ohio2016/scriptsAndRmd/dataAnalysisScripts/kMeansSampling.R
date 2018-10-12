@@ -7,7 +7,7 @@ kMeansTrainSet <- function(d, seed = NULL, k = 5,
   ## and a training proportion.
   ## Returns a set of indices that are samples proportionally from
   ## the clustered groupings.
-  library(plyr)
+  ## library(plyr) # loaded from masterLibrary.R
   # d <- data.frame("X"=rnorm(100),"Y"=rnorm(100),"Z"=rnorm(100))
   # seed <- 1111; k = 5; trainProp = 0.8
   if(!is.null(seed) & is.numeric(seed)) set.seed(seed)

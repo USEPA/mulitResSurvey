@@ -47,11 +47,7 @@ evalGBMKmeans <- function(x, resp, covar, weights=NULL, nTrees = 20000,
   ## Loop
   set.seed(setSeed)
   for(i in 1:nrow(parmGrid)){
-    message(i)
-    # i = 1
-    # isMSE <- NULL
-    # osMSE <- NULL
-    # numTrees <- NULL
+    message(i) # report number of iterations
 
       trainInds <- kMeansTrainSet(x, k = 5, trainProp = parmGrid$trainProp[i])
       tmpTrain <- x[trainInds,]
@@ -83,7 +79,7 @@ evalGBMKmeans <- function(x, resp, covar, weights=NULL, nTrees = 20000,
   return(parmGrid)
 }
 
-# RUN SIMULATIONS WITH TOTAL CH4 EMISSION RATE, LOCAL OBSERVATIONS, ALLCOVAR
+# RUN SIMULATIONS WITH TOTAL CH4 EMISSION RATE, LOCAL OBSERVATIONS, ALLCOVAR-----
 evalGBMKmeansResults <- evalGBMKmeans(x = localDataGbm, 
                                       resp = "ch4.trate.mg.h_Estimate",
                                       covar = allCovar, 
@@ -94,4 +90,71 @@ evalGBMKmeansResults <- evalGBMKmeans(x = localDataGbm,
                                       nGridCv = 5, nGridProp = 5, nGBM = 50, setSeed = 2345)
 
 
-write.table(evalGBMKmeansResults, file = "ohio2016/output/evalGBMKmeansResults.txt")
+# # write.table(evalGBMKmeansResults, file = "ohio2016/output/evalGBMKmeansResults.txt")
+# 
+# # Read into workspace if needed
+# evalGBMKmeansResults <- read.table(file = "ohio2016/output/evalGBMKmeansResults.txt")
+# str(evalGBMKmeansResults)
+
+
+# PLOTS----------------
+# osMSE as a function of trainProp and cv folds
+ggplot(evalGBMKmeansResults, aes(cvFolds,osMSE)) + 
+  geom_point() +
+  facet_wrap(~trainProp, labeller = label_both)
+
+ggsave("ohio2016/output/figures/evalGBMKmeansTrainProp.tiff",
+       units="in",  # specify units for dimensions
+       width=11,   
+       height=8, 
+       dpi=600,   
+       compression = "lzw")
+
+# Distribution of osMSE at cvFolds == 10, trainProp == 0.9
+p1 <- ggplot(filter(evalGBMKmeansResults, cvFolds == 10, trainProp == 0.9),
+             aes(osMSE)) +
+  geom_density() +
+  ggtitle("shr=0.0005, bf=10, cv=10 \ntrainProp = 0.9, kMeansCluster") +
+  theme(plot.title = element_text(size = 8))
+
+p2 <- ggplot(filter(evalGBMKmeansResults, cvFolds == 10, trainProp == 0.9),
+             aes(osMSE)) +
+  stat_ecdf(geom = "step") +
+  ylab("cumulative distribution") +
+  ggtitle("shr=0.0005, bf=10, cv=10 \ntrainProp = 0.9, kMeansCluster") +
+  theme(plot.title = element_text(size = 8))
+
+p3 <- ggplot(filter(evalGBMKmeansResults, cvFolds == 10, trainProp %in% c(0.5, 0.9)),
+       aes(osMSE, group = trainProp)) +
+  stat_ecdf(aes(color = as.factor(trainProp))) +
+  ylab("cumulative distribution") +
+  ggtitle("shr=0.0005, bf=10, cv=10 \ntrainProp = 0.9, kMeansCluster") +
+  theme(legend.position = c(0.8, 0.3),
+        plot.title = element_text(size = 8)) +
+  scale_color_discrete(name = "trainProp")
+
+
+# Push to .tiff
+tiff("ohio2016/output/figures/osMseDistribution.tiff",
+     units = "in",
+     width = 8,
+     height = 3,
+     res = 800,
+     compression = "lzw")
+
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1,3)))
+
+vplayout <- function(x,y)
+  viewport(layout.pos.row = x, layout.pos.col = y)
+print(p1, vp = vplayout(1,1))
+print(p2, vp = vplayout(1,2))
+print(p3, vp = vplayout(1,3))
+dev.off()
+  
+  
+  
+# How does distribution of optTrees look?
+ggplot(evalGBMKmeansResults, aes(optTrees,osMSE)) + 
+  geom_point() +
+  facet_wrap(~trainProp, labeller = label_both)

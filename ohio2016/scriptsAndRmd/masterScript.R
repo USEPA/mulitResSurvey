@@ -37,6 +37,7 @@ source("ohio2016/scriptsAndRmd/convertMaxDepthToMeter.R")  # converts max depth 
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBM.R") # 5 hours per model, careful!
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBMresults.Rmd") # contour plots for evalGBM() generated objects
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBMcompare.R") # Effect of nGBM and seed on reproducability
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalKmeansTrainProp.R") # Effect of trainProp and cvFolds on reproducability
 
 # Function for running gbm using ideal parameters extracted from
 # object created in evalGBM.R.  First version of function written
@@ -52,6 +53,3 @@ source("ohio2016/scriptsAndRmd/convertMaxDepthToMeter.R")  # converts max depth 
 # not depend on evalGBM.R
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/runGBM.v3.R")
 
-
-# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/applyRunGbm.v2.R") # Run gbms!
-# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/applyRunGbm.v3.R") # Run gbms!
