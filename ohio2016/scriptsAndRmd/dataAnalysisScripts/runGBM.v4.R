@@ -1,30 +1,32 @@
 ## Will wrote a nice function to run a gbm using best parameters extracted from
 ## objects produced with evalGBM function (evalGBM.R).  I modified this function
-## to accomodate evalGBM objects created with nGBM set to 50 (runGBM.v2.R).
-## Here I modify the function to accept default values for shr and bf, rather than
-## extracting 'optimal' values from evalGBM.  I also use 'repeat' and 'break'
-## to rerun gbm function until optimal number of trees > 1000 & < 9990.
+## to accomodate evalGBM objects created with nGBM set to 50 (runGBM.v2.R). In
+## runGBM.v3.R I modify the function to 1) accept default values for shr and bf, 
+## rather than extracting 'optimal' values from evalGBM, and 2) use 'repeat' and 
+## 'break' to rerun gbm function until optimal number of trees > 1000 & < 9990.
 
-## Function assumes 'localDataGbm' and 'natDataGbm' exist in environments (defined
-## in evalGBM.R).  Function takes a response, a set of covariates, and a National/Full
-## designation.
-runGBM.v4 <- function(resp, covarType = "Full", obs, nTrees = 10000, 
+## Here I modify function to 1) allow the user to specify the fraction of observations
+## used for training data (trainProp argument), and 2) use kMeansClustering to 
+## chose representative data subsets.  
+
+runGBM.v4 <- function(resp, covarType = "All", obs, nTrees = 10000, 
                    seed = 2222, bf, shr, trainProp){
-  ## This script assumes that covarList (defined in and nationalCovar
+  ## This script assumes that allCovar and nationalCovar (defineRespCov.R)
   ## objects are in the global environment.
   # resp = "ch4.trate.mg.h_Estimate"
-  # covarType = "Full" # 'Full' or 'Nat'
+  # covarType = "All" # 'All' or 'Nat'
   # obs = "Local" # 'Local' or 'Nat' using local observations or all data
   # seed = 2222
   # bf = 0.9 # bagging fraction
   # shr = 0.0005 # small number
+  # trainProp = 0.9
   
   
   
   ## Run gbm model
   set.seed(seed) # for reproducability
   dataGbm <- eval(parse(text = paste0(tolower(obs), "DataGbm")))
-  if(covarType == "Full"){ # define covariate list
+  if(covarType == "All"){ # define covariate list
     covar <- allCovar # national + local
   }else{
     covar <- nationalCovar # just national
@@ -37,7 +39,7 @@ runGBM.v4 <- function(resp, covarType = "Full", obs, nTrees = 10000,
   tmpTest <- dataGbm[-trainInds,]
   tmpWeights <- wts[trainInds]
   
-  if(covarType == "Full"){
+  if(covarType == "All"){
     gbmFormula <- as.formula(paste(resp,"~",paste(allCovar, collapse="+")))
   }else{
     gbmFormula <- as.formula(paste(resp,"~",paste(nationalCovar, collapse="+")))

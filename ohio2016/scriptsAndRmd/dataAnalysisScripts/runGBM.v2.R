@@ -15,7 +15,7 @@ runGBM.v2 <- function(resp, covarType = "Full", nTrees = 10000,
   # resp = "ch4.trate.mg.h_Estimate"
   # covarType = "Full" # 'Full' or 'Nat'
   # seed = 2222
-  # file = "50.2856"
+  # covarType = "Full"
   # obs = "Local" # 'Local' or 'Nat' using local observations or all data
   
   # Read in relevant R workspace.

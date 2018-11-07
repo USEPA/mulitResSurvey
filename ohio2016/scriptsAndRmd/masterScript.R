@@ -19,7 +19,8 @@ source("ohio2016/scriptsAndRmd/calculateEmissions.R") # Merges with eqAreaData, 
 source("ohio2016/scriptsAndRmd/grtsWgtAdj.R") # Merges with eqAreaData, 2s
 source("ohio2016/scriptsAndRmd/grtsMeanVariance.R") # 20s
 
-# Add LU and morophology data to grts estimates
+# Add LU and morophology data to grts estimates. Prep for analysis.
+source("ohio2016/scriptsAndRmd/dataAnalysisScripts/defineRespCov.R") # response and covarlist for gbm and aggregateActon.R
 source("ohio2016/scriptsAndRmd/descRes.R") # creates meanVariance.c.lake.lu
 source("ohio2016/scriptsAndRmd/harrisonData.R")  # merges Harrison data w/ res survey
 source("ohio2016/scriptsAndRmd/bevelhimerData.R")  # merges Bevelhimer data w/ res survey
@@ -33,6 +34,7 @@ source("ohio2016/scriptsAndRmd/convertMaxDepthToMeter.R")  # converts max depth 
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/responseSurfacePlots.R") # uses models from above
 
 # GBM scripts
+
 # evalGBM.R calls evalGBM() which is sourced from masterLibrary.R
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBM.R") # 5 hours per model, careful!
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBMresults.Rmd") # contour plots for evalGBM() generated objects
@@ -53,3 +55,8 @@ source("ohio2016/scriptsAndRmd/convertMaxDepthToMeter.R")  # converts max depth 
 # not depend on evalGBM.R
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/runGBM.v3.R")
 
+# Function for running gbm using reasonable values for bf and shr.  Use kmeans
+# for choosing representative training data.  Does not depend on evalGBM.R
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/runGBM.v4.R")
+
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalVIPlots.R) # explore variation in relative importance plots across 'replicate' gbm runs

@@ -1,17 +1,17 @@
-## Function that takes a response, a set of covariates, and a National/Full
+## Function that takes a response, a set of covariates, and a National/All
 ## designation - and finds the best parameters from previous simulations
-runGBM.v1 <- function(resp, covarType = "Full", nTrees = 10000, seed = 2222){
-  ## This script assumes that the dataGbm object, covarList, and nationalCovar
+runGBM.v1 <- function(resp, covarType = "All", nTrees = 10000, seed = 2222){
+  ## This script assumes that the dataGbm object, allCovar, and nationalCovar
   ## objects are in the global environment.
-  ## covarType can be "Full" or "Nat"
-  # resp = "co2.trate.mg.h_Estimate"; covarType = "Full"; seed = 2222
+  ## covarType can be "All" or "Nat"
+  # resp = "co2.trate.mg.h_Estimate"; covarType = "All"; seed = 2222
   
   ## Read in relevant R workspace.
   gasNm <- ifelse(grepl("ch4",resp), "Ch4", "Co2")
   gasSrc <- ifelse(grepl("trate",resp), "trate", 
                    ifelse(grepl("erate", resp), "erate","drate"))
   rdNm <- paste("eval", gasNm, gasSrc, 
-                ifelse(covarType == "Full","Full","Nat"),
+                ifelse(covarType == "All","All","Nat"),
                 ".RData", sep="")
   load(paste("ohio2016/output/", rdNm, sep=""))
   
@@ -30,7 +30,7 @@ runGBM.v1 <- function(resp, covarType = "Full", nTrees = 10000, seed = 2222){
   trainInds <- sample(1:nrow(dataGbm), floor(nrow(dataGbm)*0.9))
   tmpTrain <- dataGbm[trainInds,]
   tmpTest <- dataGbm[-trainInds,]
-  if(covarType == "Full"){
+  if(covarType == "All"){
     gbmFormula <- as.formula(paste(resp,"~",paste(allCovar, collapse="+")))
   }else{
     gbmFormula <- as.formula(paste(resp,"~",paste(nationalCovar, collapse="+")))
@@ -84,7 +84,7 @@ runGBM.v1 <- function(resp, covarType = "Full", nTrees = 10000, seed = 2222){
   
   ## Partial dependence plots
   covs <- switch(covarType,
-                 Full = covarList, Nat = nationalCovar) # see evalGBM.R for objects
+                 All = allCovar, Nat = nationalCovar) # see evalGBM.R for objects
   numPlots <- length(covs)
   numP1 <- ceiling(numPlots/2)
   pl <- list()

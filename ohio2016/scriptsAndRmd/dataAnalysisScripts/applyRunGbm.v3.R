@@ -9,14 +9,14 @@ resp <- c("ch4.trate.mg.h_Estimate", "ch4.drate.mg.m2.h_Estimate", "ch4.erate.mg
          "co2.trate.mg.h_Estimate", "co2.drate.mg.m2.h_Estimate", "co2.erate.mg.h_Estimate",
          "ebMlHrM2_Estimate")
 
-covList <- c("Full", "Nat") # full is national + local
+covList <- c("All", "Nat") # All is national + local
 
 obs <- c("Local", "Nat") # local in EPA 32, Nat is EPA + lit
 
 # Matrix of above, filter out unused scenarios
 respCovList <- expand.grid(resp, covList, obs, stringsAsFactors = FALSE) %>%
   rename(cov = Var2, resp = Var1, obs = Var3) %>%
-  filter(obs != "Nat" | cov != "Full") %>% # Remove Nat obs w/full cov set
+  filter(obs != "Nat" | cov != "All") %>% # Remove Nat obs w/All cov set
   filter(!grepl(pattern = "co2", x = resp) | # Remove Nat CO2 resp, no data
            obs != "Nat") %>%
   filter(obs != "Nat" | # volumetric ebullition not available at national scale

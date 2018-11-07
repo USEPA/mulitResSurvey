@@ -4,27 +4,12 @@
 
 ## Acton Lake exists multiple times. Aggregate the entries in a 
 ## reasonable way.
-# List of variables to be aggregated.
-
-respList <- c("ebMlHrM2_Estimate",
-              "ch4.trate.mg.h_Estimate",
-              "ch4.drate.mg.m2.h_Estimate",
-              "ch4.erate.mg.h_Estimate",
-              "co2.trate.mg.h_Estimate",
-              "co2.drate.mg.m2.h_Estimate",
-              "co2.erate.mg.h_Estimate")
-
-# excluding SI from covarList due to strong correlation with res size
-covarList <- c("chla_Estimate", "tp_Estimate", "tn_Estimate", "max.depth.ft",
-               "mean.depth.m", "prop.less.3m", "hypoxic.frac", "hypol.frac",
-               "res.perimeter.m", "res.fetch.m", "reservoir.area.m2", 
-               "watershed.area.m2", "percent.agg.ag", "rda")
-
+## See defineRespCov.R for list of variables to be aggregated.
 actonInds <- grepl("Acton", meanVariance.c.lake.lu$Lake_Name)
 actonDat <- meanVariance.c.lake.lu[actonInds,
                                    c(respList, 
                                      gsub("Estimate","StdError",respList),
-                                               covarList)
+                                               allCovarActon)
                                    ]
 outVec <- NULL
 for(i in 1:ncol(actonDat)){
@@ -56,7 +41,7 @@ meanVariance.c.lake.lu.agg <- rbind(tmp,
                                     meanVariance.c.lake.lu[!actonInds,
                                                            c(respList, 
                                                              gsub("Estimate","StdError",respList),
-                                                             covarList, "citation", "Lake_Name")
+                                                             allCovarActon, "citation", "Lake_Name")
                                                            ])
 
 # Columns restricted to response variables, covariates, and id variables

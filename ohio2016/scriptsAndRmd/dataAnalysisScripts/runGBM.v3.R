@@ -6,14 +6,14 @@
 ## to rerun gbm function until optimal number of trees > 1000 & < 9990.
 
 ## Function assumes 'localDataGbm' and 'natDataGbm' exist in environments (defined
-## in evalGBM.R).  Function takes a response, a set of covariates, and a National/Full
+## in evalGBM.R).  Function takes a response, a set of covariates, and a National/All
 ## designation.
-runGBM.v3 <- function(resp, covarType = "Full", obs, nTrees = 10000, 
+runGBM.v3 <- function(resp, covarType = "All", obs, nTrees = 10000, 
                    seed = 2222, bf, shr){
-  ## This script assumes that covarList (defined in and nationalCovar
+  ## This script assumes that allCovar and nationalCovar (defineRespCov.R)
   ## objects are in the global environment.
   # resp = "ch4.trate.mg.h_Estimate"
-  # covarType = "Full" # 'Full' or 'Nat'
+  # covarType = "All" # 'All' or 'Nat'
   # obs = "Local" # 'Local' or 'Nat' using local observations or all data
   # seed = 2222
   # bf = 0.9 # bagging fraction
@@ -44,7 +44,7 @@ runGBM.v3 <- function(resp, covarType = "Full", obs, nTrees = 10000,
   tmpWeights <- wts[trainInds]
   tmpTest <- dataGbm[-trainInds,]
   
-  if(covarType == "Full"){
+  if(covarType == "All"){
     gbmFormula <- as.formula(paste(resp,"~",paste(allCovar, collapse="+")))
   }else{
     gbmFormula <- as.formula(paste(resp,"~",paste(nationalCovar, collapse="+")))

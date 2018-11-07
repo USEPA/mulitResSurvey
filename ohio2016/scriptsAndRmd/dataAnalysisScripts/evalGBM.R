@@ -6,29 +6,19 @@
 # Using lake-scale estimates of mean and variance calculated from
 # spSurvey function (grtsMeanVariance.R).  Replicate observations
 # at Acton lake aggregated into one value (aggregateActon.R).
+natDataGbm;localDataGbm # see defineRespCovar.R
+
 # Dependent variables include volumtric ebullition, CH4 emisson (3 mechanisms),
-# and CO2 emissions (3 mechanisms).  Predictor variables include those found
-# in national data sets, and national + local data (i.e., chlorophyll).
+# and CO2 emissions (3 mechanisms).  
+respList # see defineRespCov.R
+
+# Predictor variables include those found in national data sets, and 
+# national + local data (i.e., chlorophyll).
+allCovar # see defineRespCov.R
+nationalCovar # see defineRespCovar.R
+
+
 # Function run for only local measurements AND local + lit data.
-
-natDataGbm <- meanVariance.c.lake.lu.agg # local + lit data
-localDataGbmIndex <- grepl(pattern = "EPA", x = meanVariance.c.lake.lu.agg$citation)
-localDataGbm <- meanVariance.c.lake.lu.agg[localDataGbmIndex, ] # local data
-
-# Predictor variables
-# allCovar similar to covarList in aggregateActon.R, but here max.depth.ft
-# is replaced with max.depth.m
-allCovar <- c("chla_Estimate", "tp_Estimate", "tn_Estimate", "max.depth.m",
-              "mean.depth.m", "prop.less.3m", "hypoxic.frac", "hypol.frac",
-              "res.perimeter.m", "res.fetch.m", "reservoir.area.m2", 
-              "watershed.area.m2", "percent.agg.ag", "rda")
-
-# See aggregateActon.R for list.
-nationalCovar <- c("max.depth.m", # exclude SI due to correlation with res size
-                   "mean.depth.m", "prop.less.3m",
-                   "res.perimeter.m", "res.fetch.m", "reservoir.area.m2", 
-                   "watershed.area.m2", "percent.agg.ag", "rda")
-
 # Volumetric ebullition rate---------------------------------
 # This response variable not available at national scale
 resp = "ebMlHrM2_Estimate"
