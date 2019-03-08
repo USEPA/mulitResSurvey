@@ -35,3 +35,34 @@ sample.dates <- select(eqAreaData, Lake_Name, deplyDt) %>%
   distinct(Lake_Name, deplyDt) %>% 
   filter(!is.na(deplyDt))
 meanVariance.c <- merge(meanVariance.c, sample.dates)
+
+
+# Extract 'lake' scale data
+meanVariance.c.lake <- filter(meanVariance.c, Subpopulation == "lake")
+
+# In three lakes (Brookville|Buckhorn|Waynoka) we only have dissolved
+# gas data from one site.  Sample from the other site was somehow lost.
+# The function above reports NA for these lakes, which breaks the gbm.
+# Substitute NA values with the measured value from one site in each of 
+# these 3 lakes.
+
+dgData <- filter(eqAreaData,  # Measurement made at each site.
+                 grepl("Brook|Buckhorn|Waynoka", Lake_Name),
+                 !is.na(dissolved.ch4)) %>%
+  select(Lake_Name, dissolved.ch4, dissolved.co2)
+
+meanVariance.c.lake  <- meanVariance.c.lake %>%
+  mutate(dissolved.ch4_Estimate = ifelse(Lake_Name == "Lake Waynoka", # update CH4 for 3 lakes
+                                         dgData[dgData$Lake_Name == "Lake Waynoka", "dissolved.ch4"],
+                                         ifelse(Lake_Name == "Buckhorn Lake",
+                                                dgData[dgData$Lake_Name == "Buckhorn Lake", "dissolved.ch4"],
+                                                ifelse(Lake_Name == "Brookville Lake",
+                                                       dgData[dgData$Lake_Name == "Brookville Lake", "dissolved.ch4"],
+                                                       dissolved.ch4_Estimate))),
+         dissolved.co2_Estimate = ifelse(Lake_Name == "Lake Waynoka", # update co2 for 3 lakes
+                                         dgData[dgData$Lake_Name == "Lake Waynoka", "dissolved.co2"],
+                                         ifelse(Lake_Name == "Buckhorn Lake",
+                                                dgData[dgData$Lake_Name == "Buckhorn Lake", "dissolved.co2"],
+                                                ifelse(Lake_Name == "Brookville Lake",
+                                                       dgData[dgData$Lake_Name == "Brookville Lake", "dissolved.co2"],
+                                                       dissolved.co2_Estimate))))

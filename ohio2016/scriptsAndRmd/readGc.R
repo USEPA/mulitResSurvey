@@ -30,7 +30,7 @@ gas.10 <- read.xls(paste(rootDir, "Ebul_DgasAir_16_10_05_UNK_STD.xlsx", sep = ""
 # This file contains all gas data from 2017 sampling.  This includes Acton Lake,
 # NLA, Harsha, etc.  Need to strip out Acton Lake grts data.  This file has been 
 # somewhat formatted and will need to be treated differently, then merged in later.
-gas.11 <- read.table(paste(rootDir, "gcMasterFile2017updated2018-02-07.txt", sep = ""),
+gas.11 <- read.table(paste(rootDir, "gcMasterFile2017updated2018-03-15.txt", sep = ""),
                      as.is = TRUE, header = TRUE) %>%
   filter(grepl(x = sample, pattern = "ACT")) %>% # Exlcude samples not from Acton Lake
   # Exclude unecesary columns. LN2 module broke, only have composite O2/Ar peak.  Remove.
@@ -185,7 +185,7 @@ omitCodes <- c(16170, # run on GC, but field notes indicate is bad and not enter
                16576,  # Empty short tube run on GC
                16603, # trap sample, but no record in field sheets.
                16825, # no record in field sheets
-               16614:16617, # no record in field sheets
+               # 16614:16617, # not in field sheets (these belong to Waynoka)
                16070) # Karen noted loose cap. Came from trap, but looks like air.
                
 

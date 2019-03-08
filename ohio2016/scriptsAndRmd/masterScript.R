@@ -20,12 +20,13 @@ source("ohio2016/scriptsAndRmd/grtsWgtAdj.R") # Merges with eqAreaData, 2s
 source("ohio2016/scriptsAndRmd/grtsMeanVariance.R") # 20s
 
 # Add LU and morophology data to grts estimates. Prep for analysis.
-source("ohio2016/scriptsAndRmd/dataAnalysisScripts/defineRespCov.R") # response and covarlist for gbm and aggregateActon.R
 source("ohio2016/scriptsAndRmd/descRes.R") # creates meanVariance.c.lake.lu
-source("ohio2016/scriptsAndRmd/harrisonData.R")  # merges Harrison data w/ res survey
-source("ohio2016/scriptsAndRmd/bevelhimerData.R")  # merges Bevelhimer data w/ res survey
+source("ohio2016/scriptsAndRmd/harrisonData.R")  # merges Harrison data w/ meanVariance.c.lake.lu
+source("ohio2016/scriptsAndRmd/bevelhimerData.R")  # merges Bevelhimer data w/ meanVariance.c.lake.lu
+source("ohio2016/scriptsAndRmd/readNHD.R") # read NHD data (i.e lakeMorpho, lakeCat, streamCat)
+source("ohio2016/scriptsAndRmd/calculateMorpho.R")  # calculates derived quantities
 source("ohio2016/scriptsAndRmd/aggregateActon.R")  # Aggregate Acton reps.  meanVariance.c.lake.lu.agg
-source("ohio2016/scriptsAndRmd/convertMaxDepthToMeter.R")  # converts max depth from ft to m.
+source("ohio2016/scriptsAndRmd/defineRespCov.R") # response and covarlists for gbm
 
 # Exploratory Data Analysis and Linear Models
 # load('ohio2016/output/meanVariance.c.lake.lu.RData') # can run obove, or load data
@@ -36,6 +37,7 @@ source("ohio2016/scriptsAndRmd/convertMaxDepthToMeter.R")  # converts max depth 
 # GBM scripts
 
 # evalGBM.R calls evalGBM() which is sourced from masterLibrary.R
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/defineGbmData.R") # Define local and national for model
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBM.R") # 5 hours per model, careful!
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBMresults.Rmd") # contour plots for evalGBM() generated objects
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalGBMcompare.R") # Effect of nGBM and seed on reproducability
@@ -59,4 +61,13 @@ source("ohio2016/scriptsAndRmd/convertMaxDepthToMeter.R")  # converts max depth 
 # for choosing representative training data.  Does not depend on evalGBM.R
 # source("ohio2016/scriptsAndRmd/dataAnalysisScripts/runGBM.v4.R")
 
-# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalVIPlots.R) # explore variation in relative importance plots across 'replicate' gbm runs
+# Explore variation in relative importance plots across 'replicate' gbm runs.
+# This executes runGBM.v4 and produces 850 gbm models.  Must be run on VM.
+# From these runs we extracted 1 model for each resp ~ cov
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/evalVIPlots.R) 
+
+# Explore final gbm models for each set of observations, response, and 
+# covariates.
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/inspectFinalGbmModels.R") # covariates do not include NHD data
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/inspectFinalGbmModelsNHD.R") # includes NHD covariates
+# source("ohio2016/scriptsAndRmd/dataAnalysisScripts/inspectFinalGbmModelsNHDbest.R") # best models w/NHD covariates

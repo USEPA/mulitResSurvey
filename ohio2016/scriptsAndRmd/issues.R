@@ -1,7 +1,39 @@
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+# DISSOLVED GAS ISSUES
+# Brookville Lake missing smDpth for SU-35, which breaks code for filling in
+# BrPrssr (readSitesEqAreaData.R, line 106), therefore can't calculate dissolved
+# gas concentration.
+
+# Buckhorn Lake missing smDpth for SU-30, which breaks code for filling in
+# BrPrssr (readSitesEqAreaData.R, line 106), therefore can't calculate dissolved
+# gas concentration.
+
+# Waynoka only has DG_Extn for one station (SU-01).  What about other station? 
+# Check on this via ArcMap at AWBERC
+
+# Once these are fixed, add dissolved.ch4_Estimate and dissolved.co2_Estimate
+# to defineRespCov.R
+
+# 2/12/2019
+# Forgot about above details.  I assumed we didn't have these samples and
+# hardcoded a value in grtsMeanVariance.R line 43.  Need to follow up w/above
+
+# 11-19-2018
+# I updated GC file (updated2018-03-15.txt) in read.gc.  This file contains
+# dissolved gas for Acton Aug and Oct.  Need to re-run scripts to incorporate these
+# data into project.
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+
+
+# 2/12/2018
+# line 167 in readNHD.R breaks.  Need to investigate.
+
+
+
+
 
 
 # Need to follow up on 16242.  readGcdata
-
 
 
 # Brookeville chem data:
@@ -14,18 +46,5 @@
 
 # exploratoryPlots.R
 # Revisit how ag land use is aggregrated.
+# Revisit Paul delGorgio's talk and put together list of lake characteristics to consider.
 
-
-# statModel.R
-# How should the summary tool be used for model selection?  Remove all non-significant
-# variables from full model?  Remove highest order interactions first?
-
-# Need assistance in evaluating residual pattern in lme model.  Good enough?  What else can we try?
-
-# Drawbacks of lme model for upscaling?
-
-# How to asses overall p-value for lme model?
-
-# Do we need to aggregate time series data from acton?
-
-# What to do when AIC selects a model with non-significant terms?

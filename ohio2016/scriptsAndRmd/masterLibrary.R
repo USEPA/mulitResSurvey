@@ -3,6 +3,7 @@
 # LIBRARIES---------------
 library(readxl)  # For reading Excel files
 library(gdata)   # Also for reading Excel files
+library(readr)  # read_csv_chunk for large lakeCat .csv files 
 library(ggplot2) # For plotting
 library(gridExtra) # For plotting
 library(scales)  # For plotting
@@ -43,7 +44,7 @@ library(piecewiseSEM) # for rsquared of lme model
 
 # Always load dplyr after plyr and relaimpo!  These packages mask
 # dplyr functions.
-library(plyr)  # for 'join' in ggplot plotting of shapefile
+library(plyr)  # for 'join' in ggplot plotting of shapefile. rbind.fill in evalVIplots.R
 library(dplyr)   # For data manipulation
 
 # Dissolved gas calculation function. Loading function copied from local NEON
@@ -245,7 +246,17 @@ orderLake <- function(x, choice1) {
     orderList <- order(x[, column])
     lakeLevels <- x[orderList, "Lake_Name"]
     factor(x$Lake_Name, levels = lakeLevels)
-  } 
+  } else if (choice1 == "dissolved.ch4_Estimate") {
+    column <- "dissolved.ch4_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
+  } else if (choice1 == "co2.sat.ratio_Estimate") {
+    column <- "co2.sat.ratio_Estimate"
+    orderList <- order(x[, column])
+    lakeLevels <- x[orderList, "Lake_Name"]
+    factor(x$Lake_Name, levels = lakeLevels)
+  }
 }
 
 

@@ -140,12 +140,7 @@ harMerge <- harMerge %>%
                           proportion.of.reservoir.area.shallower.than.xm.contour) # use value from bathymetry
   ) 
 
-# Calculate Derived Quantities
-harMerge <- mutate(harMerge, 
-                  rda = watershed.area.m2 / reservoir.area.m2,
-                  si = res.perimeter.m / (2*sqrt(pi*reservoir.area.m2)),
-                  percent.agg.ag = percent.pasture.hay + 
-                    percent.cultivated.crops)
+
 # FINAL MERGES AND FORMATTING-----------------------
 # Merge watershed/morphology dataframe with emission rate dataframe.
 # harRate contains emission rate data for Keno, but the bathymetry data
@@ -158,9 +153,9 @@ harDat <- left_join(harMerge, harRate)
 # Format for consistency with meanVariance.c.lake.lu
 harDat <- harDat %>%
   rename(mean.depth.m = mean.reservoir.depth..m.,
-    reservoir.volume.m3 = volume.m3.) %>%        
-  mutate(Subpopulation = "Lake",
-         max.depth.ft = max.reservoir.depth..m.*3.28) %>%
+    reservoir.volume.m3 = volume.m3.,
+    max.depth.m = max.reservoir.depth..m.) %>%        
+  mutate(Subpopulation = "Lake") %>%
   select(-percent.perennial.ice.snow,  # omit unneeded columns
          -largeLitWidth, -litSlope, -estLitWidth, -estLitArea,
          -surface.area.less.3m.or.closest, -xm.shallow.contour..m.,
@@ -168,18 +163,17 @@ harDat <- harDat %>%
          -proportion.of.reservoir.area.shallower.than.xm.contour,
          -percent.reservoir.area.shallower.than.xm.contour,
          -reservoir.id, -dam, -dam.former.name, -main.dam, 
-         -reservoir.polygon.yn, -issue.type, -overlap.watershed.yn,
-         -max.reservoir.depth..m.) 
+         -reservoir.polygon.yn, -issue.type, -overlap.watershed.yn) 
   
 
 
 # Merge with meanVariance.c.lake.lu
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 119 columns, 35 rows
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 116 columns, 35 rows
 
 meanVariance.c.lake.lu <- bind_rows(harDat, meanVariance.c.lake.lu) %>%
  as.data.frame() # convert back to df.  tibbleDf causes problems.
 
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 119 columns, 40 rows, good
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 116 columns, 40 rows, good
 
 
 

@@ -4,13 +4,16 @@
 
 ## Acton Lake exists multiple times. Aggregate the entries in a 
 ## reasonable way.
-## See defineRespCov.R for list of variables to be aggregated.
+## Aggregating all variables here.  Pick and choose variables for 
+# modeling in defineRespCov.R
 actonInds <- grepl("Acton", meanVariance.c.lake.lu$Lake_Name)
-actonDat <- meanVariance.c.lake.lu[actonInds,
-                                   c(respList, 
-                                     gsub("Estimate","StdError",respList),
-                                               allCovarActon)
+actonDat <- meanVariance.c.lake.lu[actonInds, # this aggregates all variables
+                                   # c(respList, # use this code if only aggregating select variables.
+                                   #   gsub("Estimate","StdError",respList),
+                                   #             allCovar)
                                    ]
+
+
 outVec <- NULL
 for(i in 1:ncol(actonDat)){
   # i = 8
@@ -26,7 +29,7 @@ for(i in 1:ncol(actonDat)){
     # interested in the variance of the mean of those variables. This is just
     # the sum of the variances * (1 / n)^2
     wt <- 1/(nrow(actonDat) - numNA)
-    aggEst <- sqrt(wt^2 * sum(actonDat[,i]^2))
+    aggEst <- sqrt(wt^2 * sum(actonDat[,i]^2, na.rm = TRUE))
   }
   outVec <- c(outVec, aggEst)
 }
@@ -35,15 +38,16 @@ names(tmp) <- names(actonDat)
 tmp$citation <- "EPA" # Add citation column
 tmp$Lake_Name <- "Acton Lake" # Add Lake_Name
 
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 119 columns, 46 rows
+
+dim(meanVariance.c.lake.lu) # 46 rows, 407 columns
 
 meanVariance.c.lake.lu.agg <- rbind(tmp, 
-                                    meanVariance.c.lake.lu[!actonInds,
-                                                           c(respList, 
-                                                             gsub("Estimate","StdError",respList),
-                                                             allCovarActon, "citation", "Lake_Name")
+                                    meanVariance.c.lake.lu[!actonInds,  # this aggregates all variables
+                                                           # c(respList, # use this code if only aggregating select variables.
+                                                           #   gsub("Estimate","StdError",respList),
+                                                           #   allCovar, "citation", "Lake_Name")
                                                            ])
 
 # Columns restricted to response variables, covariates, and id variables
 # (i.e. citation, Lake_Name)
-ncol(meanVariance.c.lake.lu.agg); nrow(meanVariance.c.lake.lu.agg) # 30 columns, 43 rows
+dim(meanVariance.c.lake.lu.agg) # 43 rows x 407 columns

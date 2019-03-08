@@ -34,16 +34,19 @@ plotColor <- ifelse(grepl(pattern = c("Acton|Harsha"), meanVariance.c.lake.lu$La
 
 # Diffusive CH4  flux
 # Reset plotting order for CH4 diffusion
-meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "ch4.d")
-ggplot(meanVariance.c.lake.lu,
+meanVariance.c.lake.lu.agg$fLake_Name <- orderLake(meanVariance.c.lake.lu.agg, choice1 = "ch4.d")
+ggplot(filter(meanVariance.c.lake.lu.agg, citation == "EPA"),
        aes(ch4.drate.mg.m2.h_Estimate, fLake_Name)) +
-  geom_point(color = plotColor) +
+  geom_point() +
   geom_errorbarh(aes(xmax = ch4.drate.mg.m2.h_UCB95Pct, 
-                     xmin = ch4.drate.mg.m2.h_LCB95Pct), color = plotColor)
+                     xmin = ch4.drate.mg.m2.h_LCB95Pct) #, color = plotColor
+                 ) +
+  xlab(expression(CH[4]~diffusion~(mg~CH[4]~m^{-2}~h^{-1}))) +
+  theme(axis.title.y = element_blank())
 
 ggsave('ohio2016/output/figures/ch4DifDotChart.tiff',  # export as .tif
        units="in",  # specify units for dimensions
-       width=6,   # 1 column
+       width=4,   # 1 column
        height=6, # Whatever works
        dpi=600,   # ES&T. 300-600 at PLOS One,
        compression = "lzw")
@@ -67,25 +70,28 @@ ggsave('ohio2016/output/figures/ch4EbDotChart.tiff',  # export as .tif
 
 # CH4 total rate
 # Reset plotting order for CH4 total
-meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "ch4.t")
-ggplot(meanVariance.c.lake.lu,
+meanVariance.c.lake.lu.agg$fLake_Name <- orderLake(meanVariance.c.lake.lu.agg, choice1 = "ch4.t")
+ggplot(filter(meanVariance.c.lake.lu.agg, citation == "EPA"),
        aes(ch4.trate.mg.h_Estimate, fLake_Name)) +
-  geom_point(color = plotColor) +
+  geom_point() +
   geom_errorbarh(aes(xmax = ch4.trate.mg.h_UCB95Pct, 
-                     xmin = ch4.trate.mg.h_LCB95Pct), 
-                 color = plotColor) +
-  xlab(expression(CH[4]~emission~rate~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
-  theme(axis.title.y = element_blank()) +  # Eliminate x-axis title
- ggtitle("Mean (95% CI) from grts function")
+                     xmin = ch4.trate.mg.h_LCB95Pct) #, color = plotColor) +
+  ) +
+  xlab(expression(total~CH[4]~(mg~ CH[4]~ m^{-2}~ hr^{-1}))) +
+  theme(axis.title.y = element_blank()) # +  # Eliminate x-axis title
+ #ggtitle("Mean (95% CI) from grts function")
 
 ggsave('ohio2016/output/figures/ch4TotDotChart.tiff',  # export as .tif
 units="in",  # specify units for dimensions
-width=6,   # 1 column
+width=4,   # 1 column
 height=6, # Whatever works
 dpi=600,   # ES&T. 300-600 at PLOS One,
 compression = "lzw")
 
 # CH4 dissolved
+# Reset plotting order for CH4 dissolved
+meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, 
+                                               choice1 = "dissolved.ch4_Estimate")
 ggplot(meanVariance.c.lake.lu,
        aes(dissolved.ch4_Estimate, fLake_Name)) +
   geom_point(color = plotColor) +
@@ -95,6 +101,13 @@ ggplot(meanVariance.c.lake.lu,
   xlab(expression(dissolved~CH[4]~(mu*moles~L^{-1}))) +
   theme(axis.title.y = element_blank()) +  # Eliminate x-axis title
   ggtitle("Mean (95% CI) from grts function")
+
+ggsave('ohio2016/output/figures/dissolvedCh4DotChart.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=6,   # 1 column
+       height=6, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
 ##---------------------------------------------------------------------------##
 # CO2 rates
 
@@ -107,6 +120,13 @@ ggplot(meanVariance.c.lake.lu,
   geom_errorbarh(aes(xmax = co2.drate.mg.m2.h_UCB95Pct, 
                      xmin = co2.drate.mg.m2.h_LCB95Pct), color = plotColor)
 
+ggsave('ohio2016/output/figures/co2DifDotChart.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=6,   # 1 column
+       height=6, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
+
 # CO2 ebullition
 # Reset plotting order for CO2 ebullition
 meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "co2.e")
@@ -117,15 +137,32 @@ ggplot(meanVariance.c.lake.lu,
                      xmin = co2.erate.mg.h_LCB95Pct), 
                  color = plotColor)
 
+ggsave('ohio2016/output/figures/co2EbDotChart.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=6,   # 1 column
+       height=6, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
+
 # CO2 total rate
-# Reset plotting order for CO2 ebullition
+# Reset plotting order for CO2 total
 meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "co2.t")
 ggplot(meanVariance.c.lake.lu,
        aes(co2.trate.mg.h_Estimate, fLake_Name)) +
   geom_point(color = plotColor) +
   geom_errorbarh(aes(xmax = co2.trate.mg.h_UCB95Pct, xmin = co2.trate.mg.h_LCB95Pct), color = plotColor)
 
+ggsave('ohio2016/output/figures/co2TotDotChart.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=6,   # 1 column
+       height=6, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
 # CO2 dissolved
+# Reset plotting order for CO2 dissolved
+meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, 
+                                               choice1 = "co2.sat.ratio_Estimate")
+
 ggplot(meanVariance.c.lake.lu,
        aes(co2.sat.ratio_Estimate, fLake_Name)) +
   geom_point(color = plotColor) +
@@ -136,6 +173,12 @@ ggplot(meanVariance.c.lake.lu,
   theme(axis.title.y = element_blank()) +  # Eliminate x-axis title
   ggtitle("Mean (95% CI) from grts function")
 
+ggsave('ohio2016/output/figures/dissolvedCo2DotChart.tiff',  # export as .tif
+       units="in",  # specify units for dimensions
+       width=6,   # 1 column
+       height=6, # Whatever works
+       dpi=600,   # ES&T. 300-600 at PLOS One,
+       compression = "lzw")
 ##---------------------------------------------------------------------------##
 # Chlorophyll
 meanVariance.c.lake.lu$fLake_Name <- orderLake(meanVariance.c.lake.lu, choice1 = "chl")

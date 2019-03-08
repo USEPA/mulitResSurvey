@@ -35,7 +35,7 @@ ohioRes <- mutate(ohioRes,
                   max_contour_ft = as.numeric(gsub(".*-", "", max_contour_ft)), # extract after"-"
                   max_depth_ft = ifelse(is.na(max_depth_ft),
                                         (min_contour_ft + (contour_interval_ft/2)),
-                                        max_depth_ft))
+                                        max_depth_ft)) # converted to m below
 
 
 
@@ -185,18 +185,11 @@ descRes[descRes$Lake_Name == "Buckhorn Lake", "max.depth.ft"] = 50
 descRes[descRes$Lake_Name == "Carr Fork Lake", "max.depth.ft"] = 66
 descRes[descRes$Lake_Name == "Cave Run Lake", "max.depth.ft"] = 70
 
+# Convert max depth to meters.
+descRes <- mutate(descRes,
+                  max.depth.m = max.depth.ft / 3.28) %>%
+  select(-max.depth.ft)
 
-# Calculate Derived Quantities
-descRes <- mutate(descRes, 
-                  rda = watershed.area.m2 / reservoir.area.m2,
-                  si = res.perimeter.m / (2*sqrt(pi*reservoir.area.m2)),
-                  percent.agg.ag = percent.pasture.hay + 
-                    percent.cultivated.crops)
-
-# Could calculate residence time, but don't have flow data for many
-# systems
-# residence.time.yr = (reservoir.volume.m3 * 35.3147)  # convert to ft3
-# / (outflow.cfs*60*60*24*365),
 
 
 # Next, need to deal with 2017 Acton data.  The Lake_Name used for these
@@ -210,8 +203,8 @@ logicalIndicator <- apply(poo, MARGIN = 2, FUN = anyNA) %>% unname() #columns w/
 descRes[grepl(c("July|Aug|Oct"), descRes$Lake_Name), logicalIndicator] = # NA data
   descRes[descRes$Lake_Name == "Acton Lake", logicalIndicator]  # replacement data
 
-# Merge with meanVariance.c
-meanVariance.c.lake.lu <- merge(filter(meanVariance.c, Subpopulation == "lake"), descRes)
+# Merge with meanVariance.c.lake
+meanVariance.c.lake.lu <- merge(meanVariance.c.lake, descRes)
 
 # Add citation column to facilitate merging with literature data
 meanVariance.c.lake.lu$citation = "EPA"

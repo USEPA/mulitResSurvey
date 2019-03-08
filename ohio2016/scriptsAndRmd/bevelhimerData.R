@@ -198,13 +198,6 @@ bevMorph <- bevMorph %>%
   ) 
 
 
-# Calculate derived quantities
-bevMorph <- mutate(bevMorph, 
-                   rda = watershed.area.m2 / surface.area..m2.,
-                   si = res.perimeter.m / (2*sqrt(pi*surface.area..m2.)),
-                   percent.agg.ag = percent.pasture.hay + 
-                     percent.cultivated.crops)
-
 
 
 # FINAL MERGES-------------------
@@ -213,22 +206,23 @@ bevMerge <- Reduce(function(...) merge(..., all=T),
 
 # Format for consistency with meanVariance.c.lake.lu
 bevMerge <- bevMerge %>%
-  rename(reservoir.area.m2 = surface.area..m2.) %>%
+  rename(reservoir.area.m2 = surface.area..m2.,
+         max.depth.m = max.reservoir.depth..m.) %>%
   mutate(Subpopulation = "Lake",
-         citation = "Bevelhimer",
-         max.depth.ft = max.reservoir.depth..m.*3.28) %>% # convert m to ft
+         citation = "Bevelhimer") %>% # convert m to ft
   select(-percent.perennial.ice.snow,  # omit unneeded columns
          -largeLitWidth, -litSlope, -estLitWidth, -estLitArea,
          -surface.area.less.3m.or.closest, -xm.shallow.contour..m.,
          -notes, -source, 
          -proportion.of.reservoir.area.shallower.than.xm.contour,
          -percent.reservoir.area.shallower.than.xm.contour,
-         -state, -max.reservoir.depth..m.) 
+         -state) 
+
 
 # # Merge with meanVariance.c.lake.lu
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 119 columns, 40 rows
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 116 columns, 40 rows
 
 meanVariance.c.lake.lu <- bind_rows(bevMerge, meanVariance.c.lake.lu) %>%
   as.data.frame() # convert back to df.  tibbleDf causes problems.
 
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 119 columns, 46 rows, good
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 116 columns, 46 rows, good
