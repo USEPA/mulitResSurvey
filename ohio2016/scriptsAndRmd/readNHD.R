@@ -131,7 +131,7 @@ dim(sCat)
 # lakeCat data downloaded 12/11/2018.  Contains data for all reservoirs
 # except Carr Cr. which is in streamCat.
 
-# List of .CSV files containing the streamCat data
+# List of .CSV files containing the lakeCat data
 lcFiles <- list.files("ohio2016/inputData/watershedAndMorphology/nhdPlus/lakeCat", 
                       pattern="*.csv$", recursive = TRUE) # $ matches end of string, excludes '...txt.zip' file
 
@@ -150,11 +150,12 @@ for (i in 1:length(lcFiles)) {  # loop to read each file
 }
 
 # Merge files
-sCat <- do.call("cbind", lcList.1)  # Coerces list into dataframe.
+lCat <- do.call("cbind", lcList)  # Coerces list into dataframe.
 # A few fields are redundant across all dataframes (i.e. COMID, CatAreaSqKm,
 # WsAreaSqKm, CatPctFull, WsPctFull) and were retained by the cbind call.
 #  This code identifies and removes these redundant fields.
-lCat <- sCat[, !duplicated(names(sCat))] # eliminate duplicated columns
+lCat <- lCat[, !duplicated(names(lCat))] # eliminate duplicated columns
+
 
 # 276 variables desribing watersheds.
 str(lCat)
@@ -187,11 +188,15 @@ nhd_all <- Reduce(function(...) merge(..., all = TRUE), # 43 rows, 287 columns
   rename_all(function(x) paste0("nhd", x))  %>%
   rename(Lake_Name = nhdLake_Name)  # remove 'nhd' to facilitate merge w/ meanVariance.c.lake.lu
 
+# Use combined fert N and manture N in model.  Create new variable for this
+nhd_all <- mutate(nhd_all,
+                  NWs = nhdManureWs + nhdFertWs)
+
 # Merge w/meanVariance.c.lake.lu
-dim(nhd_all) # 43 286
+dim(nhd_all) # 43 287
 dim(meanVariance.c.lake.lu) # 46 116
 meanVariance.c.lake.lu <- merge(meanVariance.c.lake.lu, nhd_all, all = TRUE)
-dim(meanVariance.c.lake.lu) # 46 401, good!
+dim(meanVariance.c.lake.lu) # 46 402, good!
 
 
 # Next, need to deal with 2017 Acton data.  The Lake_Name used for these

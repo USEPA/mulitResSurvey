@@ -49,6 +49,7 @@ natObsNatPred <-{select(meanVariance.c.lake.lu.agg,
                         nhdPctAg2006Slp10Ws, # ag on high slopes
                         nhdFertWs, # synthetic N fertilizer (kg N/ha/yr)
                         nhdManureWs, # manure application (kg N/ha/yr)
+                        nhdNWs, # sume of Fert and Manure (kg N/ha/yr)
                         
                         # National soils
                         # Kffactor: relative index of susceptibility of bare, cultivated soil to particle detachment and transport by rainfall.
@@ -87,9 +88,10 @@ write.table(round(natObsNatPredCor, 2), # conditional formatting in Excel to hig
 # circ ~ Tmean 0.66
 # rda ~ watershed.area 0.64
 
-# percent.agg ~ Fert 0.97
-# percent.agg ~ AgKffact 0.99
-# percent.agg ~ Runoff 0.61
+# percent.ag ~ Fert 0.97
+# percent.ag ~ N 0.93 where N is Fert + manure
+# percent.ag ~ AgKffact 0.99
+# percent.ag ~ Runoff 0.61
 
 # pctAgSlp20 ~ pctAgSlp10 0.87
 
@@ -155,6 +157,7 @@ localObsNatPred <-{filter(meanVariance.c.lake.lu.agg,
            nhdPctAg2006Slp10Ws, # ag on high slopes
            nhdFertWs, # synthetic N fertilizer (kg N/ha/yr)
            nhdManureWs, # manure application (kg N/ha/yr)
+           nhdNWs, # sume of Fert and Manure (kg N/ha/yr)
            
            # National soils
            # Kffactor: relative index of susceptibility of bare, cultivated soil to particle detachment and transport by rainfall.
@@ -197,8 +200,9 @@ write.table(round(localObsNatPredCor, 2), # conditional formatting in Excel to h
 
 # rda ~ watershed.area 0.72
 
-# percent.agg ~ Fert 0.96
-# percent.agg ~ AgKffact 0.99  # eliminate AgKffact
+# percent.ag ~ Fert 0.96
+# percent.ag ~ N 0.97 where N is Fert + manure
+# percent.ag ~ AgKffact 0.99  # eliminate AgKffact
 
 # pctAgSlp20 ~ pctAgSlp10 0.84 # eliminate AgSlp20
 # pctAgSlp20 ~ OmWs -0.6 Soil Organic matter values # eliminate AgSlp20
@@ -264,6 +268,7 @@ localObsAllPred <-{filter(meanVariance.c.lake.lu.agg,
       nhdPctAg2006Slp10Ws, # ag on high slopes
       nhdFertWs, # synthetic N fertilizer (kg N/ha/yr)
       nhdManureWs, # manure application (kg N/ha/yr)
+      nhdNWs, # sum of Fert and Manure (kg N/ha/yr)
       
       # National soils
       # Kffactor: relative index of susceptibility of bare, cultivated soil to particle detachment and transport by rainfall.
@@ -316,8 +321,9 @@ write.table(round(localObsAllPredCor, 2), # conditional formatting in Excel to h
 
 # rda ~ watershed.area 0.72
 
-# percent.agg ~ Fert 0.96
-# percent.agg ~ AgKffact 0.99
+# percent.ag ~ Fert 0.96
+# percent.ag ~ N 0.97 where N is Fert + Manure
+# percent.ag ~ AgKffact 0.99
 
 # pctAgSlp20 ~ pctAgSlp10 0.84
 # pctAgSlp20 ~ OmWs -0.6 Soil Organic matter values

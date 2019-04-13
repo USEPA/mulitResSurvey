@@ -30,7 +30,8 @@ allCovar <- c(
   # "res.fetch.m" correlates with area and perimeter (0.85, 0.65)
   # "res.perimeter.m" correlates with area, circ, and watershed area (.87, -0.85,.62)
   "max.depth.m", "depth.ratio", "dynamic.ratio", "prop.less.3m",
-  "reservoir.area.m2", "circ",  
+  "reservoir.area.m2", 
+  # "circ", correlates w/ size and gives a strange result  
   "rda", 
   
   # National watershed
@@ -39,7 +40,8 @@ allCovar <- c(
   "percent.agg.ag",  # From Pegasus/Dynamac/UC
   "nhdPctAg2006Slp10Ws", # ag on high slopes
   # "nhdFertWs", # synthetic N fertilizer (kg N/ha/yr) 0.96 correlation w/%ag
-  "nhdManureWs", # manure application (kg N/ha/yr)
+  # "nhdManureWs", # manure application (kg N/ha/yr), gives strange result
+  # nhdNWs, # correlates with %N >=0.93 where N is Fert + Manure
   "nhdRunoffWs", # mean runoff (mm)
   
   # Kffactor: relative index of susceptibility of bare, cultivated soil to particle detachment and transport by rainfall.
@@ -65,7 +67,8 @@ nationalCovar <- c(
   # "res.fetch.m" correlates with area and perimeter (0.85, 0.65)
   # "res.perimeter.m" correlates with area, circ, and watershed area (.87, -0.85,.62)
   "max.depth.m", "depth.ratio", "dynamic.ratio", "prop.less.3m",
-  "reservoir.area.m2", "circ",  
+  "reservoir.area.m2", 
+  # "circ", correlates w/ size, gives weird result  
   "rda", 
   
   # National watershed
@@ -74,7 +77,8 @@ nationalCovar <- c(
   "percent.agg.ag",  # From Pegasus/Dynamac/UC
   "nhdPctAg2006Slp10Ws", # ag on high slopes
   # "nhdFertWs", # synthetic N fertilizer (kg N/ha/yr) 0.96 correlation w/%ag
-  "nhdManureWs", # manure application (kg N/ha/yr)
+  # "nhdManureWs", # manure application (kg N/ha/yr), gives strange result
+  # nhdNWs, # correlates with %N >=0.93 where N is Fert + Manure
   "nhdRunoffWs", # mean runoff (mm)
   
   # Kffactor: relative index of susceptibility of bare, cultivated soil to particle detachment and transport by rainfall.
@@ -85,7 +89,7 @@ nationalCovar <- c(
   "nhdOmWs" # Mean organic matter content (% by weight) of soils 
 )
 
-
+# DATA--------
 
 natDataGbm <- meanVariance.c.lake.lu.agg
 

@@ -50,4 +50,4 @@ meanVariance.c.lake.lu.agg <- rbind(tmp,
 
 # Columns restricted to response variables, covariates, and id variables
 # (i.e. citation, Lake_Name)
-dim(meanVariance.c.lake.lu.agg) # 43 rows x 407 columns
+dim(meanVariance.c.lake.lu.agg) # 43 rows x 408 columns
