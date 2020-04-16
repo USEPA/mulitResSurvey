@@ -354,4 +354,10 @@ eqAreaData <- mutate(eqAreaData,
                                              ch4.drate.mg.h.best +ch4.erate.mg.h))
 
 
-
+# CO2 EQUIVALENTS------------------
+source("ohio2016/scriptsAndRmd/co2Equiv.R")
+eqAreaData <- mutate(eqAreaData,
+                     ch4Co2eq = co2Equiv(eqAreaData$ch4.trate.mg.h, 
+                                      choice1 = "CH4"),
+                  co2Co2eq = eqAreaData$co2.trate.mg.h,
+                  totCo2eq = ch4Co2eq + co2Co2eq)

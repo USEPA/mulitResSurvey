@@ -241,6 +241,7 @@ localObsAllPred <-{filter(meanVariance.c.lake.lu.agg,
       chla_Estimate, 
       tp_Estimate, 
       tn_Estimate,
+      toc_Estimate,
       dissolved.ch4_Estimate,
       dissolved.co2_Estimate,
       

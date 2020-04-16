@@ -8,7 +8,7 @@ for (i in 1:length(unique(eqAreaData$Lake_Name))) {
   lake.i <- unique(eqAreaData$Lake_Name)[i]
   data.i <- filter(eqAreaData, Lake_Name == lake.i)
   
-  myMeanVarianceList[[i]] <- grtsMeanVariance(data.i)  # this function is sourced from masterLibrary.R
+  myMeanVarianceList[[i]] <- grtsMeanVariance(data.i, choice1 = "Local")  # this function is sourced from masterLibrary.R
   myMeanVarianceList[[i]]$Pct$Lake_Name = lake.i  # add lake name to dataframe!
 }
 
@@ -49,7 +49,7 @@ meanVariance.c.lake <- filter(meanVariance.c, Subpopulation == "lake")
 dgData <- filter(eqAreaData,  # Measurement made at each site.
                  grepl("Brook|Buckhorn|Waynoka", Lake_Name),
                  !is.na(dissolved.ch4)) %>%
-  select(Lake_Name, dissolved.ch4, dissolved.co2)
+  select(Lake_Name, dissolved.ch4, dissolved.co2, ch4.sat.ratio, co2.sat.ratio)
 
 meanVariance.c.lake  <- meanVariance.c.lake %>%
   mutate(dissolved.ch4_Estimate = ifelse(Lake_Name == "Lake Waynoka", # update CH4 for 3 lakes
@@ -65,4 +65,80 @@ meanVariance.c.lake  <- meanVariance.c.lake %>%
                                                 dgData[dgData$Lake_Name == "Buckhorn Lake", "dissolved.co2"],
                                                 ifelse(Lake_Name == "Brookville Lake",
                                                        dgData[dgData$Lake_Name == "Brookville Lake", "dissolved.co2"],
-                                                       dissolved.co2_Estimate))))
+                                                       dissolved.co2_Estimate))),
+         ch4.sat.ratio_Estimate = ifelse(Lake_Name == "Lake Waynoka", # update ch4 saturation for 3 lakes
+                                         dgData[dgData$Lake_Name == "Lake Waynoka", "ch4.sat.ratio"],
+                                         ifelse(Lake_Name == "Buckhorn Lake",
+                                                dgData[dgData$Lake_Name == "Buckhorn Lake", "ch4.sat.ratio"],
+                                                ifelse(Lake_Name == "Brookville Lake",
+                                                       dgData[dgData$Lake_Name == "Brookville Lake", "ch4.sat.ratio"],
+                                                       ch4.sat.ratio_Estimate))),
+         co2.sat.ratio_Estimate = ifelse(Lake_Name == "Lake Waynoka", # update co2 saturation for 3 lakes
+                                         dgData[dgData$Lake_Name == "Lake Waynoka", "co2.sat.ratio"],
+                                         ifelse(Lake_Name == "Buckhorn Lake",
+                                                dgData[dgData$Lake_Name == "Buckhorn Lake", "co2.sat.ratio"],
+                                                ifelse(Lake_Name == "Brookville Lake",
+                                                       dgData[dgData$Lake_Name == "Brookville Lake", "co2.sat.ratio"],
+                                                       co2.sat.ratio_Estimate))))
+
+
+
+# In Brookville Lake we only have TOC  from one site.  Sample from the other 
+# site was somehow lost.  The function above reports NA for this lake, which 
+# breaks the gbm.  Substitute NA values with the measured value from the one 
+# site.
+
+tocData <- filter(eqAreaData,  # Measurement made at each site.
+                 grepl("Brook", Lake_Name),
+                 !is.na(TOC)) %>%
+  select(Lake_Name, TOC)
+
+meanVariance.c.lake  <- meanVariance.c.lake %>%
+  mutate(toc_Estimate = ifelse(Lake_Name == "Brookville Lake", # update TOC for Brookeville
+                                         tocData[tocData$Lake_Name == "Brookville Lake", "TOC"],
+                                         toc_Estimate))
+
+
+
+
+# Repeat a portion of above, but with choice1 = "SRS".  This calculates variance using simple random
+# sampling, rather than 'local' variance option.
+
+# Loop to apply grtsMeanVariance function to each lake.
+myMeanVarianceListSRS <- list() # empty list to catch mean and variance
+
+for (i in 1:length(unique(eqAreaData$Lake_Name))) {
+  lake.i <- unique(eqAreaData$Lake_Name)[i]
+  data.i <- filter(eqAreaData, Lake_Name == lake.i)
+  
+  myMeanVarianceListSRS[[i]] <- grtsMeanVariance(data.i, choice1 = "SRS")  # this function is sourced from masterLibrary.R
+  myMeanVarianceListSRS[[i]]$Pct$Lake_Name = lake.i  # add lake name to dataframe!
+}
+
+
+# Extract portion of interest from list components  
+myMeanVarianceListSRS <- lapply(myMeanVarianceListSRS, function(x) {  # apply function to each list element
+  filter(x$Pct, Statistic == "Mean") %>%  # Pct is the portion we want
+    select(Lake_Name, Subpopulation, Indicator, Estimate, LCB95Pct, UCB95Pct, StdError) %>%
+    mutate(StdError = as.numeric(StdError)) # Comes out as a char of class "Asis"?
+})
+
+
+# Coerce to df, format
+meanVarianceSRS <- do.call("rbind", myMeanVarianceListSRS)  # coerce to df
+meanVarianceSRS[ , c("Subpopulation", "Indicator")] = apply(meanVarianceSRS[ , c("Subpopulation", "Indicator")], MARGIN = 2, FUN = as.character)
+
+
+# Melt/dcast for plotting
+meanVarianceSRS.m <- reshape2::melt(meanVarianceSRS)  # specify package.  reshape and reshape2 loaded
+meanVarianceSRS.c <- dcast(meanVarianceSRS.m, formula = Lake_Name + Subpopulation ~ Indicator + variable) # cast
+
+# Add sample date to meanVarianceSRS.c
+sample.dates <- select(eqAreaData, Lake_Name, deplyDt) %>% 
+  distinct(Lake_Name, deplyDt) %>% 
+  filter(!is.na(deplyDt))
+meanVarianceSRS.c <- merge(meanVarianceSRS.c, sample.dates)
+
+
+# Extract 'lake' scale data
+meanVarianceSRS.c.lake <- filter(meanVarianceSRS.c, Subpopulation == "lake")

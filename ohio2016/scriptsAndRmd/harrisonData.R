@@ -168,12 +168,12 @@ harDat <- harDat %>%
 
 
 # Merge with meanVariance.c.lake.lu
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 116 columns, 35 rows
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 128 columns, 35 rows
 
 meanVariance.c.lake.lu <- bind_rows(harDat, meanVariance.c.lake.lu) %>%
  as.data.frame() # convert back to df.  tibbleDf causes problems.
 
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 116 columns, 40 rows, good
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 128 columns, 40 rows, good
 
 
 

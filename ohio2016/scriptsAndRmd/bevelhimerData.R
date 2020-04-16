@@ -220,9 +220,9 @@ bevMerge <- bevMerge %>%
 
 
 # # Merge with meanVariance.c.lake.lu
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 116 columns, 40 rows
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 128 columns, 40 rows
 
 meanVariance.c.lake.lu <- bind_rows(bevMerge, meanVariance.c.lake.lu) %>%
   as.data.frame() # convert back to df.  tibbleDf causes problems.
 
-ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 116 columns, 46 rows, good
+ncol(meanVariance.c.lake.lu); nrow(meanVariance.c.lake.lu) # 128 columns, 46 rows, good

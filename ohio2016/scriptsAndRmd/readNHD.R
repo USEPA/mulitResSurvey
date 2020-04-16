@@ -193,10 +193,10 @@ nhd_all <- mutate(nhd_all,
                   NWs = nhdManureWs + nhdFertWs)
 
 # Merge w/meanVariance.c.lake.lu
-dim(nhd_all) # 43 287
-dim(meanVariance.c.lake.lu) # 46 116
+dim(nhd_all) # 43 286
+dim(meanVariance.c.lake.lu) # 46 128
 meanVariance.c.lake.lu <- merge(meanVariance.c.lake.lu, nhd_all, all = TRUE)
-dim(meanVariance.c.lake.lu) # 46 402, good!
+dim(meanVariance.c.lake.lu) # 46 413, good!
 
 
 # Next, need to deal with 2017 Acton data.  The Lake_Name used for these

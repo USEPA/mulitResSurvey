@@ -39,7 +39,7 @@ tmp$citation <- "EPA" # Add citation column
 tmp$Lake_Name <- "Acton Lake" # Add Lake_Name
 
 
-dim(meanVariance.c.lake.lu) # 46 rows, 407 columns
+dim(meanVariance.c.lake.lu) # 46 rows, 419 columns
 
 meanVariance.c.lake.lu.agg <- rbind(tmp, 
                                     meanVariance.c.lake.lu[!actonInds,  # this aggregates all variables
@@ -50,4 +50,4 @@ meanVariance.c.lake.lu.agg <- rbind(tmp,
 
 # Columns restricted to response variables, covariates, and id variables
 # (i.e. citation, Lake_Name)
-dim(meanVariance.c.lake.lu.agg) # 43 rows x 408 columns
+dim(meanVariance.c.lake.lu.agg) # 43 rows x 419 columns

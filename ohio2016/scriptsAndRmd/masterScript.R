@@ -26,7 +26,7 @@ source("ohio2016/scriptsAndRmd/bevelhimerData.R")  # merges Bevelhimer data w/ m
 source("ohio2016/scriptsAndRmd/readNHD.R") # read NHD data (i.e lakeMorpho, lakeCat, streamCat)
 source("ohio2016/scriptsAndRmd/calculateMorpho.R")  # calculates derived quantities
 source("ohio2016/scriptsAndRmd/aggregateActon.R")  # Aggregate Acton reps.  meanVariance.c.lake.lu.agg
-source("ohio2016/scriptsAndRmd/defineRespCov.R") # response and covarlists for gbm
+source("ohio2016/scriptsAndRmd/defineRespCov.R") # OneDrive, for now.  response and covarlists for gbm
 
 # Exploratory Data Analysis and Linear Models
 # load('ohio2016/output/meanVariance.c.lake.lu.RData') # can run obove, or load data

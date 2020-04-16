@@ -10,6 +10,7 @@ library(scales)  # For plotting
 library(rgl) # For plotting interactive response surface in 3d
 #library(persp3D) # Not compable with R 3.3.0
 library(scatterplot3d)  # for plotting
+library(cowplot) # multiple graphs in grid
 library(reshape) # For merge_recurse function
 library(reshape2) # For melt/dcast
 library(tidyr)  # for separate
@@ -24,9 +25,11 @@ library(rgdal)   # For reading shapefiles
 library(spsurvey)  # survey design
 library(maptools) # for ggplot plotting of shapefile (fortify function)
 library(minpack.lm) # for non linear diffusion model
-
+library(DescTools) # %overlap% for trib vs OW
 library(plot3D)
 library(plot3Drgl)   
+library(micromap) # fortify polygons (siteMap.R)
+library(ggspatial) # plotting polyline (siteMap.R).  Not using, incompatible with packrat ggplot2 version
 
 # car for variance inflation factor (vif)
 # http://www.statmethods.net/stats/rdiagnostics.html)
@@ -62,7 +65,8 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
 # GRTS ANALYSIS FUNCTION------------------
 # Analyze continuous variable from grts survey design.
-grtsMeanVariance <- function(x) {
+grtsMeanVariance <- function(x, choice1) {
+  # choice1 = "Local" or "SRS".  used for vartype in cont.analysis
   
   # FIRST, DEFINE FRAMESIZE.  DEPENDS ON WHETHER STRATIFIED OR NOT.
   if(length(unique(x$stratum)) == 1) {  # if unstratified
@@ -122,6 +126,7 @@ grtsMeanVariance <- function(x) {
                           tn = x$TN,
                           tnh4 = x$TNH4,
                           tno2 = x$TNO2,
+                          toc = x$TOC,
                           trap_ch4.ppm = x$trap_ch4.ppm,
                           #tno2-3 = x$TNO-3, # this breaks code.  need to remove dash
                           dissolved.ch4 = x$dissolved.ch4,
@@ -136,19 +141,23 @@ grtsMeanVariance <- function(x) {
                           co2.erate.mg.h = x$co2.erate.mg.h,
                           n2o.erate.mg.h = x$n2o.erate.mg.h,
                           co2.trate.mg.h = x$co2.trate.mg.h,
-                          ch4.trate.mg.h = x$ch4.trate.mg.h)
+                          ch4.trate.mg.h = x$ch4.trate.mg.h,
+                          ch4.co2.eq.mg.h = x$ch4Co2eq,
+                          tot.Co2eq.mg.h = x$totCo2eq)
   
   
   # CALCULATE CDF ESTIMATES
   if(length(unique(x$stratum)) == 1) {  # if unstratified
     cdf.final <- cont.analysis(sites, subpop, design, data.cont,
-                               popsize=list(lake=sum(framesize)))
+                               popsize=list(lake=sum(framesize)),
+                               vartype = choice1)
   }
   
   if(length(unique(x$stratum)) > 1) {  # if stratified
     cdf.final <- cont.analysis(sites, subpop, design, data.cont,
                                popsize=list(lake=sum(framesize),
-                                            stratum=as.list(framesize)))
+                                            stratum=as.list(framesize)),
+                               vartype = choice1)
   }
   cdf.final
 }
